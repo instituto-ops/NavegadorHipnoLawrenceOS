@@ -1,4 +1,5 @@
 import os
+import sys
 import shlex
 import asyncio
 from fastapi import WebSocket
@@ -55,6 +56,12 @@ async def run_jules_command(request: JulesRequest, websocket: WebSocket):
     jules_api_key = os.getenv("JULES_API_KEY")
     if jules_api_key:
         env["JULES_API_KEY"] = jules_api_key
+
+    # Use local jules.py for 'jules' commands
+    if args[0] == "jules":
+        # Get absolute path to jules.py
+        jules_script = os.path.join(os.path.dirname(__file__), "jules.py")
+        args = [sys.executable, jules_script] + args[1:]
 
     # We use asyncio.create_subprocess_exec to avoid shell injection vulnerabilities
     try:
