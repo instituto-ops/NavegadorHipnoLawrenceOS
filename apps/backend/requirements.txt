@@ -8,3 +8,6 @@ playwright
 python-dotenv
 langgraph
 pydantic
+ruff
+mypy
+pre-commit

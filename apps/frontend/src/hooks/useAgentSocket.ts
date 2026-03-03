@@ -33,19 +33,19 @@ export function useAgentSocket(url: string) {
         } else if (data.type === 'done') {
           setIsRunning(false);
         } else if (data.type === 'error' && data.message) {
-           setLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
-           setIsRunning(false);
+          setLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
+          setIsRunning(false);
         } else if (data.type === 'jules_output' && data.message) {
-           setJulesLogs((prev) => [...prev, data.message!]);
+          setJulesLogs((prev) => [...prev, data.message!]);
         } else if (data.type === 'jules_error' && data.message) {
-           setJulesLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
-           setIsJulesRunning(false);
+          setJulesLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
+          setIsJulesRunning(false);
         } else if (data.type === 'jules_done') {
-           setJulesLogs((prev) => [...prev, `[PROCESS EXITED WITH CODE ${data.exit_code}]`]);
-           setIsJulesRunning(false);
+          setJulesLogs((prev) => [...prev, `[PROCESS EXITED WITH CODE ${data.exit_code}]`]);
+          setIsJulesRunning(false);
         }
       } catch (e) {
-        console.error("Failed to parse websocket message", e);
+        console.error('Failed to parse websocket message', e);
       }
     };
 
@@ -62,21 +62,27 @@ export function useAgentSocket(url: string) {
     };
   }, [url]);
 
-  const sendTask = useCallback((task: string) => {
-    if (ws.current && isConnected) {
-      setLogs([]);
-      setScreenshot(null);
-      setIsRunning(true);
-      ws.current.send(JSON.stringify({ type: 'lam', task }));
-    }
-  }, [isConnected]);
+  const sendTask = useCallback(
+    (task: string) => {
+      if (ws.current && isConnected) {
+        setLogs([]);
+        setScreenshot(null);
+        setIsRunning(true);
+        ws.current.send(JSON.stringify({ type: 'lam', task }));
+      }
+    },
+    [isConnected],
+  );
 
-  const sendJulesCommand = useCallback((command: string) => {
-     if (ws.current && isConnected) {
+  const sendJulesCommand = useCallback(
+    (command: string) => {
+      if (ws.current && isConnected) {
         setIsJulesRunning(true);
         ws.current.send(JSON.stringify({ type: 'jules', command }));
-     }
-  }, [isConnected]);
+      }
+    },
+    [isConnected],
+  );
 
   const sendPanicStop = useCallback(() => {
     if (ws.current && isConnected) {
@@ -93,6 +99,6 @@ export function useAgentSocket(url: string) {
     isJulesRunning,
     sendTask,
     sendJulesCommand,
-    sendPanicStop
+    sendPanicStop,
   };
 }

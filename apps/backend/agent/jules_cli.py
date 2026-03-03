@@ -1,7 +1,6 @@
-import subprocess
 import os
-import shlex
 import asyncio
+import shlex
 from fastapi import WebSocket
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -18,7 +17,6 @@ class JulesResponse(BaseModel):
 
 async def run_jules_command(request: JulesRequest, websocket: WebSocket):
     command = request.command
-
     # Security: basic validation
     if not command.startswith("jules"):
         await websocket.send_json(JulesResponse(type="jules_error", message="Error: Command must start with 'jules'").model_dump())
@@ -48,7 +46,7 @@ async def run_jules_command(request: JulesRequest, websocket: WebSocket):
             *args,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            env=env
+            env=env,
         )
 
         async def read_stream(stream: asyncio.StreamReader, ws: WebSocket, stream_type: str):

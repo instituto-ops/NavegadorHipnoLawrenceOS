@@ -34,62 +34,62 @@ O fluxo de execução é dividido em quatro módulos fundamentais que operam em 
 
 ### **orchestrator.py (O Cérebro Stateful)**
 
-* **Função:** É o gerente do Grafo de Estado (LangGraph). Ele mantém a memória persistente da sessão e rastreia o progresso das tarefas.  
+* **Função:** É o gerente do Grafo de Estado (LangGraph). Ele mantém a memória persistente da sessão e rastreia o progresso das tarefas.
 * **Human-in-the-Loop (HITL):** O orquestrador é o responsável por pausar a execução do LAM sempre que o agente propõe uma ação sensível (ex: submeter um formulário de orçamento no Google Ads, publicar um post no WordPress ou responder a uma avaliação no Doctoralia). Ele devolve o estado para o Frontend IA-Híbrida, exigindo aprovação manual do usuário.
 
 ### **planner.py (Cognitive Planner)**
 
-* **Função:** Implementa nosso protocolo de **Intention Intelligence**. Quando o usuário digita no chat: *"Ajuste minha campanha no Ads para focar em TEA Adulto"*, o Planner desambígua essa intenção e a quebra em um plano de ação atômico (ex: \[NAVEGAR\], \[LER\_TELA\], \[CLICAR\_BOTAO\], \[PREENCHER\_TEXTO\]).  
+* **Função:** Implementa nosso protocolo de **Intention Intelligence**. Quando o usuário digita no chat: *"Ajuste minha campanha no Ads para focar em TEA Adulto"*, o Planner desambígua essa intenção e a quebra em um plano de ação atômico (ex: \[NAVEGAR\], \[LER\_TELA\], \[CLICAR\_BOTAO\], \[PREENCHER\_TEXTO\]).
 * **Mecânica:** Ele não toca no navegador. Apenas mapeia o "O Quê" e o "Como" a nível lógico, baseando-se no contexto injetado pela camada de dados do sistema.
 
 ### **executor.py (Logic Executor & Web Driver)**
 
-* **Função:** Onde a mágica do browser-use e Playwright acontece\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]\[[2](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFtmCftewIYTpGIwu79pJYKS3hBx1IzUvTBfJYkQSX6RXJXgukiR38qCyTh-Rs1UfOIB-9jWgQi5ncupcJHPSNZCMSbtYlGHsl5AzCJu3C6U-ONsR8M9TWZ4z8l5b_TMUo6UPDLOAZJIUN3VKv910drWPTiZe5RcxO7Kguk2XMuOAKA95WLh6Lx4XKr8e8VtRKQLlE4--tHj4LjGQefJNqUgQ4E_yy2BjNTwKwECpTrx3KNcYpu)\]. Ele recebe o plano e o traduz em ações de navegador em tempo real\[[3](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGIQvENe72sZJgAIPeJQRgI94tLe0GoxZ9yVqyxkIe3uD7v2tYBgV_ctiyj6dS7C3fmDFvq7F42J5AXa9F_jwWqEZjM1ChbXtQCGOLoE8XN5A8-XAlBzvJpL_lLUv2fzeLvS-1GUKONh-AFC36fzA90SXxmcOvRSgiO-Aw=)\].  
+* **Função:** Onde a mágica do browser-use e Playwright acontece\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]\[[2](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFtmCftewIYTpGIwu79pJYKS3hBx1IzUvTBfJYkQSX6RXJXgukiR38qCyTh-Rs1UfOIB-9jWgQi5ncupcJHPSNZCMSbtYlGHsl5AzCJu3C6U-ONsR8M9TWZ4z8l5b_TMUo6UPDLOAZJIUN3VKv910drWPTiZe5RcxO7Kguk2XMuOAKA95WLh6Lx4XKr8e8VtRKQLlE4--tHj4LjGQefJNqUgQ4E_yy2BjNTwKwECpTrx3KNcYpu)\]. Ele recebe o plano e o traduz em ações de navegador em tempo real\[[3](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGIQvENe72sZJgAIPeJQRgI94tLe0GoxZ9yVqyxkIe3uD7v2tYBgV_ctiyj6dS7C3fmDFvq7F42J5AXa9F_jwWqEZjM1ChbXtQCGOLoE8XN5A8-XAlBzvJpL_lLUv2fzeLvS-1GUKONh-AFC36fzA90SXxmcOvRSgiO-Aw=)\].
 * **Visão e Ação:** Extrai a árvore do DOM simplificada e tira *screenshots* (se necessário) para alimentar o LLM local\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]\[[2](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFtmCftewIYTpGIwu79pJYKS3hBx1IzUvTBfJYkQSX6RXJXgukiR38qCyTh-Rs1UfOIB-9jWgQi5ncupcJHPSNZCMSbtYlGHsl5AzCJu3C6U-ONsR8M9TWZ4z8l5b_TMUo6UPDLOAZJIUN3VKv910drWPTiZe5RcxO7Kguk2XMuOAKA95WLh6Lx4XKr8e8VtRKQLlE4--tHj4LjGQefJNqUgQ4E_yy2BjNTwKwECpTrx3KNcYpu)\]\[[3](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGIQvENe72sZJgAIPeJQRgI94tLe0GoxZ9yVqyxkIe3uD7v2tYBgV_ctiyj6dS7C3fmDFvq7F42J5AXa9F_jwWqEZjM1ChbXtQCGOLoE8XN5A8-XAlBzvJpL_lLUv2fzeLvS-1GUKONh-AFC36fzA90SXxmcOvRSgiO-Aw=)\]. O LLM avalia a tela ("*Onde está o botão de login?*") e o Executor realiza a injeção do evento (clique, digitação) simulando latência orgânica humana\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]\[[2](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFtmCftewIYTpGIwu79pJYKS3hBx1IzUvTBfJYkQSX6RXJXgukiR38qCyTh-Rs1UfOIB-9jWgQi5ncupcJHPSNZCMSbtYlGHsl5AzCJu3C6U-ONsR8M9TWZ4z8l5b_TMUo6UPDLOAZJIUN3VKv910drWPTiZe5RcxO7Kguk2XMuOAKA95WLh6Lx4XKr8e8VtRKQLlE4--tHj4LjGQefJNqUgQ4E_yy2BjNTwKwECpTrx3KNcYpu)\]\[[3](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGIQvENe72sZJgAIPeJQRgI94tLe0GoxZ9yVqyxkIe3uD7v2tYBgV_ctiyj6dS7C3fmDFvq7F42J5AXa9F_jwWqEZjM1ChbXtQCGOLoE8XN5A8-XAlBzvJpL_lLUv2fzeLvS-1GUKONh-AFC36fzA90SXxmcOvRSgiO-Aw=)\].
 
 ### **summarizer.py (Semantic Summarizer)**
 
-* **Função:** Atua após a execução de uma etapa ou extração de dados (Scraping).  
+* **Função:** Atua após a execução de uma etapa ou extração de dados (Scraping).
 * **Normalização:** Tudo o que o Executor coleta na web crua passa pelo Summarizer, que invoca o modelo canônico IntelligenceSource. Os dados desestruturados são então padronizados e transformados nos **NeuroInsights** (Priority, Risk, Opportunity, Trend) que o Frontend exibirá ao Dr. Victor Lawrence.
 
 ---
 
 ## **3\. Diagrama do Fluxo de Dados (Stateful Graph)**
 
-code Mermaid  
-downloadcontent\_copy  
-expand\_less  
-sequenceDiagram  
-    participant User as Frontend (Chat)  
-    participant Orch as orchestrator.py (LangGraph)  
-    participant Plan as planner.py (Cognitive Planner)  
-    participant Exec as executor.py (browser-use/Playwright)  
-    participant Sum as summarizer.py (NeuroEngine)  
+code Mermaid
+downloadcontent\_copy
+expand\_less
+sequenceDiagram
+    participant User as Frontend (Chat)
+    participant Orch as orchestrator.py (LangGraph)
+    participant Plan as planner.py (Cognitive Planner)
+    participant Exec as executor.py (browser-use/Playwright)
+    participant Sum as summarizer.py (NeuroEngine)
     participant Web as Target Web (Doctoralia/Ads)
 
-    User-\>\>Orch: "Analise o perfil de concorrentes no Doctoralia"  
-    Orch-\>\>Plan: Solicita Plano de Ação (Intention Intelligence)  
-    Plan--\>\>Orch: Plano Estruturado (Acessar, Pesquisar, Extrair)  
-      
-    loop Execução LAM  
-        Orch-\>\>Exec: Executar Passo 1  
-        Exec-\>\>Web: Playwright Navega (Stealth)  
-        Web--\>\>Exec: Retorna DOM Snapshot & Visão  
-        Exec--\>\>Orch: Passo Concluído (Dados Extraídos Brutos)  
+    User-\>\>Orch: "Analise o perfil de concorrentes no Doctoralia"
+    Orch-\>\>Plan: Solicita Plano de Ação (Intention Intelligence)
+    Plan--\>\>Orch: Plano Estruturado (Acessar, Pesquisar, Extrair)
+
+    loop Execução LAM
+        Orch-\>\>Exec: Executar Passo 1
+        Exec-\>\>Web: Playwright Navega (Stealth)
+        Web--\>\>Exec: Retorna DOM Snapshot & Visão
+        Exec--\>\>Orch: Passo Concluído (Dados Extraídos Brutos)
     end
 
-    Orch-\>\>Sum: Envia dados brutos extraídos  
-    Sum--\>\>Orch: Retorna NeuroInsights (IntelligenceSource)  
-    Orch-\>\>User: Exibe Insights Acionáveis no Frontend Híbrido  
+    Orch-\>\>Sum: Envia dados brutos extraídos
+    Sum--\>\>Orch: Retorna NeuroInsights (IntelligenceSource)
+    Orch-\>\>User: Exibe Insights Acionáveis no Frontend Híbrido
 ---
 
 ## **4\. Por que essa arquitetura foi escolhida? (Decisões de Design)**
 
-1. **Computação Furtiva e Ética (Organic Automation):**  
-   Ao invés de usar requests ou BeautifulSoup que bloqueiam rapidamente e disparam firewalls (Cloudflare/CAPTCHAs), o uso de **browser-use com Playwright** permite que o NeuroStrategy OS se comporte exatamente como um humano\[[4](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFVLccwpwg5s6OlLQiE2xJuNLIZRI8gP-9vNHBuM7xRnO8XUQwxczr9oiDT7r1TQpfzXZhA_mKvWAIEXveQWcnDrX-XUWADNOUAOLNtg_4tkzr-RHkg44IsQFBFSAD2DVpG4egbaw==)\]. Ele obedece a limites de requisição e interage visualmente com a interface, o que é crucial para manter a integridade ética das contas médicas do Dr. Victor Lawrence.  
-2. **Resiliência Adaptativa vs. Fragilidade de RPA:**  
-   Interfaces como Google Ads e Doctoralia atualizam seus layouts (classes CSS, IDs) constantemente\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]. O executor do LAM não procura por id="btn-submit". Ele procura pelo conceito semântico do botão através da análise visual/DOM do modelo de IA\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]\[[3](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGIQvENe72sZJgAIPeJQRgI94tLe0GoxZ9yVqyxkIe3uD7v2tYBgV_ctiyj6dS7C3fmDFvq7F42J5AXa9F_jwWqEZjM1ChbXtQCGOLoE8XN5A8-XAlBzvJpL_lLUv2fzeLvS-1GUKONh-AFC36fzA90SXxmcOvRSgiO-Aw=)\]. Se a plataforma mudar o layout amanhã, o sistema não quebra\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\].  
-3. **Custo Zero e IA Híbrida Direcionada:**  
+1. **Computação Furtiva e Ética (Organic Automation):**
+   Ao invés de usar requests ou BeautifulSoup que bloqueiam rapidamente e disparam firewalls (Cloudflare/CAPTCHAs), o uso de **browser-use com Playwright** permite que o NeuroStrategy OS se comporte exatamente como um humano\[[4](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFVLccwpwg5s6OlLQiE2xJuNLIZRI8gP-9vNHBuM7xRnO8XUQwxczr9oiDT7r1TQpfzXZhA_mKvWAIEXveQWcnDrX-XUWADNOUAOLNtg_4tkzr-RHkg44IsQFBFSAD2DVpG4egbaw==)\]. Ele obedece a limites de requisição e interage visualmente com a interface, o que é crucial para manter a integridade ética das contas médicas do Dr. Victor Lawrence.
+2. **Resiliência Adaptativa vs. Fragilidade de RPA:**
+   Interfaces como Google Ads e Doctoralia atualizam seus layouts (classes CSS, IDs) constantemente\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]. O executor do LAM não procura por id="btn-submit". Ele procura pelo conceito semântico do botão através da análise visual/DOM do modelo de IA\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\]\[[3](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGIQvENe72sZJgAIPeJQRgI94tLe0GoxZ9yVqyxkIe3uD7v2tYBgV_ctiyj6dS7C3fmDFvq7F42J5AXa9F_jwWqEZjM1ChbXtQCGOLoE8XN5A8-XAlBzvJpL_lLUv2fzeLvS-1GUKONh-AFC36fzA90SXxmcOvRSgiO-Aw=)\]. Se a plataforma mudar o layout amanhã, o sistema não quebra\[[1](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHZZro0nm1mUobnVTohh_mezMIQjX7v0g3QfgMeM25KHrRNdP6FO027kxTt909BWUtPqOgazYHBx2j7rjCh72f6p5GUkE9l2-yUJNrnxPV1_5s_F4d2yjxRoaGUUHpX3-ufZPs0Dzh22iTkOc=)\].
+3. **Custo Zero e IA Híbrida Direcionada:**
    Processar o DOM inteiro a cada interação consome muitos tokens. Arquitetamos este fluxo de modo que tarefas de navegação pontuais e extração atômica sejam resolvidas por modelos menores e gratuitos (Qwen 2.5/Llama 3.3 via API de custo zero), enquanto análises densas do histórico de navegação são delegadas para o **Puter.js (Gemini 1.5 Pro)** na nuvem, garantindo *Performance Máxima* e *Custo Zero* absoluto na infraestrutura do backend.
 
 ---
@@ -98,7 +98,7 @@ sequenceDiagram
 
 O `orchestrator.py` utiliza LangGraph para definir um grafo de estados que representa o ciclo de vida de cada tarefa de marketing: definição de objetivo, planejamento, execução, verificação, resumo e pausa/aprovação humana. Graças à execução durável do LangGraph, o agente pode interromper-se para aguardar validação humana (ex.: responder reviews no Doctoralia) e retomar exatamente do ponto em que parou, preservando o estado.
 
-# 
+#
 
 ## **1\. Resumo Executivo / Visão Geral**
 
@@ -112,61 +112,61 @@ O ciclo de vida de uma intenção de marketing (ex: *"Preparar um artigo sobre H
 
 ### **Os Nós (Nodes) do Ciclo de Vida:**
 
-1. **Definição de Objetivo (Objective Setter):** Recebe o input do chat e normaliza a intenção.  
-2. **Planejamento (Cognitive Planner):** Quebra o objetivo em passos atômicos (navegar, raspar, redigir).  
-3. **Execução (Logic Executor):** Aciona o browser-use para interagir com a web.  
-4. **Verificação (Self-Correction/Verification):** O LAM avalia se a ação teve sucesso (ex: *"O formulário foi preenchido corretamente?"*). Se houver erro, uma aresta condicional (Conditional Edge) devolve o fluxo para o Planejador.  
-5. **Resumo (Semantic Summarizer):** Compila os resultados em *NeuroInsights*.  
+1. **Definição de Objetivo (Objective Setter):** Recebe o input do chat e normaliza a intenção.
+2. **Planejamento (Cognitive Planner):** Quebra o objetivo em passos atômicos (navegar, raspar, redigir).
+3. **Execução (Logic Executor):** Aciona o browser-use para interagir com a web.
+4. **Verificação (Self-Correction/Verification):** O LAM avalia se a ação teve sucesso (ex: *"O formulário foi preenchido corretamente?"*). Se houver erro, uma aresta condicional (Conditional Edge) devolve o fluxo para o Planejador.
+5. **Resumo (Semantic Summarizer):** Compila os resultados em *NeuroInsights*.
 6. **Aprovação Humana (Human-in-the-Loop \- HITL):** O nó de interrupção (Interrupt Node).
 
 ### **Execução Durável e Human-in-the-Loop (HITL)**
 
 Na psiquiatria/psicologia (foco em TEA Adulto), erros de comunicação ou vieses algorítmicos em respostas públicas são inaceitáveis.
 
-* O LangGraph usa um **Checkpointer** (como um banco local SQLite gerenciado pelo backend).  
-* Quando o Grafo atinge o estado de submeter um post ou responder a um review do Doctoralia, configuramos uma regra estrita: interrupt\_before=\["execute\_sensitive\_action"\].  
-* A execução da *Thread* é salva no disco. A CPU é liberada. O servidor Backend aguarda passivamente.  
+* O LangGraph usa um **Checkpointer** (como um banco local SQLite gerenciado pelo backend).
+* Quando o Grafo atinge o estado de submeter um post ou responder a um review do Doctoralia, configuramos uma regra estrita: interrupt\_before=\["execute\_sensitive\_action"\].
+* A execução da *Thread* é salva no disco. A CPU é liberada. O servidor Backend aguarda passivamente.
 * O Frontend emite um alerta visual. Após o Dr. Victor revisar, editar e clicar em "Aprovar", a interface dispara um sinal de retomada (resume) com a mesma *Thread ID*. O agente "acorda", injeta o botão de submit no Playwright e finaliza a tarefa.
 
 ---
 
 ## **3\. Diagrama do Grafo de Execução (LangGraph State Machine)**
 
-code Mermaid  
-downloadcontent\_copy  
-expand\_less  
-stateDiagram-v2  
-    direction TB  
-    \[\*\] \--\> ObjectiveDefinition: Input do Usuário  
-      
-    ObjectiveDefinition \--\> CognitivePlanner: Extrai Intenção  
-    CognitivePlanner \--\> LogicExecutor: Inicia Loop de Ações  
-      
-    state Loop\_Navegacao {  
-        LogicExecutor \--\> Verification: Ação Realizada no Browser  
-        Verification \--\> LogicExecutor: Falha (Retentar)  
-    }  
-      
-    Verification \--\> CheckpointPausa: Sucesso (Ação Sensível Detectada)  
-      
-    note right of CheckpointPausa  
-        Estado Salvo em Disco (Thread ID).  
-        Grafo Interrompido.  
-        Aguardando Frontend IA-Híbrida.  
-    end note  
-      
-    CheckpointPausa \--\> HumanApproval: Notifica Dr. Victor  
-    HumanApproval \--\> CheckpointPausa: Correções Injetadas  
-    HumanApproval \--\> ExecuteSensitiveAction: "Aprovado"  
-      
-    ExecuteSensitiveAction \--\> SemanticSummarizer: Coleta Resultados  
-    SemanticSummarizer \--\> \[\*\]: Gera NeuroInsights  
+code Mermaid
+downloadcontent\_copy
+expand\_less
+stateDiagram-v2
+    direction TB
+    \[\*\] \--\> ObjectiveDefinition: Input do Usuário
+
+    ObjectiveDefinition \--\> CognitivePlanner: Extrai Intenção
+    CognitivePlanner \--\> LogicExecutor: Inicia Loop de Ações
+
+    state Loop\_Navegacao {
+        LogicExecutor \--\> Verification: Ação Realizada no Browser
+        Verification \--\> LogicExecutor: Falha (Retentar)
+    }
+
+    Verification \--\> CheckpointPausa: Sucesso (Ação Sensível Detectada)
+
+    note right of CheckpointPausa
+        Estado Salvo em Disco (Thread ID).
+        Grafo Interrompido.
+        Aguardando Frontend IA-Híbrida.
+    end note
+
+    CheckpointPausa \--\> HumanApproval: Notifica Dr. Victor
+    HumanApproval \--\> CheckpointPausa: Correções Injetadas
+    HumanApproval \--\> ExecuteSensitiveAction: "Aprovado"
+
+    ExecuteSensitiveAction \--\> SemanticSummarizer: Coleta Resultados
+    SemanticSummarizer \--\> \[\*\]: Gera NeuroInsights
 ---
 
 ## **4\. Por que o LangGraph foi escolhido? (Decisões de Design)**
 
-1. **Memória Persistente e Previsibilidade:** Diferente de agentes autônomos puros (como AutoGPT) que entram em loops infinitos, o LangGraph nos permite modelar o LAM como um Grafo Cíclico Dirigido (DAG) com limites claros. Sabemos exatamente em qual estágio o agente está, e a persistência de estado (*Checkpointers*) evita perda de trabalho caso haja uma queda de conexão.  
-2. **Mandato de Custo Zero (Eficiência de Tokens):** Passar todo o histórico de um navegador para um LLM iterativamente consome a janela de contexto em minutos. Com o estado tipado do LangGraph, mantemos apenas o summary da página e os NeuroInsights na memória de curto prazo, descartando o HTML sujo. Isso permite que usemos modelos gratuitos locais ou de peso aberto (via Groq/OpenRouter) para transições de nós lógicos.  
+1. **Memória Persistente e Previsibilidade:** Diferente de agentes autônomos puros (como AutoGPT) que entram em loops infinitos, o LangGraph nos permite modelar o LAM como um Grafo Cíclico Dirigido (DAG) com limites claros. Sabemos exatamente em qual estágio o agente está, e a persistência de estado (*Checkpointers*) evita perda de trabalho caso haja uma queda de conexão.
+2. **Mandato de Custo Zero (Eficiência de Tokens):** Passar todo o histórico de um navegador para um LLM iterativamente consome a janela de contexto em minutos. Com o estado tipado do LangGraph, mantemos apenas o summary da página e os NeuroInsights na memória de curto prazo, descartando o HTML sujo. Isso permite que usemos modelos gratuitos locais ou de peso aberto (via Groq/OpenRouter) para transições de nós lógicos.
 3. **Ética por Design (Compliance Clínico):** A funcionalidade nativa de interrupção do LangGraph materializa o nosso princípio número 3 (*Human-in-the-loop por Design*). Garantimos ao médico controle absoluto sobre o disparo da gatilho financeiro (orçamentos Google Ads) ou reputacional (respostas a pacientes).
 
 ---
@@ -189,73 +189,73 @@ A implementação da memória segue o paradigma **RAG (Retrieval-Augmented Gener
 
 Gerenciada nativamente pelo State (TypedDict) do LangGraph. Ela é altamente volátil e otimizada para não estourar a janela de contexto (Context Window) dos LLMs gratuitos que utilizamos (Llama 3.3 / Qwen 2.5 via Groq).
 
-* **O que armazena:** A árvore do DOM recente (limpa e minificada), *screenshots* em base64 da página atual, as últimas 5 ações executadas pelo executor.py e os *NeuroInsights* gerados na thread ativa.  
+* **O que armazena:** A árvore do DOM recente (limpa e minificada), *screenshots* em base64 da página atual, as últimas 5 ações executadas pelo executor.py e os *NeuroInsights* gerados na thread ativa.
 * **Ciclo de Vida:** Nasce quando uma "Intenção" é iniciada pelo usuário e morre (ou é consolidada) quando a tarefa atinge o estado final do grafo.
 
 ### **Memória de Longo Prazo (Semântica / Episódica)**
 
 Gerenciada por um banco de dados vetorial embutido e local (ex: ChromaDB ou LanceDB rodando em SQLite) acoplado ao **NeuroEngine**. A vetorização (Embeddings) é feita **100% localmente no browser ou no backend via Transformers.js**, sem custo de API.
 
-* **O que armazena (O modelo IntelligenceSource):**  
-  1. **Regras e Ética:** Diretrizes do Conselho Federal de Medicina (CFM), tom de voz empático e científico exigido para TEA Adulto e Hipnose Ericksoniana.  
-  2. **Histórico de Campanhas (Episódica):** Padrões de CTR (Click-Through Rate), palavras-chave negativas no Google Ads, orçamentos passados que performaram bem.  
-  3. **Benchmarks (Semântica):** Histórico de reclamações e elogios extraídos do Doctoralia (próprio e da concorrência), armazenados como *NeuroInsights* consolidados.  
-*   
+* **O que armazena (O modelo IntelligenceSource):**
+  1. **Regras e Ética:** Diretrizes do Conselho Federal de Medicina (CFM), tom de voz empático e científico exigido para TEA Adulto e Hipnose Ericksoniana.
+  2. **Histórico de Campanhas (Episódica):** Padrões de CTR (Click-Through Rate), palavras-chave negativas no Google Ads, orçamentos passados que performaram bem.
+  3. **Benchmarks (Semântica):** Histórico de reclamações e elogios extraídos do Doctoralia (próprio e da concorrência), armazenados como *NeuroInsights* consolidados.
+*
 * **Ciclo de Vida:** Persistente. Cresce iterativamente a cada execução bem-sucedida do LAM.
 
 ### **A Dança entre o Planner e o Summarizer**
 
-* **O Cognitive Planner (Leitura LTM):** Antes de planejar como ajustar um anúncio, o Planner consulta a LTM buscando a intenção: *"Quais foram os CTRs anteriores para 'Diagnóstico TEA Adulto'?"*. O sistema recupera esses vetores e os injeta no prompt do Planner, garantindo decisões informadas.  
+* **O Cognitive Planner (Leitura LTM):** Antes de planejar como ajustar um anúncio, o Planner consulta a LTM buscando a intenção: *"Quais foram os CTRs anteriores para 'Diagnóstico TEA Adulto'?"*. O sistema recupera esses vetores e os injeta no prompt do Planner, garantindo decisões informadas.
 * **O Semantic Summarizer (Escrita LTM):** Após o Executor terminar uma raspagem no Doctoralia, o Summarizer condensa as avaliações cruas. Ele extrai as métricas (Priority, Risk, Opportunity, Trend), converte-as em NeuroInsights e as grava na LTM para uso futuro.
 
 ---
 
 ## **3\. Diagrama da Arquitetura de Memória**
 
-code Mermaid  
-downloadcontent\_copy  
-expand\_less  
-graph TD  
-    subgraph Frontend IA-Híbrida  
-        User\[Dr. Victor / Chat\]  
-        Emb\[Transformers.js Local Embeddings\]  
+code Mermaid
+downloadcontent\_copy
+expand\_less
+graph TD
+    subgraph Frontend IA-Híbrida
+        User\[Dr. Victor / Chat\]
+        Emb\[Transformers.js Local Embeddings\]
     end
 
-    subgraph Backend LAM (LangGraph State)  
-        STM\[Memória de Curto Prazo\]  
-        STM \--\>|Contém| DOM\[DOM Atual\]  
-        STM \--\>|Contém| Actions\[Ações Recentes\]  
-          
-        Plan\[Cognitive Planner\]  
-        Summ\[Semantic Summarizer\]  
-        Exec\[Logic Executor\]  
+    subgraph Backend LAM (LangGraph State)
+        STM\[Memória de Curto Prazo\]
+        STM \--\>|Contém| DOM\[DOM Atual\]
+        STM \--\>|Contém| Actions\[Ações Recentes\]
+
+        Plan\[Cognitive Planner\]
+        Summ\[Semantic Summarizer\]
+        Exec\[Logic Executor\]
     end
 
-    subgraph NeuroEngine (Local Vector DB)  
-        LTM\[(Memória de Longo Prazo)\]  
-        LTM \--\>|Contém| Ethics\[Regras Éticas CFM\]  
-        LTM \--\>|Contém| Hist\[Histórico Ads/Doctoralia\]  
-        LTM \--\>|Contém| Pref\[Preferências do Consultório\]  
+    subgraph NeuroEngine (Local Vector DB)
+        LTM\[(Memória de Longo Prazo)\]
+        LTM \--\>|Contém| Ethics\[Regras Éticas CFM\]
+        LTM \--\>|Contém| Hist\[Histórico Ads/Doctoralia\]
+        LTM \--\>|Contém| Pref\[Preferências do Consultório\]
     end
 
-    User \--\>|Inicia Intenção| Plan  
-    Plan \--\>|1. Consulta Histórico (RAG)| LTM  
-    LTM \-.-\>|Injeta Contexto| Plan  
-    Plan \--\>|2. Atualiza| STM  
-    STM \--\>|3. Guia Navegação| Exec  
-    Exec \--\>|4. Retorna Dados Web| Summ  
-    Summ \--\>|5. Extrai NeuroInsights| STM  
-    Summ \--\>|6. Consolida & Salva Vetores| Emb  
-    Emb \--\>|Grava Novo Conhecimento| LTM  
+    User \--\>|Inicia Intenção| Plan
+    Plan \--\>|1. Consulta Histórico (RAG)| LTM
+    LTM \-.-\>|Injeta Contexto| Plan
+    Plan \--\>|2. Atualiza| STM
+    STM \--\>|3. Guia Navegação| Exec
+    Exec \--\>|4. Retorna Dados Web| Summ
+    Summ \--\>|5. Extrai NeuroInsights| STM
+    Summ \--\>|6. Consolida & Salva Vetores| Emb
+    Emb \--\>|Grava Novo Conhecimento| LTM
 ---
 
 ## **4\. Por que essa arquitetura foi escolhida? (Decisões de Design)**
 
-1. **Gestão Rigorosa do "Token Budget" (Custo Zero):**  
-   Modelos gratuitos, mesmo com janelas grandes, perdem precisão (*Lost in the Middle*) se inundados de informações irrelevantes. Separar estritamente o que é *STM* (apenas o que importa para a navegação atômica daquele milissegundo) do que é *LTM* (recuperado apenas via busca semântica estrita) permite manter a operação robusta em infraestruturas como Groq ou OpenRouter (tiers gratuitos). Contextos densos que exijam cruzar muito histórico são passados unicamente para a bridge no **Puter.js (Gemini 1.5 Pro)**.  
-2. **Compliance Clínico Inquebrável:**  
-   No marketing médico, um erro de tom pode causar infrações éticas. A LTM atua como uma "camada de alinhamento" contínua (Guardrails). Como as preferências de atuação do Dr. Victor (TEA Adulto) e regras do CFM estão cravadas na memória de longo prazo, o planner.py é forçado a condicionar todas as suas estratégias por esses *NeuroInsights* primordiais, reduzindo drasticamente as alucinações.  
-3. **Evolução Contínua sem Treinamento (Fine-Tuning Zero):**  
+1. **Gestão Rigorosa do "Token Budget" (Custo Zero):**
+   Modelos gratuitos, mesmo com janelas grandes, perdem precisão (*Lost in the Middle*) se inundados de informações irrelevantes. Separar estritamente o que é *STM* (apenas o que importa para a navegação atômica daquele milissegundo) do que é *LTM* (recuperado apenas via busca semântica estrita) permite manter a operação robusta em infraestruturas como Groq ou OpenRouter (tiers gratuitos). Contextos densos que exijam cruzar muito histórico são passados unicamente para a bridge no **Puter.js (Gemini 1.5 Pro)**.
+2. **Compliance Clínico Inquebrável:**
+   No marketing médico, um erro de tom pode causar infrações éticas. A LTM atua como uma "camada de alinhamento" contínua (Guardrails). Como as preferências de atuação do Dr. Victor (TEA Adulto) e regras do CFM estão cravadas na memória de longo prazo, o planner.py é forçado a condicionar todas as suas estratégias por esses *NeuroInsights* primordiais, reduzindo drasticamente as alucinações.
+3. **Evolução Contínua sem Treinamento (Fine-Tuning Zero):**
    Não precisamos gastar com fine-tuning de modelos LLM. A inteligência do NeuroStrategy OS cresce organicamente. Ao identificar um padrão de reclamação sazonal no Doctoralia, o agente consolida isso como uma "Trend" (NeuroInsight) na LTM. Na próxima vez que o sistema for encarregado de propor temas para o WordPress, essa Trend será puxada via RAG, e o modelo sugerirá um artigo preventivo focado exatamente naquela dor do paciente.
 
 ---
@@ -280,14 +280,14 @@ A implementação do LangSmith no diretório browser\_use/lam/ não interfere na
 
 Cada tarefa (ex: *"Analisar concorrência de Hipnose Ericksoniana"*) gera um **Trace ID** único. Dentro desse Trace, o LangSmith divide a execução em **Spans**:
 
-* **LLM Spans:** Grava o prompt exato enviado (ex: a árvore DOM minificada \+ regras do CFM) e o JSON devolvido pelos modelos gratuitos (Llama 3.3 / Qwen 2.5). Isso permite auditar se o modelo alucinou na extração de dados.  
+* **LLM Spans:** Grava o prompt exato enviado (ex: a árvore DOM minificada \+ regras do CFM) e o JSON devolvido pelos modelos gratuitos (Llama 3.3 / Qwen 2.5). Isso permite auditar se o modelo alucinou na extração de dados.
 * **Tool/Action Spans:** Registra os comandos enviados ao executor.py (Playwright), como as coordenadas de um clique ou o texto digitado em um formulário.
 
 ### **Telemetria de Estado e Branching**
 
 O LangSmith captura o estado do grafo (o TypedDict) em cada transição de nó.
 
-* Se o Cognitive Planner decide que uma intenção de marketing exige a criação de um post no WordPress, o LangSmith registra o momento exato em que a aresta condicional (Conditional Edge) desviou o fluxo para o nó de HumanApproval (HITL).  
+* Se o Cognitive Planner decide que uma intenção de marketing exige a criação de um post no WordPress, o LangSmith registra o momento exato em que a aresta condicional (Conditional Edge) desviou o fluxo para o nó de HumanApproval (HITL).
 * Isso responde à pergunta crítica em sistemas médicos: *"Por que o agente parou aqui e não publicou o artigo?"* A resposta estará documentada nos logs do LangSmith: o modelo IntelligenceSource detectou uma ação de alto impacto reputacional.
 
 ### **Monitoramento de "Token Budget" e Custo Zero**
@@ -298,52 +298,52 @@ Para manter a promessa de **Custo Zero**, utilizamos a camada gratuita (Develope
 
 ## **3\. Diagrama de Arquitetura de Observabilidade**
 
-code Mermaid  
-downloadcontent\_copy  
-expand\_less  
-graph TD  
-    subgraph Frontend & HITL  
-        User\[Dr. Victor\] \--\>|Aprova/Rejeita| Graph  
+code Mermaid
+downloadcontent\_copy
+expand\_less
+graph TD
+    subgraph Frontend & HITL
+        User\[Dr. Victor\] \--\>|Aprova/Rejeita| Graph
     end
 
-    subgraph Backend LAM (LangGraph)  
-        Graph\[orchestrator.py\]  
-        Plan\[planner.py\]  
-        Exec\[executor.py\]  
-        Summ\[summarizer.py\]  
-          
-        Graph \--\> Plan  
-        Plan \--\> Exec  
-        Exec \--\> Summ  
-        Summ \--\> Graph  
+    subgraph Backend LAM (LangGraph)
+        Graph\[orchestrator.py\]
+        Plan\[planner.py\]
+        Exec\[executor.py\]
+        Summ\[summarizer.py\]
+
+        Graph \--\> Plan
+        Plan \--\> Exec
+        Exec \--\> Summ
+        Summ \--\> Graph
     end
 
-    subgraph Observability (LangSmith)  
-        Trace\[Trace ID: Execução Principal\]  
-        Span1\[Span: Prompt & Contexto CFM\]  
-        Span2\[Span: Ação Playwright / DOM\]  
-        Span3\[Span: Geração de NeuroInsights\]  
-        Audit\[Dashboard de Auditoria / Custos\]  
-          
-        Trace \--\> Span1  
-        Trace \--\> Span2  
-        Trace \--\> Span3  
-        Span1 & Span2 & Span3 \--\> Audit  
+    subgraph Observability (LangSmith)
+        Trace\[Trace ID: Execução Principal\]
+        Span1\[Span: Prompt & Contexto CFM\]
+        Span2\[Span: Ação Playwright / DOM\]
+        Span3\[Span: Geração de NeuroInsights\]
+        Audit\[Dashboard de Auditoria / Custos\]
+
+        Trace \--\> Span1
+        Trace \--\> Span2
+        Trace \--\> Span3
+        Span1 & Span2 & Span3 \--\> Audit
     end
 
-    Graph \-.-|\>|Callbacks Assíncronos| Trace  
-    Plan \-.-|\>|Log de Intenção| Span1  
-    Exec \-.-|\>|Log de Cliques/Visão| Span2  
-    Summ \-.-|\>|Log de Padronização| Span3  
+    Graph \-.-|\>|Callbacks Assíncronos| Trace
+    Plan \-.-|\>|Log de Intenção| Span1
+    Exec \-.-|\>|Log de Cliques/Visão| Span2
+    Summ \-.-|\>|Log de Padronização| Span3
 ---
 
 ## **4\. Por que o LangSmith foi escolhido? (Decisões de Design)**
 
-1. **Compliance e Explicabilidade em Saúde (CFM):**  
-   Na medicina, a responsabilidade final é sempre do médico. Se o LAM gerar um rascunho de anúncio que flerte com promessas de cura (proibido pelo CFM), o Dr. Victor precisa saber onde o sistema falhou: foi um erro na injeção da Memória de Longo Prazo? O prompt foi mal interpretado pelo Llama 3.3? O LangSmith elimina o "achismo" oferecendo um replay exato do raciocínio da IA.  
-2. **Depuração Visual de Sistemas LAM (Vision Debugging):**  
-   Programação tradicional falha com exceções claras (NullReferenceException). Agentes LAM falham de maneira silenciosa (ex: clicar no botão errado porque a classe CSS mudou). Como o LangSmith registra os *inputs* visuais e textuais passados ao modelo, podemos ver exatamente se a árvore do DOM fornecida ao agente continha o elemento esperado, facilitando manutenções cirúrgicas no browser-use.  
-3. **Curadoria Automática de Datasets (Evolução Contínua):**  
+1. **Compliance e Explicabilidade em Saúde (CFM):**
+   Na medicina, a responsabilidade final é sempre do médico. Se o LAM gerar um rascunho de anúncio que flerte com promessas de cura (proibido pelo CFM), o Dr. Victor precisa saber onde o sistema falhou: foi um erro na injeção da Memória de Longo Prazo? O prompt foi mal interpretado pelo Llama 3.3? O LangSmith elimina o "achismo" oferecendo um replay exato do raciocínio da IA.
+2. **Depuração Visual de Sistemas LAM (Vision Debugging):**
+   Programação tradicional falha com exceções claras (NullReferenceException). Agentes LAM falham de maneira silenciosa (ex: clicar no botão errado porque a classe CSS mudou). Como o LangSmith registra os *inputs* visuais e textuais passados ao modelo, podemos ver exatamente se a árvore do DOM fornecida ao agente continha o elemento esperado, facilitando manutenções cirúrgicas no browser-use.
+3. **Curadoria Automática de Datasets (Evolução Contínua):**
    Um benefício oculto do LangSmith é a capacidade de filtrar execuções bem-sucedidas. Quando o NeuroStrategy OS realiza uma raspagem perfeita no Doctoralia, e o frontend gera NeuroInsights de altíssima qualidade validados pelo médico, podemos adicionar esse "Trace" a um dataset no LangSmith. Futuramente, esses exemplos servem para *Few-Shot Prompting* (passar exemplos de sucesso nos prompts para orientar o modelo) sem gastar 1 centavo com treinamento de modelos (Fine-Tuning).
 
 ---
@@ -366,10 +366,10 @@ Para garantir precisão cirúrgica e baixo consumo de tokens, o Planner não pro
 
 O coração do planner.py é a construção de prompts de sistema densos e contextuais. O Planner injeta no LLM de navegação (WebLLaMA ou Ollama) um contrato de execução rigoroso. Este contrato exige que a saída seja formatada em blocos de ações atômicas, utilizando verbos padronizados pelo sistema:
 
-* **CLICAR \[ID\]:** Interação física com elementos de interface.  
-* **PREENCHER \[ID, TEXTO\]:** Injeção de conteúdo (ex: rascunho de resposta gerado pelo modelo).  
-* **ESPERAR \[CONDIÇÃO\]:** Sincronização de estado para carregamentos assíncronos (AJAX/React).  
-* **EXTRAIR \[QUERY\]:** Coleta de dados estruturados para posterior normalização no IntelligenceSource.  
+* **CLICAR \[ID\]:** Interação física com elementos de interface.
+* **PREENCHER \[ID, TEXTO\]:** Injeção de conteúdo (ex: rascunho de resposta gerado pelo modelo).
+* **ESPERAR \[CONDIÇÃO\]:** Sincronização de estado para carregamentos assíncronos (AJAX/React).
+* **EXTRAIR \[QUERY\]:** Coleta de dados estruturados para posterior normalização no IntelligenceSource.
 * **RESUMIR\_TABELA:** Ação específica para extração de métricas de campanhas de Ads ou listas de pacientes.
 
 ## **Eficiência Local e Modelos de Navegação (WebLLaMA/Ollama)**
@@ -444,10 +444,10 @@ O summarizer.py atua como a camada de inteligência analítica do **NeuroEngine*
 
 A saída do Summarizer é rigorosamente organizada em quatro categorias de **NeuroInsights**, permitindo uma leitura rápida e acionável por parte do médico. Esta taxonomia transforma números frios em narrativa estratégica:
 
-* **Priority (Prioridade):** Ações imediatas baseadas em urgência técnica ou comercial (ex: "Corrigir link quebrado em campanha de TEA Adulto").  
-* **Risk (Risco):** Identificação de ameaças reputacionais ou de conformidade ética (ex: "Comentário no Doctoralia com potencial infração ética detectada").  
-* **Opportunity (Oportunidade):** Gaps de mercado ou de performance identificados em relação aos benchmarks (ex: "Aumento de buscas por Hipnose Ericksoniana em bairros específicos sem cobertura de anúncios").  
-* **Trend (Tendência):** Padrões comportamentais observados ao longo do tempo (ex: "Crescimento sazonal de dúvidas sobre diagnóstico tardio de TEA").  
+* **Priority (Prioridade):** Ações imediatas baseadas em urgência técnica ou comercial (ex: "Corrigir link quebrado em campanha de TEA Adulto").
+* **Risk (Risco):** Identificação de ameaças reputacionais ou de conformidade ética (ex: "Comentário no Doctoralia com potencial infração ética detectada").
+* **Opportunity (Oportunidade):** Gaps de mercado ou de performance identificados em relação aos benchmarks (ex: "Aumento de buscas por Hipnose Ericksoniana em bairros específicos sem cobertura de anúncios").
+* **Trend (Tendência):** Padrões comportamentais observados ao longo do tempo (ex: "Crescimento sazonal de dúvidas sobre diagnóstico tardio de TEA").
   Cada insight é acompanhado de uma referência direta à sua fonte de origem (IntelligenceSource), garantindo a rastreabilidade total do dado.
 
 ## **Síntese de Contexto Longo com Puter.js e Gemini 1.5 Pro**
@@ -610,8 +610,8 @@ O modelProvider.ts atua como o sistema nervoso central de inteligência do **Neu
 
 A lógica de roteamento é segmentada em níveis de carga cognitiva, otimizando o hardware do dispositivo e os recursos de rede:
 
-* **builtInAI() \- Interação Imediata:** Aciona a Prompt API nativa do navegador (Gemini Nano) para micro-tarefas de interface, como resumo de mensagens do chat, correção gramatical em tempo real e sugestões de comandos rápidos. É o nível de menor latência, processado instantaneamente sem despertar a GPU para grandes modelos.  
-* **webLLM() \- Análise Estratégica Local:** Utiliza o motor WebGPU para carregar modelos de maior porte, como o **Llama-3-8B-Instruct** ou **Qwen2.5**. Este nível é reservado para o raciocínio tático do Agente LAM, onde o sistema precisa planejar sequências de navegação complexas ou analisar criticamente os dados de concorrência antes de gerar **NeuroInsights**.  
+* **builtInAI() \- Interação Imediata:** Aciona a Prompt API nativa do navegador (Gemini Nano) para micro-tarefas de interface, como resumo de mensagens do chat, correção gramatical em tempo real e sugestões de comandos rápidos. É o nível de menor latência, processado instantaneamente sem despertar a GPU para grandes modelos.
+* **webLLM() \- Análise Estratégica Local:** Utiliza o motor WebGPU para carregar modelos de maior porte, como o **Llama-3-8B-Instruct** ou **Qwen2.5**. Este nível é reservado para o raciocínio tático do Agente LAM, onde o sistema precisa planejar sequências de navegação complexas ou analisar criticamente os dados de concorrência antes de gerar **NeuroInsights**.
 * **transformersJS() \- Processamento Atômico em Background:** Delegado para tarefas de suporte constante, como a geração de embeddings para a Memória de Longo Prazo e classificação de texto via **SmolLM2-360M**. Por rodar em WebAssembly (WASM), garante que processos de fundo não interfiram na interatividade da UI principal.
 
 ## **Extensão Puter para Contexto Longo e Síntese Clínica**
@@ -674,10 +674,10 @@ O **Marketing Copy Analyzer** é implementado como um pipeline de inferência lo
 
 Diferente de uma análise de sentimento genérica (positivo/negativo), o analyzer utiliza modelos ajustados (fine-tuned) para identificar gatilhos específicos do marketing ético e clínico. Através de modelos como o distilbert-base-uncased-finetuned-sst-2-english ou equivalentes multilíngues como o distilbert-base-multilingual-cased, o sistema mapeia o texto em dimensões emocionais que ressoam com a jornada do paciente:
 
-* **Confiança (Trust):** Identifica elementos de autoridade e segurança, vitais para o tratamento de TEA Adulto.  
-* **Urgência (Urgency):** Detecta pressões temporais ou escassez em anúncios de concorrentes.  
-* **Medo/Ansiedade (Fear/Anxiety):** Monitora se a comunicação utiliza "agitação de dor" de forma excessiva ou inadequada.  
-* **Acolhimento (Joy/Empathy):** Avalia o nível de empatia e suporte em textos sobre Hipnose Ericksoniana.  
+* **Confiança (Trust):** Identifica elementos de autoridade e segurança, vitais para o tratamento de TEA Adulto.
+* **Urgência (Urgency):** Detecta pressões temporais ou escassez em anúncios de concorrentes.
+* **Medo/Ansiedade (Fear/Anxiety):** Monitora se a comunicação utiliza "agitação de dor" de forma excessiva ou inadequada.
+* **Acolhimento (Joy/Empathy):** Avalia o nível de empatia e suporte em textos sobre Hipnose Ericksoniana.
   Esta segmentação permite que o sistema identifique não apenas a polaridade do texto, mas a tática persuasiva utilizada, fornecendo uma base técnica para o refinamento da comunicação do consultório.
 
 ## **Inteligência de Concorrência e Benchmarking Local**
@@ -688,9 +688,9 @@ O analyzer é a ferramenta primordial para a análise de mercado geolocalizada. 
 
 Os resultados gerados pelo Marketing Copy Analyzer são convertidos imediatamente em dados estruturados para o modelo IntelligenceSource. Cada análise alimenta o fluxo de **NeuroInsights**, onde os gatilhos detectados são transformados em visualizações acionáveis:
 
-* **Risk (Risco):** Se a copy do próprio consultório for classificada com alto índice de "Urgência" agressiva, o sistema alerta para o risco de infração ética perante o CFM.  
-* **Opportunity (Oportunidade):** Se a concorrência negligencia gatilhos de "Confiança" em tópicos complexos como Hipnose, o sistema sugere a criação de conteúdo focado em autoridade técnica.  
-* **Trend (Tendência):** Identifica padrões emocionais recorrentes em anúncios de alta performance na região.  
+* **Risk (Risco):** Se a copy do próprio consultório for classificada com alto índice de "Urgência" agressiva, o sistema alerta para o risco de infração ética perante o CFM.
+* **Opportunity (Oportunidade):** Se a concorrência negligencia gatilhos de "Confiança" em tópicos complexos como Hipnose, o sistema sugere a criação de conteúdo focado em autoridade técnica.
+* **Trend (Tendência):** Identifica padrões emocionais recorrentes em anúncios de alta performance na região.
   Essa integração garante que a inteligência atômica produzida localmente pelo Transformers.js seja elevada ao nível de decisão estratégica, mantendo o ciclo de melhoria contínua do marketing médico do Dr. Victor Lawrence.
 
 # ***Arquitetura do aiWorker***
@@ -705,8 +705,8 @@ O aiWorker.ts é o componente central da arquitetura de processamento em segundo
 
 A comunicação entre o frontend em React e o worker é regida por um protocolo de mensageria serializada robusto, que gerencia o ciclo de vida completo dos modelos de inteligência atômica. O aiWorker.ts expõe ouvintes de eventos (event listeners) para tipos de mensagens específicos:
 
-* **LOAD\_MODEL:** Inicia o processo de busca dos pesos do modelo nos servidores da Hugging Face (via CDN) ou no cache local (**IndexedDB**). O worker é responsável por instanciar os pipelines do Transformers.js e sinalizar quando o ambiente está pronto para inferência.  
-* **ANALYZE\_COPY:** Recebe strings de texto de anúncios ou posts e aciona o pipeline de text-classification, devolvendo um objeto estruturado com as probabilidades de gatilhos emocionais detectados.  
+* **LOAD\_MODEL:** Inicia o processo de busca dos pesos do modelo nos servidores da Hugging Face (via CDN) ou no cache local (**IndexedDB**). O worker é responsável por instanciar os pipelines do Transformers.js e sinalizar quando o ambiente está pronto para inferência.
+* **ANALYZE\_COPY:** Recebe strings de texto de anúncios ou posts e aciona o pipeline de text-classification, devolvendo um objeto estruturado com as probabilidades de gatilhos emocionais detectados.
 * **ANALYZE\_SCREENSHOT\_TEXT:** Implementa capacidades de OCR (Reconhecimento Óptico de Caracteres) ou análise de imagem para extrair informações textuais de capturas de tela, permitindo que o sistema "leia" dashboards visuais onde o scraping de HTML seria ineficiente.
 
 ## **Pipelines de Inteligência Atômica: Texto e Visão**
@@ -777,9 +777,9 @@ Os resultados da análise local são imediatamente catalogados sob o modelo can�
 
 A culminação deste processo silencioso é a agregação de dados para a geração de **NeuroInsights** acionáveis. Ao cruzar múltiplos registros de IntelligenceSource coletados pelo agente furtivo, o sistema identifica padrões que orientam a tomada de decisão estratégica do Dr. Victor Lawrence:
 
-* **Trend (Tendência):** Identifica se a maioria dos concorrentes locais começou a utilizar gatilhos de "Confiança" em detrimento de "Urgência".  
-* **Opportunity (Oportunidade):** Detecta lacunas de comunicação (ex: baixa incidência de copy focada em Hipnose Ericksoniana em um bairro específico).  
-* **Risk (Risco):** Alerta se a copy coletada de um parceiro ou canal próprio está se desviando do tom ético exigido pelo CFM.  
+* **Trend (Tendência):** Identifica se a maioria dos concorrentes locais começou a utilizar gatilhos de "Confiança" em detrimento de "Urgência".
+* **Opportunity (Oportunidade):** Detecta lacunas de comunicação (ex: baixa incidência de copy focada em Hipnose Ericksoniana em um bairro específico).
+* **Risk (Risco):** Alerta se a copy coletada de um parceiro ou canal próprio está se desviando do tom ético exigido pelo CFM.
   Toda essa inteligência é produzida localmente e sem qualquer chamada externa de API paga, mantendo a soberania estratégica e a privacidade absoluta dos dados de marketing do consultório.
 
 # ***Configuração de modelos locais e CDN***
@@ -914,9 +914,9 @@ O **NeuroEngine** atua como o córtex integrador do **NeuroStrategy OS**, resolv
 
 A interface IntelligenceSource é o contrato fundamental que rege a ingestão de dados no NeuroEngine. Cada atributo foi desenhado para conferir rigor arquitetural e confiança clínica ao sistema:
 
-* **category:** Segmenta os dados em domínios estratégicos (analytics, search, geo, doctoralia, social, campaign), permitindo que o planner.py filtre rapidamente o contexto necessário para cada tarefa.  
-* **dataSnapshot:** Um contêiner de tipo unknown que preserva a integridade dos dados brutos (JSONs, tabelas ou strings) coletados pelo executor.py. Isso permite que o sistema mantenha a "evidência original" para futuras re-análises ou auditorias.  
-* **freshnessScore (0–1):** Uma métrica temporal de vitalidade. No marketing digital, um dado de CPC (Custo por Clique) de 30 dias atrás possui relevância menor que um de 24 horas. Este score pondera o peso da informação no raciocínio da IA.  
+* **category:** Segmenta os dados em domínios estratégicos (analytics, search, geo, doctoralia, social, campaign), permitindo que o planner.py filtre rapidamente o contexto necessário para cada tarefa.
+* **dataSnapshot:** Um contêiner de tipo unknown que preserva a integridade dos dados brutos (JSONs, tabelas ou strings) coletados pelo executor.py. Isso permite que o sistema mantenha a "evidência original" para futuras re-análises ou auditorias.
+* **freshnessScore (0–1):** Uma métrica temporal de vitalidade. No marketing digital, um dado de CPC (Custo por Clique) de 30 dias atrás possui relevância menor que um de 24 horas. Este score pondera o peso da informação no raciocínio da IA.
 * **reliabilityScore (0–1):** Atribui um nível de confiança à coleta. Se o Agente LAM encontrou instabilidades no site do concorrente ou se os dados do Doctoralia parecem inconsistentes, esse score cai, alertando o sistema para tratar a informação como uma hipótese, não como uma certeza factual.
 
 ## **O Papel do Summarizer na Hidratação do Modelo Canônico**
@@ -967,8 +967,8 @@ O hub gerencia conectores específicos para os pilares estratégicos do consult�
 
 A inteligência do IntelligenceHub.ts reside em sua capacidade de qualificar o dado através do cálculo automático de freshnessScore e reliabilityScore.
 
-* **FreshnessScore:** Implementa funções de decaimento temporal que penalizam a relevância do dado conforme o tempo passa. No marketing geolocalizado, métricas de leilão do Google Ads perdem valor rapidamente, enquanto o histórico clínico do Doctoralia possui maior longevidade.  
-* **ReliabilityScore:** Avalia a integridade da coleta. Dados obtidos via APIs oficiais recebem pontuação máxima, enquanto informações extraídas via navegação furtiva (scraping) são avaliadas com base na taxa de sucesso da extração e na ausência de elementos obstrutores (modais ou erros de layout).  
+* **FreshnessScore:** Implementa funções de decaimento temporal que penalizam a relevância do dado conforme o tempo passa. No marketing geolocalizado, métricas de leilão do Google Ads perdem valor rapidamente, enquanto o histórico clínico do Doctoralia possui maior longevidade.
+* **ReliabilityScore:** Avalia a integridade da coleta. Dados obtidos via APIs oficiais recebem pontuação máxima, enquanto informações extraídas via navegação furtiva (scraping) são avaliadas com base na taxa de sucesso da extração e na ausência de elementos obstrutores (modais ou erros de layout).
   Esses indicadores garantem que o Agente LAM priorize informações recentes e confiáveis ao planejar ações estratégicas, evitando decisões baseadas em dados obsoletos ou imprecisos.
 
 ## **Distribuição de NeuroInsights e Orquestração LAM-like**
@@ -1011,9 +1011,9 @@ No coração da interface conversacional reside o módulo de **Intention Intelli
 
 Uma vez que a intenção é decodificada e as entidades são desambiguadas, o módulo de Intention Intelligence atua como um roteador de decisão lógica. Ele avalia o estado atual do conhecimento no **NeuroEngine** para decidir o melhor caminho de execução:
 
-* **Acesso Direto:** Se os dados solicitados já foram normalizados recentemente e possuem um alto freshnessScore, o chatbot apresenta os **NeuroInsights** imediatamente.  
-* **Acionamento LAM:** Se a informação for inédita ou obsoleta, o sistema dispara o **Agente Furtivo (LAM)** para navegar e coletar novos dados.  
-* **Abordagem Híbrida:** O sistema pode combinar dados históricos com uma nova varredura rápida para oferecer uma análise de tendência.  
+* **Acesso Direto:** Se os dados solicitados já foram normalizados recentemente e possuem um alto freshnessScore, o chatbot apresenta os **NeuroInsights** imediatamente.
+* **Acionamento LAM:** Se a informação for inédita ou obsoleta, o sistema dispara o **Agente Furtivo (LAM)** para navegar e coletar novos dados.
+* **Abordagem Híbrida:** O sistema pode combinar dados históricos com uma nova varredura rápida para oferecer uma análise de tendência.
   Esse processo de decisão é invisível para o usuário, garantindo uma resposta sempre otimizada que equilibra a velocidade da memória local com a precisão da coleta em tempo real na web.
 
 ## **Sincronização com o Orquestrador LAM e LangGraph**
@@ -1072,17 +1072,17 @@ No **NeuroStrategy OS**, o princípio de *Human-in-the-loop* (HITL) não é uma 
 
 A política de segurança do sistema define três domínios primordiais onde a autonomia do Agente LAM é terminantemente proibida de prosseguir sem validação humana:
 
-* **Gestão Financeira e Orçamentos:** Qualquer alteração de lances (bids), limites de gastos diários ou realocação de verbas em plataformas como Google Ads dispara uma pausa imediata. O planner.py propõe o ajuste baseado em **NeuroInsights**, mas o executor.py é bloqueado até a confirmação do valor pelo médico.  
-* **Publicação de Conteúdo (WordPress/Social):** A postagem de artigos sobre TEA Adulto ou Hipnose Ericksoniana e a resposta a comentários em redes sociais exigem revisão editorial. O sistema gera o rascunho, mas o disparo do comando de submit no navegador furtivo fica retido no estado de aprovação.  
+* **Gestão Financeira e Orçamentos:** Qualquer alteração de lances (bids), limites de gastos diários ou realocação de verbas em plataformas como Google Ads dispara uma pausa imediata. O planner.py propõe o ajuste baseado em **NeuroInsights**, mas o executor.py é bloqueado até a confirmação do valor pelo médico.
+* **Publicação de Conteúdo (WordPress/Social):** A postagem de artigos sobre TEA Adulto ou Hipnose Ericksoniana e a resposta a comentários em redes sociais exigem revisão editorial. O sistema gera o rascunho, mas o disparo do comando de submit no navegador furtivo fica retido no estado de aprovação.
 * **Comunicação Reputacional (Doctoralia):** Respostas a avaliações de pacientes são sensíveis e regidas pelo sigilo médico. O fluxo de automação é interrompido para garantir que o tom de voz e o conteúdo técnico estejam em conformidade com as diretrizes do CFM.
 
 ## **Interface de Revisão e Comandos de Feedback (Approve/Edit/Cancel)**
 
 A interface de chat do **NeuroStrategy OS** atua como o terminal de controle para a governança do agente. Quando o LangGraph entra em estado de pausa, o Frontend IA-Híbrida apresenta ao usuário um "Card de Revisão de Ação". Este card contém o plano estruturado do LAM e o conteúdo final proposto (ex: o texto do post ou o novo orçamento). O Dr. Victor Lawrence dispõe de três comandos fundamentais:
 
-* **Approve (Aprovar):** Libera o grafo para prosseguir para o nó de execução final.  
-* **Edit (Editar):** Permite que o médico altere o rascunho ou o valor proposto diretamente na interface. O novo dado é reinjetado no estado do grafo e o ciclo de verificação é reiniciado.  
-* **Cancel (Cancelar):** Aborta a tarefa específica, instruindo o orquestrador a reverter para um estado seguro ou aguardar novas instruções.  
+* **Approve (Aprovar):** Libera o grafo para prosseguir para o nó de execução final.
+* **Edit (Editar):** Permite que o médico altere o rascunho ou o valor proposto diretamente na interface. O novo dado é reinjetado no estado do grafo e o ciclo de verificação é reiniciado.
+* **Cancel (Cancelar):** Aborta a tarefa específica, instruindo o orquestrador a reverter para um estado seguro ou aguardar novas instruções.
   Este ciclo de feedback garante que o sistema atue como um amplificador da produtividade do médico, e não como um substituto de sua autoridade clínica e estratégica.
 
 ## **Compliance Ético e Segurança Regulatória (CFM)**
@@ -1133,4 +1133,4 @@ O encerramento de cada ciclo de desenvolvimento é documentado através de mensa
 
 # ***Evolução para Marketing Intelligence completo***
 
-Com a fundação do NeuroEngine e da camada LAM-like estabelecida, novas capacidades podem ser acopladas: módulos específicos para SEO, GEO avançado, gestão de reputação em múltiplas plataformas e automação guiada de conteúdo em Wordpress. A mesma arquitetura de dados canônicos e de orquestração de agentes permite escalar de um consultório individual para redes de clínicas, preservando controle humano e ética em todas as ações.  
+Com a fundação do NeuroEngine e da camada LAM-like estabelecida, novas capacidades podem ser acopladas: módulos específicos para SEO, GEO avançado, gestão de reputação em múltiplas plataformas e automação guiada de conteúdo em Wordpress. A mesma arquitetura de dados canônicos e de orquestração de agentes permite escalar de um consultório individual para redes de clínicas, preservando controle humano e ética em todas as ações.

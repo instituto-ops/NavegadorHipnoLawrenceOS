@@ -25,6 +25,7 @@ class WebSocketMessage(BaseModel):
 async def health_check():
     return {"status": "ok"}
 
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -51,7 +52,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 request = JulesRequest(command=msg.command)
                 asyncio.create_task(run_jules_command(request=request, websocket=websocket))
             else:
-                 await websocket.send_text(json.dumps({"type": "error", "message": "Unknown task type or missing payload"}))
+                await websocket.send_text(json.dumps({"type": "error", "message": "Unknown task type or missing payload"}))
 
     except WebSocketDisconnect:
         print("Client disconnected gracefully.")
@@ -62,6 +63,8 @@ async def websocket_endpoint(websocket: WebSocket):
         except Exception:
             pass
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

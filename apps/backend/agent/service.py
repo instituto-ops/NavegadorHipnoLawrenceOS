@@ -1,30 +1,33 @@
-import os
 import json
-import base64
 import asyncio
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
-from browser_use import Agent, Browser, BrowserProfile
+from browser_use import Agent, Browser
+from browser_use.browser.browser import BrowserConfig
 from fastapi import WebSocket, WebSocketDisconnect
 
 load_dotenv()
+
 
 async def run_agent(task: str, websocket: WebSocket):
     # Initialize the LLM (Groq Llama 3 70B)
     llm = ChatGroq(model="llama3-70b-8192", temperature=0.0)
 
     # Initialize Browser (headless=False)
-    browser = Browser(config=BrowserProfile(headless=False))
+    browser = Browser(config=BrowserConfig(headless=False))  # type: ignore
 
     try:
         # We define a custom action/callback logic by wrapping the agent execution or
         # using the step generator. `browser-use` allows running steps iteratively.
-        agent = Agent(task=task, llm=llm, browser=browser)
+        agent: Agent = Agent(task=task, llm=llm, browser=browser)  # type: ignore
 
-        await websocket.send_text(json.dumps({"type": "log", "message": f"Starting task: {task}"}))
+        await websocket.send_text(
+            json.dumps({"type": "log", "message": f"Starting task: {task}"})
+        )
 
         # In browser-use, we can step through the agent's execution
-        async for state in agent.run_step_by_step():
+        result = await agent.run(max_steps=10)
+        for state in [result]:
             if state is None:
                 continue
 
@@ -36,45 +39,50 @@ async def run_agent(task: str, websocket: WebSocket):
 
                 # Try to extract the last thought or action
                 action_text = "Processing step..."
-                if hasattr(state, 'history') and state.history:
-                     last_step = state.history[-1]
-                     if hasattr(last_step, 'thought'):
-                         action_text = f"Thought: {last_step.thought}"
+                if hasattr(state, "history") and state.history:
+                    last_step = state.history[-1]
+                    if hasattr(last_step, "thought"):
+                        action_text = f"Thought: {last_step.thought}"
 
                 # Send log
-                await websocket.send_text(json.dumps({
-                    "type": "log",
-                    "message": action_text
-                }))
+                await websocket.send_text(
+                    json.dumps({"type": "log", "message": action_text})
+                )
 
                 # Try to send screenshot if available
                 # Usually state has a base64 encoded screenshot or we can get it from the browser state
-                if hasattr(state, 'screenshot') and state.screenshot:
-                    await websocket.send_text(json.dumps({
-                        "type": "screenshot",
-                        "data": state.screenshot
-                    }))
-                elif hasattr(state, 'state') and hasattr(state.state, 'screenshot') and state.state.screenshot:
-                    await websocket.send_text(json.dumps({
-                        "type": "screenshot",
-                        "data": state.state.screenshot
-                    }))
+                if hasattr(state, "screenshot") and state.screenshot:
+                    await websocket.send_text(
+                        json.dumps({"type": "screenshot", "data": state.screenshot})
+                    )
+                elif (
+                    hasattr(state, "state")
+                    and hasattr(state.state, "screenshot")
+                    and state.state.screenshot
+                ):
+                    await websocket.send_text(
+                        json.dumps(
+                            {"type": "screenshot", "data": state.state.screenshot}
+                        )
+                    )
 
             except Exception as e:
                 print(f"Error extracting step info: {e}")
 
-            await asyncio.sleep(0.5) # Slight delay to not overwhelm websocket
+            await asyncio.sleep(0.5)  # Slight delay to not overwhelm websocket
 
-        await websocket.send_text(json.dumps({"type": "log", "message": "Task completed."}))
+        await websocket.send_text(
+            json.dumps({"type": "log", "message": "Task completed."})
+        )
         await websocket.send_text(json.dumps({"type": "done"}))
 
     except WebSocketDisconnect:
-         print("Client disconnected gracefully during agent execution.")
+        print("Client disconnected gracefully during agent execution.")
     except Exception as e:
-         print(f"Error running agent: {e}")
-         try:
-             await websocket.send_text(json.dumps({"type": "error", "message": str(e)}))
-         except:
-             pass
+        print(f"Error running agent: {e}")
+        try:
+            await websocket.send_text(json.dumps({"type": "error", "message": str(e)}))
+        except Exception as e:
+            pass
     finally:
-         await browser.close()
+        await browser.close()
