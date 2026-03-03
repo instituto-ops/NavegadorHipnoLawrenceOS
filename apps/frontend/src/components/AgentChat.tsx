@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, TerminalSquare, Image as ImageIcon, Loader2, Code2, OctagonPause } from 'lucide-react';
+import { Send, TerminalSquare, Image as ImageIcon, Loader2, OctagonPause } from 'lucide-react';
 import { useAgentSocket } from '../hooks/useAgentSocket';
+import { JulesTerminal } from './JulesTerminal';
 
 export const AgentChat: React.FC = () => {
   const [input, setInput] = useState('');
@@ -12,15 +13,10 @@ export const AgentChat: React.FC = () => {
   } = useAgentSocket('ws://localhost:8000/ws');
 
   const logsEndRef = useRef<HTMLDivElement>(null);
-  const julesLogsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
-
-  useEffect(() => {
-    julesLogsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [julesLogs]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,45 +129,14 @@ export const AgentChat: React.FC = () => {
         </div>
 
         {/* Right Column: Jules Terminal */}
-        <div className="flex-1 flex flex-col bg-[#1e1e1e] rounded-xl shadow-sm border border-gray-800 overflow-hidden">
-             <div className="bg-[#2d2d2d] text-gray-200 px-4 py-2 flex items-center gap-2 border-b border-black">
-                 <Code2 size={18} className="text-blue-400" />
-                 <h2 className="font-semibold text-sm">Jules Terminal</h2>
-             </div>
-             <div className="flex-1 p-4 overflow-y-auto text-gray-300 font-mono text-sm">
-                 <div className="mb-4 text-blue-400">
-                    Welcome to Jules CLI. Type commands starting with "jules" (e.g., `jules --help`)
-                 </div>
-                 {julesLogs.map((log, index) => (
-                    <div key={index} className="whitespace-pre-wrap font-mono text-sm leading-snug">
-                       {log}
-                    </div>
-                 ))}
-                 {isJulesRunning && (
-                    <div className="flex items-center gap-2 mt-2 text-gray-500">
-                       <Loader2 size={14} className="animate-spin" />
-                       <span>Running...</span>
-                    </div>
-                 )}
-                 <div ref={julesLogsEndRef} />
-             </div>
-
-             {/* Jules Input */}
-             <div className="p-2 border-t border-gray-800 bg-[#2d2d2d]">
-                <form onSubmit={handleJulesSubmit} className="flex gap-2">
-                  <span className="text-green-500 font-mono py-2 pl-2">❯</span>
-                  <input
-                    type="text"
-                    value={julesInput}
-                    onChange={(e) => setJulesInput(e.target.value)}
-                    disabled={!isConnected || isJulesRunning}
-                    placeholder="jules --help"
-                    className="flex-1 px-2 py-2 bg-transparent text-gray-200 font-mono focus:outline-none disabled:opacity-50 placeholder-gray-600"
-                  />
-                </form>
-             </div>
-        </div>
-
+        <JulesTerminal
+          logs={julesLogs}
+          isRunning={isJulesRunning}
+          isConnected={isConnected}
+          input={julesInput}
+          setInput={setJulesInput}
+          onSubmit={handleJulesSubmit}
+        />
       </div>
     </div>
   );
