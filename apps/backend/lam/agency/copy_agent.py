@@ -65,4 +65,4 @@ async def copy_agent_node(state: Dict[str, Any]) -> Dict[str, Any]:
 
     # We append the generated asset to the state.
     # We might want to add an 'agency_results' key to the state later.
-    return {"status": "copy_generated", "copy_asset": result}
+    return {"copy_asset": result}

@@ -60,4 +60,4 @@ async def ads_agent_node(state: Dict[str, Any]) -> Dict[str, Any]:
     result = await chain.ainvoke({"task": task, "metrics_data": memory_context})
 
     # We append the generated asset to the state.
-    return {"status": "ads_generated", "ads_asset": result}
+    return {"ads_asset": result}

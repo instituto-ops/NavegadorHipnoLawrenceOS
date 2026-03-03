@@ -56,4 +56,4 @@ async def seo_agent_node(state: Dict[str, Any]) -> Dict[str, Any]:
     result = await chain.ainvoke({"task": task, "competitor_analysis": memory_context})
 
     # We append the generated asset to the state.
-    return {"status": "seo_generated", "seo_asset": result}
+    return {"seo_asset": result}
