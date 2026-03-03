@@ -117,10 +117,10 @@ class LamOrchestrator:
 
     async def run_task(self, task: str, thread_id: str = "default_thread"):
         """Main entry point invoked by main.py WebSocket."""
-        config = {"configurable": {"thread_id": thread_id}}
+        config: Any = {"configurable": {"thread_id": thread_id}}
 
         # Initialize state
-        initial_state = {
+        initial_state: Any = {
             "task": task,
             "plan": {},
             "execution_results": [],

@@ -1,3 +1,4 @@
+from pydantic import SecretStr
 import os
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
@@ -38,7 +39,7 @@ def create_planner_chain():
     # We use Llama 3 via Groq for planning
     # Provide a fallback if GROQ_API_KEY is not set (it should be in .env)
     api_key = os.environ.get("GROQ_API_KEY", "")
-    llm = ChatGroq(temperature=0, model_name="llama3-70b-8192", api_key=api_key)
+    llm = ChatGroq(temperature=0, model="llama3-70b-8192", api_key=SecretStr(api_key) if api_key else None)
 
     parser = JsonOutputParser(pydantic_object=Plan)
 
