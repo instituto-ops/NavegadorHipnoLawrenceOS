@@ -2,6 +2,9 @@ import asyncio
 import random
 from typing import List, Dict, Any
 from playwright.async_api import Page
+from bridges.doctoralia import scrape_doctoralia_profile
+from bridges.google_ads import read_ads_campaigns
+from bridges.wordpress import draft_wordpress_post
 
 # Playwright execution engine mapping DSL to real browser actions
 
@@ -91,7 +94,8 @@ class Executor:
             if selector and text:
                 # Organic typing simulation
                 await self.page.fill(selector, "")
-                await self.page.type(selector, text, delay=random.randint(50, 150))
+                await self._stealth_delay(1500, 4000) # Pre-fill wait
+                await self.page.type(selector, text, delay=random.randint(100, 300))
                 return f"Filled {selector} with text"
             return "Missing selector or text"
 
@@ -105,6 +109,29 @@ class Executor:
             content = await self.page.inner_text(selector)
             # Truncate for safety
             return content[:500] + "..." if len(content) > 500 else content
+
+        elif action_type == "DOCTORALIA_SCRAPE":
+            url = params.get("url")
+            if url:
+                await self._stealth_delay(1500, 4000)
+                return await scrape_doctoralia_profile(self.page, url)
+            return "FAIL: Missing Doctoralia URL"
+
+        elif action_type == "ADS_READ_CAMPAIGNS":
+            url = params.get("url")
+            if url:
+                await self._stealth_delay(1500, 4000)
+                return await read_ads_campaigns(self.page, url)
+            return "FAIL: Missing Ads URL"
+
+        elif action_type == "WP_DRAFT_POST":
+            url = params.get("url")
+            title = params.get("title")
+            content_text = params.get("content")
+            if url and title and content_text:
+                await self._stealth_delay(1500, 4000)
+                return await draft_wordpress_post(self.page, url, title, content_text)
+            return "FAIL: Missing WordPress draft parameters (url, title, content)"
 
         elif action_type == "SUMMARIZE":
             text = params.get("text", "")

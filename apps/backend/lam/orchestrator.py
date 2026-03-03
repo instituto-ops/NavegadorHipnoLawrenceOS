@@ -7,11 +7,21 @@ import aiosqlite
 
 # Make sure imports point correctly depending on how main.py invokes this module
 try:
-    from .planner import generate_plan
-    from .executor import Executor
+    from .executor import Executor  # type: ignore
+    from .planner import generate_plan  # type: ignore
 except ImportError:
-    from planner import generate_plan
-    from executor import Executor
+    from executor import Executor  # type: ignore
+    from planner import generate_plan  # type: ignore
+try:
+    from .agency.ads_agent import ads_agent_node
+    from .agency.coordinator import marketing_coordinator_node, route_agency
+    from .agency.copy_agent import copy_agent_node
+    from .agency.seo_agent import seo_agent_node
+except ImportError:
+    from lam.agency.ads_agent import ads_agent_node
+    from lam.agency.coordinator import marketing_coordinator_node, route_agency
+    from lam.agency.copy_agent import copy_agent_node
+    from lam.agency.seo_agent import seo_agent_node
 
 
 # Core state definition for the LAM session
@@ -23,6 +33,10 @@ class LamState(TypedDict):
     hitl_approved: bool
     summary: str
     memory_context: str  # Placeholder for NeuroEngine connection
+    agency_routing: Dict[str, Any]  # For coordinator decisions
+    copy_asset: Dict[str, Any]
+    ads_asset: Dict[str, Any]
+    seo_asset: Dict[str, Any]
 
 
 class LamOrchestrator:
@@ -54,6 +68,12 @@ class LamOrchestrator:
         # 1. Goal Node: Initial processing and context gathering (NeuroEngine hook)
         builder.add_node("Goal", self._node_goal)
 
+        # Agency Subsystem Nodes
+        builder.add_node("MarketingCoordinator", marketing_coordinator_node)
+        builder.add_node("CopyAgent", copy_agent_node)
+        builder.add_node("AdsAgent", ads_agent_node)
+        builder.add_node("SEOAgent", seo_agent_node)
+
         # 2. Planning Node: Generates the DSL via Intention Intelligence
         builder.add_node("Planning", self._node_planning)
 
@@ -68,7 +88,18 @@ class LamOrchestrator:
 
         # --- Edges Definition ---
         builder.add_edge(START, "Goal")
-        builder.add_edge("Goal", "Planning")
+        # Route from Goal to Coordinator or straight to Planning depending on the task
+        builder.add_conditional_edges("Goal", self._route_from_goal)
+
+        # From Coordinator, route to the sub-agents
+        builder.add_conditional_edges(
+            "MarketingCoordinator", route_agency, ["CopyAgent", "AdsAgent", "SEOAgent"]
+        )
+
+        # Sub-agents go back to verification/planning if they need LAM execution, else Summarization. For simplicity, we send them to Summarization.
+        builder.add_edge("CopyAgent", "Summarization")
+        builder.add_edge("AdsAgent", "Summarization")
+        builder.add_edge("SEOAgent", "Summarization")
 
         # Route to Verification if HITL is required, otherwise directly to Execution
         builder.add_conditional_edges(
@@ -92,6 +123,23 @@ class LamOrchestrator:
         return builder.compile(
             checkpointer=self.memory, interrupt_before=["Verification"]
         )
+
+    def _route_from_goal(
+        self, state: LamState
+    ) -> Literal["MarketingCoordinator", "Planning"]:
+        task = state.get("task", "").lower()
+        marketing_keywords = [
+            "campaign",
+            "copy",
+            "ads",
+            "seo",
+            "marketing",
+            "hypnotherapy campaign",
+        ]
+        if any(keyword in task for keyword in marketing_keywords):
+            print("Routing to Marketing Agency Subsystem...")
+            return "MarketingCoordinator"
+        return "Planning"
 
     async def _node_goal(self, state: LamState):
         """Prepares task and context (hook for NeuroEngine/Long-Term Memory)."""
@@ -161,7 +209,6 @@ class LamOrchestrator:
             # We assume state has been updated externally if needed
             async for event in self.graph.astream(None, config):
                 print("Event:", event)
-        else:
             # Initialize state
             initial_state: Any = {
                 "task": task,
@@ -171,6 +218,10 @@ class LamOrchestrator:
                 "hitl_approved": False,  # Changed to False until explicitly approved
                 "summary": "",
                 "memory_context": "",
+                "agency_routing": {},
+                "copy_asset": {},
+                "ads_asset": {},
+                "seo_asset": {},
             }
 
             # Run up to the interruption point (Verification)
