@@ -2,7 +2,6 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from agent.service import run_agent
 from agent.jules_cli import run_jules_command
-import asyncio
 import json
 
 app = FastAPI(title="NeuroStrategy OS Backend")
@@ -15,9 +14,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -43,7 +44,9 @@ async def websocket_endpoint(websocket: WebSocket):
                 if command:
                     await run_jules_command(command=command, websocket=websocket)
             else:
-                 await websocket.send_text(json.dumps({"type": "error", "message": "Unknown task type"}))
+                await websocket.send_text(
+                    json.dumps({"type": "error", "message": "Unknown task type"})
+                )
 
     except WebSocketDisconnect:
         print("Client disconnected gracefully.")
@@ -54,6 +57,8 @@ async def websocket_endpoint(websocket: WebSocket):
         except Exception:
             pass
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -5,6 +5,7 @@ from playwright.async_api import Page
 
 # Playwright execution engine mapping DSL to real browser actions
 
+
 class Executor:
     def __init__(self, headless: bool = False):
         self.headless = headless
@@ -16,11 +17,14 @@ class Executor:
     async def initialize(self):
         """Initializes the browser session."""
         from playwright.async_api import async_playwright
+
         self.playwright = await async_playwright().start()
         # Launch Chromium (headless=False so navigation is visible as per instructions)
-        self.raw_browser = await self.playwright.chromium.launch(headless=self.headless, slow_mo=50)
+        self.raw_browser = await self.playwright.chromium.launch(
+            headless=self.headless, slow_mo=50
+        )
         self.context = await self.raw_browser.new_context(
-             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
         self.page = await self.context.new_page()
 
@@ -113,21 +117,23 @@ class Executor:
     async def close(self):
         """Cleans up browser resources and resets state for reuse."""
         if self.page:
-             await self.page.close()
-             self.page = None
+            await self.page.close()
+            self.page = None
         if self.context:
             await self.context.close()
             self.context = None
         if self.browser:
             await self.browser.close()
             self.browser = None
-        if hasattr(self, 'playwright') and self.playwright:
-             await self.playwright.stop()
-             self.playwright = None
+        if hasattr(self, "playwright") and self.playwright:
+            await self.playwright.stop()
+            self.playwright = None
 
         print("Browser closed.")
 
+
 if __name__ == "__main__":
+
     async def test():
         executor = Executor(headless=True)
         await executor.initialize()

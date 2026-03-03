@@ -4,12 +4,9 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 
 # Make sure imports point correctly depending on how main.py invokes this module
-try:
-    from .planner import generate_plan
-    from .executor import Executor
-except ImportError:
-    from planner import generate_plan
-    from executor import Executor
+from .planner import generate_plan
+from .executor import Executor
+
 
 # Core state definition for the LAM session
 class LamState(TypedDict):
@@ -19,13 +16,14 @@ class LamState(TypedDict):
     status: str
     hitl_approved: bool
     summary: str
-    memory_context: str # Placeholder for NeuroEngine connection
+    memory_context: str  # Placeholder for NeuroEngine connection
+
 
 class LamOrchestrator:
     def __init__(self, headless: bool = False):
         self.headless = headless
         self.executor = Executor(headless=headless)
-        self.memory = MemorySaver() # Initialize MemorySaver BEFORE building graph
+        self.memory = MemorySaver()  # Initialize MemorySaver BEFORE building graph
         self.graph = self._build_graph()
 
     def _build_graph(self):
@@ -56,11 +54,7 @@ class LamOrchestrator:
         builder.add_conditional_edges(
             "Verification",
             self._route_after_verification,
-            {
-                "execute": "Execution",
-                "abort": END,
-                "replan": "Planning"
-            }
+            {"execute": "Execution", "abort": END, "replan": "Planning"},
         )
 
         builder.add_edge("Execution", "Summarization")
@@ -68,7 +62,9 @@ class LamOrchestrator:
 
         # Compile the state graph
         # For HITL, we interrupt before Verification if we want it to block
-        return builder.compile(checkpointer=self.memory, interrupt_before=["Verification"])
+        return builder.compile(
+            checkpointer=self.memory, interrupt_before=["Verification"]
+        )
 
     async def _node_goal(self, state: LamState):
         """Prepares task and context (hook for NeuroEngine/Long-Term Memory)."""
@@ -90,11 +86,13 @@ class LamOrchestrator:
         print(f"Verification Node: Plan is {state.get('plan')}")
         return {"status": "verified"}
 
-    def _route_after_verification(self, state: LamState) -> Literal["execute", "abort", "replan"]:
+    def _route_after_verification(
+        self, state: LamState
+    ) -> Literal["execute", "abort", "replan"]:
         """Routing logic based on state['hitl_approved'] or similar."""
-        approved = state.get("hitl_approved", True) # Defaulting to True for now
+        approved = state.get("hitl_approved", True)  # Defaulting to True for now
         if approved:
-             return "execute"
+            return "execute"
         # In a real scenario, you might check if they requested replanning
         return "abort"
 
@@ -119,26 +117,26 @@ class LamOrchestrator:
 
         # Initialize state
         initial_state = {
-             "task": task,
-             "plan": {},
-             "execution_results": [],
-             "status": "started",
-             "hitl_approved": True, # Hardcoded True to allow execution in testing
-             "summary": "",
-             "memory_context": ""
+            "task": task,
+            "plan": {},
+            "execution_results": [],
+            "status": "started",
+            "hitl_approved": True,  # Hardcoded True to allow execution in testing
+            "summary": "",
+            "memory_context": "",
         }
 
         # Run up to the interruption point (Verification)
         async for event in self.graph.astream(initial_state, config):
-             print("Event:", event)
+            print("Event:", event)
 
         # If it paused at Verification, we resume it
         snapshot = self.graph.get_state(config)
         if snapshot.next and snapshot.next[0] == "Verification":
-             print("Resuming graph from HITL checkpoint...")
-             # Resuming graph
-             async for event in self.graph.astream(None, config):
-                  print("Event:", event)
+            print("Resuming graph from HITL checkpoint...")
+            # Resuming graph
+            async for event in self.graph.astream(None, config):
+                print("Event:", event)
 
         final_state = self.graph.get_state(config)
 
@@ -147,10 +145,10 @@ class LamOrchestrator:
 
         return final_state.values
 
+
 if __name__ == "__main__":
+
     async def test():
-        orchestrator = LamOrchestrator(headless=True)
-        import os
         print("Orchestrator state graph compiled successfully.")
 
     asyncio.run(test())
