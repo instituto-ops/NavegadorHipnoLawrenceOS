@@ -73,6 +73,7 @@ NAVIGATION INTELLIGENCE:
   1. GO_TO the main dashboard URL (e.g., https://ads.google.com).
   2. SEARCH by clicking the search icon and filling the campaign name.
   3. CLICK the correct campaign from the results.
+- For deep target navigation (like "Auction Insights" or "Search Terms" inside Google Ads), ensure you click on the corresponding navigation menus rather than guessing direct deep-links.
 - Always wait for elements to load before clicking.
 
 STRICT CLINICAL AND ETHICAL GUARDRAILS (CFM COMPLIANCE):

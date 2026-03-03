@@ -108,7 +108,21 @@ class Executor:
         elif action_type == "CLICK":
             selector = params.get("selector")
             if selector:
-                await self.page.click(selector)
+                # Try standard click first
+                try:
+                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
+                    await self.page.click(selector, force=True)
+                except Exception as e:
+                    print(f"Standard click failed for {selector}: {e}")
+                    # If it's an input/textarea often used for search, we can try pressing Enter
+                    # if the element was already focused/filled previously, or we evaluate the element
+                    try:
+                        # Fallback: Just hit enter as a general recovery mechanism for forms/searches
+                        await self.page.keyboard.press("Enter")
+                        return f"Pressed Enter as fallback for {selector}"
+                    except Exception as enter_e:
+                        print(f"Fallback enter failed: {enter_e}")
+                        raise
                 return f"Clicked {selector}"
             return "No selector provided"
 
@@ -116,8 +130,22 @@ class Executor:
             selector = params.get("selector")
             text = params.get("text")
             if selector and text:
-                # Organic typing simulation
-                await self.page.fill(selector, "")
+                # Add wait before fill
+                try:
+                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
+                    await self.page.fill(selector, "")
+                except Exception as e:
+                    print(f"Selector {selector} not found before fill: {e}")
+                    # In many modern apps, inputs change tags dynamically (e.g. input -> textarea)
+                    # A generalized fallback is to look for the element by its aria-label or placeholder
+                    # if we have a simple CSS selector, but without an LLM here, we'll just try to focus
+                    # whatever is currently active and type.
+                    try:
+                        await self.page.keyboard.type(text)
+                        return f"Typed {text} via fallback"
+                    except Exception as type_e:
+                        print(f"Fallback typing failed: {type_e}")
+                        raise
                 await self._stealth_delay(1500, 4000) # Pre-fill wait
                 await self.page.type(selector, text, delay=random.randint(100, 300))
                 return f"Filled {selector} with text"

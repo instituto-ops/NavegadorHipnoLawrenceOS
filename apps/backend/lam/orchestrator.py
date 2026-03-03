@@ -239,6 +239,7 @@ class LamOrchestrator:
             # We assume state has been updated externally if needed
             async for event in self.graph.astream(None, config):
                 print("Event:", event)
+        else:
             # Initialize state
             initial_state: Any = {
                 "task": task,

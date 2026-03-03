@@ -30,11 +30,14 @@ async def run_test_loop(goal: str, max_retries: int = 5):
             # We run the task
             result = await orchestrator.run_task(task=goal, thread_id=f"test_loop_{attempt}")
             
+            # Extract state values from run_task which returns final_snapshot.values
+            state_values = result
+
             # Simple success heuristic: check if 'status' is completed and no 'Error' in execution_results
-            execution_results = result.get("execution_results", [])
+            execution_results = state_values.get("execution_results", [])
             has_error = any("Error" in str(res) for res in execution_results)
             
-            if result.get("status") == "completed" and not has_error:
+            if state_values.get("status") == "completed" and not has_error:
                 print(f"Goal achieved on attempt #{attempt}!")
                 success = True
                 break
@@ -55,7 +58,7 @@ async def run_test_loop(goal: str, max_retries: int = 5):
 
 def main():
     parser = argparse.ArgumentParser(description="Jules Engineering CLI")
-    parser.add_argument("--help", action="store_true", help="Show help")
+    # parser.add_argument("--help", action="store_true", help="Show help") # Conflicting argument
     subparsers = parser.add_subparsers(dest="command")
     
     # Subcommand: test-loop
@@ -65,7 +68,7 @@ def main():
     
     args = parser.parse_args()
     
-    if args.help or not args.command:
+    if not args.command:
         parser.print_help()
         return
 
