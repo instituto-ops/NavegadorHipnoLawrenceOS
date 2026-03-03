@@ -1,7 +1,9 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from agent.service import run_agent
-from agent.jules_cli import run_jules_command
+from agent.jules_cli import run_jules_command, JulesRequest
+from pydantic import BaseModel
+import asyncio
 import json
 
 app = FastAPI(title="NeuroStrategy OS Backend")
@@ -13,6 +15,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class WebSocketMessage(BaseModel):
+    type: str
+    task: str | None = None
+    command: str | None = None
 
 
 @app.get("/health")
@@ -28,24 +36,37 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data_str = await websocket.receive_text()
             try:
-                data = json.loads(data_str)
+                data_dict = json.loads(data_str)
+                msg = WebSocketMessage(**data_dict)
             except json.JSONDecodeError:
                 # Fallback to simple text for LAM if needed, but let's assume JSON now.
-                data = {"type": "lam", "task": data_str}
+                msg = WebSocketMessage(type="lam", task=data_str)
+            except ValueError as e:
+                await websocket.send_text(
+                    json.dumps(
+                        {"type": "error", "message": f"Invalid message format: {e}"}
+                    )
+                )
+                continue
 
-            if data.get("type") == "lam":
-                task = data.get("task")
-                if task:
-                    # Run the agent in background so we don't block the loop completely
-                    # but for MVP, we'll await it to keep things simple and sequential
-                    await run_agent(task=task, websocket=websocket)
-            elif data.get("type") == "jules":
-                command = data.get("command")
-                if command:
-                    await run_jules_command(command=command, websocket=websocket)
+            if msg.type == "lam" and msg.task:
+                # Run the agent in background so we don't block the loop completely
+                # but for MVP, we'll await it to keep things simple and sequential
+                await run_agent(task=msg.task, websocket=websocket)
+            elif msg.type == "jules" and msg.command:
+                # Run jules command in the background to avoid blocking the main API loop
+                request = JulesRequest(command=msg.command)
+                asyncio.create_task(
+                    run_jules_command(request=request, websocket=websocket)
+                )
             else:
                 await websocket.send_text(
-                    json.dumps({"type": "error", "message": "Unknown task type"})
+                    json.dumps(
+                        {
+                            "type": "error",
+                            "message": "Unknown task type or missing payload",
+                        }
+                    )
                 )
 
     except WebSocketDisconnect:
