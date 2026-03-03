@@ -1,8 +1,7 @@
-import subprocess
 import os
-import shlex
 import asyncio
 from fastapi import WebSocket
+
 
 async def run_jules_command(command: str, websocket: WebSocket):
     # Security: basic validation
@@ -19,24 +18,28 @@ async def run_jules_command(command: str, websocket: WebSocket):
             command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            env=env
+            env=env,
         )
 
         async def read_stream(stream, ws: WebSocket, stream_type: str):
             while True:
                 line = await stream.readline()
                 if line:
-                    await ws.send_json({"type": stream_type, "message": line.decode('utf-8')})
+                    await ws.send_json(
+                        {"type": stream_type, "message": line.decode("utf-8")}
+                    )
                 else:
                     break
 
         await asyncio.gather(
             read_stream(process.stdout, websocket, "jules_output"),
-            read_stream(process.stderr, websocket, "jules_error")
+            read_stream(process.stderr, websocket, "jules_error"),
         )
 
         await process.wait()
-        await websocket.send_json({"type": "jules_done", "exit_code": process.returncode})
+        await websocket.send_json(
+            {"type": "jules_done", "exit_code": process.returncode}
+        )
 
     except Exception as e:
         await websocket.send_json({"type": "jules_error", "message": str(e)})
