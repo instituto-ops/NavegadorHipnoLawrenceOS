@@ -2,7 +2,8 @@ import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import {
   Globe2,
-  LayoutDashboard
+  LayoutDashboard,
+  Search
 } from 'lucide-react';
 import classNames from 'classnames';
 
@@ -42,6 +43,10 @@ export const MainLayout: React.FC = () => {
               <NavLink to="/dashboard" className={navLinkClass}>
                 <LayoutDashboard size={18} className="text-[#2EED8F]" />
                 <span>Painel de Análises</span>
+              </NavLink>
+              <NavLink to="/abidus-analysis" className={navLinkClass}>
+                <Search size={18} className="text-[#2EED8F]" />
+                <span>Análises Abidus</span>
               </NavLink>
             </nav>
           </div>
