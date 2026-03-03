@@ -1,7 +1,9 @@
 import asyncio
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+import sqlite3
+import aiosqlite
 
 # Make sure imports point correctly depending on how main.py invokes this module
 try:
@@ -27,8 +29,23 @@ class LamOrchestrator:
     def __init__(self, headless: bool = False):
         self.headless = headless
         self.executor = Executor(headless=headless)
-        self.memory = MemorySaver()  # Initialize MemorySaver BEFORE building graph
-        self.graph = self._build_graph()
+        self.memory: Any = None  # Will be set in async setup
+        self.graph: Any = None
+
+    async def setup(self):
+        """Async setup for the orchestrator, specifically for DB connection."""
+        if self.graph is None:
+            self.memory_conn = await aiosqlite.connect("database/checkpoints.sqlite")
+            self.memory = AsyncSqliteSaver(self.memory_conn)
+            # Ensure tables are created
+            await self.memory.setup()
+            self.graph = self._build_graph()
+
+    async def close(self):
+        """Cleanup resources."""
+        if hasattr(self, 'memory_conn') and self.memory_conn:
+            await self.memory_conn.close()
+        await self.executor.close()
 
     def _build_graph(self):
         """Constructs the state machine."""
@@ -52,7 +69,13 @@ class LamOrchestrator:
         # --- Edges Definition ---
         builder.add_edge(START, "Goal")
         builder.add_edge("Goal", "Planning")
-        builder.add_edge("Planning", "Verification")
+
+        # Route to Verification if HITL is required, otherwise directly to Execution
+        builder.add_conditional_edges(
+            "Planning",
+            self._route_after_planning,
+            {"verify": "Verification", "execute": "Execution"}
+        )
 
         # Conditional edge based on HITL approval
         builder.add_conditional_edges(
@@ -82,6 +105,15 @@ class LamOrchestrator:
         task = state.get("task", "")
         plan = await generate_plan(task)
         return {"plan": plan, "status": "planned"}
+
+    def _route_after_planning(self, state: LamState) -> Literal["verify", "execute"]:
+        """Check if the generated plan requires HITL."""
+        plan = state.get("plan", {})
+        requires_hitl = plan.get("requires_hitl", False) if isinstance(plan, dict) else getattr(plan, "requires_hitl", False)
+        if requires_hitl:
+            print("HITL Required. Routing to Verification node.")
+            return "verify"
+        return "execute"
 
     async def _node_verification(self, state: LamState):
         """Human-in-the-loop checkpoint."""
@@ -117,43 +149,45 @@ class LamOrchestrator:
 
     async def run_task(self, task: str, thread_id: str = "default_thread"):
         """Main entry point invoked by main.py WebSocket."""
+        if self.graph is None:
+            await self.setup()
+
         config: Any = {"configurable": {"thread_id": thread_id}}
 
-        # Initialize state
-        initial_state: Any = {
-            "task": task,
-            "plan": {},
-            "execution_results": [],
-            "status": "started",
-            "hitl_approved": True,  # Hardcoded True to allow execution in testing
-            "summary": "",
-            "memory_context": "",
-        }
-
-        # Run up to the interruption point (Verification)
-        async for event in self.graph.astream(initial_state, config):
-            print("Event:", event)
-
-        # If it paused at Verification, we resume it
-        snapshot = self.graph.get_state(config)
+        # Check if thread already exists
+        snapshot = await self.graph.aget_state(config)
         if snapshot.next and snapshot.next[0] == "Verification":
             print("Resuming graph from HITL checkpoint...")
-            # Resuming graph
+            # We assume state has been updated externally if needed
             async for event in self.graph.astream(None, config):
                 print("Event:", event)
+        else:
+            # Initialize state
+            initial_state: Any = {
+                "task": task,
+                "plan": {},
+                "execution_results": [],
+                "status": "started",
+                "hitl_approved": False,  # Changed to False until explicitly approved
+                "summary": "",
+                "memory_context": "",
+            }
 
-        final_state = self.graph.get_state(config)
+            # Run up to the interruption point (Verification)
+            async for event in self.graph.astream(initial_state, config):
+                print("Event:", event)
 
-        # Cleanup browser
-        await self.executor.close()
-
-        return final_state.values
+        final_snapshot = await self.graph.aget_state(config)
+        return final_snapshot.values
 
 
 if __name__ == "__main__":
-
     async def test():
-        LamOrchestrator(headless=True)
+        import os
+        os.makedirs("database", exist_ok=True)
+        orc = LamOrchestrator(headless=True)
+        await orc.setup()
         print("Orchestrator state graph compiled successfully.")
+        await orc.close()
 
     asyncio.run(test())

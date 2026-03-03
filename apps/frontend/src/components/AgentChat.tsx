@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAgentSocket } from "../hooks/useAgentSocket";
 import { JulesTerminal } from "./JulesTerminal";
+import { ActionReviewCard } from "./ActionReviewCard";
 
 export const AgentChat: React.FC = () => {
   const [input, setInput] = useState("");
@@ -20,9 +21,11 @@ export const AgentChat: React.FC = () => {
     isConnected,
     isRunning,
     isJulesRunning,
+    hitlRequest,
     sendTask,
     sendJulesCommand,
     sendPanicStop,
+    sendHitlResponse,
   } = useAgentSocket("ws://localhost:8000/ws");
 
   const logsEndRef = useRef<HTMLDivElement>(null);
@@ -116,6 +119,14 @@ export const AgentChat: React.FC = () => {
           </div>
 
           {/* LAM Input */}
+          {hitlRequest && (
+            <ActionReviewCard
+              plan={hitlRequest.plan}
+              onApprove={() => sendHitlResponse(hitlRequest.thread_id, "approve")}
+              onReject={() => sendHitlResponse(hitlRequest.thread_id, "reject")}
+              onEdit={(editedPlan) => sendHitlResponse(hitlRequest.thread_id, "edit", editedPlan)}
+            />
+          )}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input
