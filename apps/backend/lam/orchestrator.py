@@ -4,8 +4,12 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 
 # Make sure imports point correctly depending on how main.py invokes this module
-from .planner import generate_plan
-from .executor import Executor
+try:
+    from .planner import generate_plan
+    from .executor import Executor
+except ImportError:
+    from planner import generate_plan
+    from executor import Executor
 
 
 # Core state definition for the LAM session
@@ -149,6 +153,7 @@ class LamOrchestrator:
 if __name__ == "__main__":
 
     async def test():
+        LamOrchestrator(headless=True)
         print("Orchestrator state graph compiled successfully.")
 
     asyncio.run(test())

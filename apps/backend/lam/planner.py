@@ -84,6 +84,7 @@ if __name__ == "__main__":
     # Simple test
     async def test():
         os.environ["GROQ_API_KEY"] = "dummy_key_for_test"
+        create_planner_chain()
         print("Planner chain created successfully.")
 
     asyncio.run(test())

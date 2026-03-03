@@ -16,10 +16,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class WebSocketMessage(BaseModel):
     type: str
     task: str | None = None
     command: str | None = None
+
 
 @app.get("/health")
 async def health_check():
@@ -40,7 +42,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Fallback to simple text for LAM if needed, but let's assume JSON now.
                 msg = WebSocketMessage(type="lam", task=data_str)
             except ValueError as e:
-                await websocket.send_text(json.dumps({"type": "error", "message": f"Invalid message format: {e}"}))
+                await websocket.send_text(
+                    json.dumps(
+                        {"type": "error", "message": f"Invalid message format: {e}"}
+                    )
+                )
                 continue
 
             if msg.type == "lam" and msg.task:
@@ -50,9 +56,18 @@ async def websocket_endpoint(websocket: WebSocket):
             elif msg.type == "jules" and msg.command:
                 # Run jules command in the background to avoid blocking the main API loop
                 request = JulesRequest(command=msg.command)
-                asyncio.create_task(run_jules_command(request=request, websocket=websocket))
+                asyncio.create_task(
+                    run_jules_command(request=request, websocket=websocket)
+                )
             else:
-                await websocket.send_text(json.dumps({"type": "error", "message": "Unknown task type or missing payload"}))
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "error",
+                            "message": "Unknown task type or missing payload",
+                        }
+                    )
+                )
 
     except WebSocketDisconnect:
         print("Client disconnected gracefully.")

@@ -1,11 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, TerminalSquare, Image as ImageIcon, Loader2, OctagonPause } from 'lucide-react';
-import { useAgentSocket } from '../hooks/useAgentSocket';
-import { JulesTerminal } from './JulesTerminal';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Send,
+  TerminalSquare,
+  Image as ImageIcon,
+  Loader2,
+  OctagonPause,
+} from "lucide-react";
+import { useAgentSocket } from "../hooks/useAgentSocket";
+import { JulesTerminal } from "./JulesTerminal";
 
 export const AgentChat: React.FC = () => {
-  const [input, setInput] = useState('');
-  const [julesInput, setJulesInput] = useState('');
+  const [input, setInput] = useState("");
+  const [julesInput, setJulesInput] = useState("");
 
   const {
     logs,
@@ -17,26 +23,26 @@ export const AgentChat: React.FC = () => {
     sendTask,
     sendJulesCommand,
     sendPanicStop,
-  } = useAgentSocket('ws://localhost:8000/ws');
+  } = useAgentSocket("ws://localhost:8000/ws");
 
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || !isConnected || isRunning) return;
     sendTask(input);
-    setInput('');
+    setInput("");
   };
 
   const handleJulesSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!julesInput.trim() || !isConnected || isJulesRunning) return;
     sendJulesCommand(julesInput);
-    setJulesInput('');
+    setJulesInput("");
   };
 
   return (
@@ -44,7 +50,7 @@ export const AgentChat: React.FC = () => {
       <header className="mb-4 text-center">
         <h1 className="text-3xl font-bold text-gray-800">NeuroStrategy OS</h1>
         <p className="text-sm text-gray-500">
-          Status:{' '}
+          Status:{" "}
           {isConnected ? (
             <span className="text-green-600 font-semibold">Connected</span>
           ) : (
@@ -82,7 +88,9 @@ export const AgentChat: React.FC = () => {
           <div className="flex-[0.4] flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="bg-gray-800 text-gray-200 px-4 py-2 flex items-center gap-2 border-b border-gray-700">
               <TerminalSquare size={18} />
-              <h2 className="font-semibold text-sm">Agent Thoughts & Actions</h2>
+              <h2 className="font-semibold text-sm">
+                Agent Thoughts & Actions
+              </h2>
             </div>
             <div className="flex-1 p-4 overflow-y-auto bg-gray-900 text-green-400 font-mono text-sm">
               {logs.length === 0 ? (
@@ -90,7 +98,9 @@ export const AgentChat: React.FC = () => {
               ) : (
                 logs.map((log, index) => (
                   <div key={index} className="mb-1 leading-relaxed">
-                    <span className="text-gray-500 mr-2">[{new Date().toLocaleTimeString()}]</span>
+                    <span className="text-gray-500 mr-2">
+                      [{new Date().toLocaleTimeString()}]
+                    </span>
                     {log}
                   </div>
                 ))
@@ -115,7 +125,7 @@ export const AgentChat: React.FC = () => {
                 disabled={!isConnected || isRunning}
                 placeholder={
                   !isConnected
-                    ? 'Connecting...'
+                    ? "Connecting..."
                     : "Enter LAM task (e.g., 'Search Google for NeuroStrategy')"
                 }
                 className="flex-1 px-4 py-2 rounded-lg border-none bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
@@ -135,7 +145,11 @@ export const AgentChat: React.FC = () => {
                 disabled={!input.trim() || !isConnected || isRunning}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
               >
-                {isRunning ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                {isRunning ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Send size={18} />
+                )}
                 Execute
               </button>
             </form>
