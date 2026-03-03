@@ -8,3 +8,4 @@ playwright
 python-dotenv
 langgraph
 pydantic
+langgraph-checkpoint-sqlite

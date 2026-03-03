@@ -1,68 +1,61 @@
-from typing import Any
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
-from lam.orchestrator import LamOrchestrator
-import uuid
-from agent.jules_cli import run_jules_command, JulesRequest
-from pydantic import BaseModel
-import asyncio
-import json
+with open("apps/backend/main.py", "r") as f:
+    content = f.read()
 
-app = FastAPI(title="NeuroStrategy OS Backend")
+import re
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Update imports
+content = content.replace("from agent.service import run_agent", "from lam.orchestrator import LamOrchestrator\nimport uuid")
 
+# Update WebSocketMessage
+msg_old = """class WebSocketMessage(BaseModel):
+    type: str
+    task: str | None = None
+    command: str | None = None"""
 
-class WebSocketMessage(BaseModel):
+msg_new = """class WebSocketMessage(BaseModel):
     type: str
     task: str | None = None
     command: str | None = None
     thread_id: str | None = None
     action: str | None = None # For HITL: approve, reject, edit
-    plan: dict | None = None # For edited plan
+    plan: dict | None = None # For edited plan"""
 
+content = content.replace(msg_old, msg_new)
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+# Replace the run_agent call with LamOrchestrator logic inside the websocket loop
+# We need an orchestrator instance per connection or a global one. Let's make one per connection.
+ws_old = """@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        # We listen for messages.
+        while True:"""
 
-
-@app.websocket("/ws")
+ws_new = """@app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     orchestrator = LamOrchestrator(headless=False)
     await orchestrator.setup()
     try:
         # We listen for messages.
-        while True:
-            data_str = await websocket.receive_text()
-            try:
-                data_dict = json.loads(data_str)
-                msg = WebSocketMessage(**data_dict)
-            except json.JSONDecodeError:
-                # Fallback to simple text for LAM if needed, but let's assume JSON now.
-                msg = WebSocketMessage(type="lam", task=data_str)
-            except ValueError as e:
-                await websocket.send_text(
-                    json.dumps(
-                        {"type": "error", "message": f"Invalid message format: {e}"}
-                    )
-                )
-                continue
+        while True:"""
 
-            if msg.type == "lam" and msg.task:
+content = content.replace(ws_old, ws_new)
+
+# Handle lam task and hitl_response
+loop_old = """            if msg.type == "lam" and msg.task:
+                # Run the agent in background so we don't block the loop completely
+                # but for MVP, we'll await it to keep things simple and sequential
+                await run_agent(task=msg.task, websocket=websocket)
+            elif msg.type == "jules" and msg.command:"""
+
+loop_new = """            if msg.type == "lam" and msg.task:
                 # Generate a unique thread ID if not provided
                 thread_id = msg.thread_id or str(uuid.uuid4())
                 await websocket.send_text(json.dumps({"type": "log", "message": f"Starting task: {msg.task} (Thread: {thread_id})"}))
 
-                config: Any = {"configurable": {"thread_id": thread_id}}
-                initial_state: Any = {
+                config = {"configurable": {"thread_id": thread_id}}
+                initial_state = {
                     "task": msg.task,
                     "plan": {},
                     "execution_results": [],
@@ -92,7 +85,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif msg.type == "hitl_response" and msg.thread_id:
                 thread_id = msg.thread_id
-                config: Any = {"configurable": {"thread_id": thread_id}}
+                config = {"configurable": {"thread_id": thread_id}}
 
                 snapshot = await orchestrator.graph.aget_state(config)
                 if not snapshot.next or snapshot.next[0] != "Verification":
@@ -134,34 +127,19 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_text(json.dumps({"type": "log", "message": "Task aborted."}))
                     await websocket.send_text(json.dumps({"type": "done"}))
 
-            elif msg.type == "jules" and msg.command:
-                # Run jules command in the background to avoid blocking the main API loop
-                request = JulesRequest(command=msg.command)
-                asyncio.create_task(
-                    run_jules_command(request=request, websocket=websocket)
-                )
-            else:
-                await websocket.send_text(
-                    json.dumps(
-                        {
-                            "type": "error",
-                            "message": "Unknown task type or missing payload",
-                        }
-                    )
-                )
+            elif msg.type == "jules" and msg.command:"""
 
-    except WebSocketDisconnect:
+content = content.replace(loop_old, loop_new)
+
+# Handle connection closing
+cleanup_old = """    except WebSocketDisconnect:
+        print("Client disconnected gracefully.")"""
+
+cleanup_new = """    except WebSocketDisconnect:
         print("Client disconnected gracefully.")
-        await orchestrator.close()
-    except Exception as e:
-        print(f"Error in websocket connection: {e}")
-        try:
-            await websocket.close()
-        except Exception:
-            pass
+        await orchestrator.close()"""
 
+content = content.replace(cleanup_old, cleanup_new)
 
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+with open("apps/backend/main.py", "w") as f:
+    f.write(content)

@@ -35,6 +35,11 @@ class Plan(BaseModel):
     actions: List[AtomicAction] = Field(
         description="Sequence of atomic actions to achieve the goal"
     )
+    requires_hitl: bool = Field(
+        default=False,
+        description="Must be True if ANY action in the plan involves financial spending, publishing posts, or sending public messages."
+    )
+
 
 
 def create_planner_chain():
@@ -64,6 +69,14 @@ Available actions are:
 
 Provide CSS or XPath selectors based on common web structures if exact selectors are unknown,
 but prioritize semantic HTML elements (e.g., 'input[type="search"]', 'button').
+
+STRICT CLINICAL AND ETHICAL GUARDRAILS (CFM COMPLIANCE):
+- You must evaluate if the plan involves ANY sensitive operations, defined as:
+  1. Financials: changing budgets, bidding, or Google Ads settings.
+  2. Publishing: creating, drafting, or publishing blog posts (e.g., WordPress), or social media content.
+  3. Public Messaging: replying to reviews (e.g., Doctoralia) or sending direct messages.
+- If the plan involves ANY of these sensitive operations, you MUST set `requires_hitl` to true.
+- Do not promise guaranteed cures or outcomes in any proposed text, adhering strictly to CFM (Conselho Federal de Medicina) guidelines.
 
 {format_instructions}""",
             ),
