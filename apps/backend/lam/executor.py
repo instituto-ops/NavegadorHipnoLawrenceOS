@@ -165,6 +165,32 @@ class Executor:
         else:
             return f"Unknown action: {action_type}"
 
+    async def get_accessibility_tree(self) -> str:
+        """Captures a simplified version of the accessibility tree for LLM reasoning."""
+        if not self.page:
+            return "No page loaded."
+        
+        # We use a custom JS injection to get interactive elements only, which is cheaper and clearer for the LLM
+        tree_script = """
+        () => {
+            const elements = Array.from(document.querySelectorAll('button, a, input, [role="button"], [role="link"], h1, h2, h3'));
+            return elements.map(el => {
+                return {
+                    tag: el.tagName,
+                    text: el.innerText || el.placeholder || el.getAttribute('aria-label') || '',
+                    id: el.id,
+                    role: el.getAttribute('role'),
+                    type: el.getAttribute('type')
+                };
+            }).filter(e => e.text.length > 1).slice(0, 50);
+        }
+        """
+        try:
+            tree = await self.page.evaluate(tree_script)
+            return str(tree)
+        except:
+            return "Error extracting page structure."
+
     async def take_screenshot(self) -> str | None:
         """Captures the current browser state as a base64 string."""
         if not self.page:

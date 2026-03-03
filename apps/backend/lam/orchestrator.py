@@ -116,7 +116,11 @@ class LamOrchestrator:
             {"execute": "Execution", "abort": END, "replan": "Planning"},
         )
 
-        builder.add_edge("Execution", "Summarization")
+        builder.add_conditional_edges(
+            "Execution",
+            self._route_after_execution,
+            {"summarize": "Summarization", "replan": "Planning"}
+        )
         builder.add_edge("Summarization", END)
 
         # Compile the state graph
@@ -155,11 +159,20 @@ class LamOrchestrator:
         return {"status": "goal_set", "memory_context": "Initial state"}
 
     async def _node_planning(self, state: LamState):
-        """Calls the Intention Intelligence planner."""
+        """Calls the Intention Intelligence planner with real-time browser context."""
         print("Planning Node: Generating DSL...")
         task = state.get("task", "")
-        plan = await generate_plan(task)
-        return {"plan": plan, "status": "planned"}
+        
+        # We try to get the current page context if the browser is initialized
+        page_context = "No browser session active yet."
+        if self.executor.page:
+            try:
+                page_context = await self.executor.get_accessibility_tree()
+            except:
+                page_context = "Error retrieving browser state."
+        
+        plan = await generate_plan(task, page_context=page_context)
+        return {"plan": plan, "status": "planned", "memory_context": page_context}
 
     def _route_after_planning(self, state: LamState) -> Literal["verify", "execute"]:
         """Check if the generated plan requires HITL."""
@@ -202,6 +215,15 @@ class LamOrchestrator:
         summary = f"Task completed with {len(results)} steps logged."
         # In the future, save to NeuroEngine here
         return {"summary": summary, "status": "completed"}
+
+    def _route_after_execution(self, state: LamState) -> Literal["summarize", "replan"]:
+        """Evaluates if execution was successful or if replanning is needed."""
+        results = state.get("execution_results", [])
+        # If any step failed, we route back to Planning to try a different approach
+        if any("Error" in str(res) for res in results):
+            print("Execution Node: Error detected. Routing back to Planning for recovery...")
+            return "replan"
+        return "summarize"
 
     async def run_task(self, task: str, thread_id: str = "default_thread"):
         """Main entry point invoked by main.py WebSocket."""

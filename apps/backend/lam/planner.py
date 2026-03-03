@@ -95,10 +95,14 @@ STRICT CLINICAL AND ETHICAL GUARDRAILS (CFM COMPLIANCE):
     return chain
 
 
-async def generate_plan(command: str) -> Dict[str, Any]:
-    """Generates a structured plan of atomic actions from a user command."""
+async def generate_plan(command: str, page_context: str = "No page loaded.") -> Dict[str, Any]:
+    """Generates a structured plan of atomic actions from a user command and current page state."""
     chain = create_planner_chain()
-    plan = await chain.ainvoke({"command": command})
+    
+    # We enrich the human prompt with current page context if available
+    enriched_command = f"Goal: {command}\n\nCurrent Browser State (Accessibility Tree): {page_context}"
+    
+    plan = await chain.ainvoke({"command": enriched_command})
     return plan
 
 
