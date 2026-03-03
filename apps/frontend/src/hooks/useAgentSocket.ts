@@ -78,5 +78,21 @@ export function useAgentSocket(url: string) {
      }
   }, [isConnected]);
 
-  return { logs, julesLogs, screenshot, isConnected, isRunning, isJulesRunning, sendTask, sendJulesCommand };
+  const sendPanicStop = useCallback(() => {
+    if (ws.current && isConnected) {
+      ws.current.send(JSON.stringify({ type: 'panic_stop' }));
+    }
+  }, [isConnected]);
+
+  return {
+    logs,
+    julesLogs,
+    screenshot,
+    isConnected,
+    isRunning,
+    isJulesRunning,
+    sendTask,
+    sendJulesCommand,
+    sendPanicStop
+  };
 }
