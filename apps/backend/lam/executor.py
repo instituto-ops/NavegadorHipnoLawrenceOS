@@ -1,0 +1,136 @@
+import asyncio
+import random
+from typing import List, Dict, Any
+from playwright.async_api import Page
+
+# Playwright execution engine mapping DSL to real browser actions
+
+class Executor:
+    def __init__(self, headless: bool = False):
+        self.headless = headless
+        # Use type hinting for structural tracking even if we don't import browser-use to avoid import issues
+        self.browser = None
+        self.context = None
+        self.page: Page | None = None
+
+    async def initialize(self):
+        """Initializes the browser session."""
+        from playwright.async_api import async_playwright
+        self.playwright = await async_playwright().start()
+        # Launch Chromium (headless=False so navigation is visible as per instructions)
+        self.raw_browser = await self.playwright.chromium.launch(headless=self.headless, slow_mo=50)
+        self.context = await self.raw_browser.new_context(
+             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
+        self.page = await self.context.new_page()
+
+        # We assign it to self.browser for structural tracking
+        self.browser = self.raw_browser
+
+        print("Browser initialized.")
+
+    async def _stealth_delay(self, min_ms: int = 500, max_ms: int = 1500):
+        """Adds organic latency to mimic human behavior."""
+        delay = random.uniform(min_ms, max_ms) / 1000.0
+        await asyncio.sleep(delay)
+
+    async def execute_plan(self, plan: Dict[str, Any]) -> List[str]:
+        """Executes a sequence of actions derived from the planner."""
+        results = []
+        if not self.browser or not self.page:
+            await self.initialize()
+
+        actions = plan.get("actions", [])
+        for action_block in actions:
+            action_type = action_block.get("action")
+            params = action_block.get("params", {})
+            desc = action_block.get("description", "")
+
+            print(f"Executing: {action_type} - {desc}")
+            await self._stealth_delay()
+
+            try:
+                res = await self._execute_action(action_type, params)
+                if res:
+                    results.append(f"Success: {action_type} - {res}")
+                else:
+                    results.append(f"Success: {action_type}")
+            except Exception as e:
+                print(f"Error executing {action_type}: {e}")
+                results.append(f"Error: {action_type} - {str(e)}")
+                # Depending on resilience strategy, we could break or continue
+
+        return results
+
+    async def _execute_action(self, action_type: str, params: Dict[str, Any]) -> str:
+        """Translates DSL action into Playwright call using the page instance."""
+        if not self.page:
+            raise RuntimeError("Page is not initialized.")
+
+        if action_type == "GO_TO":
+            url = params.get("url")
+            if url:
+                await self.page.goto(url, wait_until="networkidle")
+                return f"Navigated to {url}"
+            return "No URL provided"
+
+        elif action_type == "CLICK":
+            selector = params.get("selector")
+            if selector:
+                await self.page.click(selector)
+                return f"Clicked {selector}"
+            return "No selector provided"
+
+        elif action_type == "FILL":
+            selector = params.get("selector")
+            text = params.get("text")
+            if selector and text:
+                # Organic typing simulation
+                await self.page.fill(selector, "")
+                await self.page.type(selector, text, delay=random.randint(50, 150))
+                return f"Filled {selector} with text"
+            return "Missing selector or text"
+
+        elif action_type == "WAIT":
+            duration = params.get("duration", 2000)
+            await self.page.wait_for_timeout(duration)
+            return f"Waited for {duration}ms"
+
+        elif action_type == "EXTRACT":
+            selector = params.get("selector", "body")
+            content = await self.page.inner_text(selector)
+            # Truncate for safety
+            return content[:500] + "..." if len(content) > 500 else content
+
+        elif action_type == "SUMMARIZE":
+            text = params.get("text", "")
+            # This would typically call an LLM, but for the executor it might just pass it along
+            return f"Summarization requested for {len(text)} chars"
+
+        else:
+            return f"Unknown action: {action_type}"
+
+    async def close(self):
+        """Cleans up browser resources and resets state for reuse."""
+        if self.page:
+             await self.page.close()
+             self.page = None
+        if self.context:
+            await self.context.close()
+            self.context = None
+        if self.browser:
+            await self.browser.close()
+            self.browser = None
+        if hasattr(self, 'playwright') and self.playwright:
+             await self.playwright.stop()
+             self.playwright = None
+
+        print("Browser closed.")
+
+if __name__ == "__main__":
+    async def test():
+        executor = Executor(headless=True)
+        await executor.initialize()
+        await executor.close()
+
+    asyncio.run(test())
