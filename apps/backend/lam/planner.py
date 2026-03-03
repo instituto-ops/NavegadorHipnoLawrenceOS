@@ -19,11 +19,13 @@ class ActionParam(BaseModel):
     duration: Optional[int] = Field(
         default=None, description="Time to wait in milliseconds"
     )
+    title: Optional[str] = Field(default=None, description="Title for WP_DRAFT_POST")
+    content: Optional[str] = Field(default=None, description="Content for WP_DRAFT_POST")
 
 
 class AtomicAction(BaseModel):
     action: str = Field(
-        description="Action type: GO_TO, CLICK, FILL, WAIT, EXTRACT, SUMMARIZE"
+        description="Action type: GO_TO, CLICK, FILL, WAIT, EXTRACT, SUMMARIZE, DOCTORALIA_SCRAPE, ADS_READ_CAMPAIGNS, WP_DRAFT_POST"
     )
     params: ActionParam = Field(description="Parameters for the action")
     description: str = Field(description="Reasoning for this action")
@@ -56,6 +58,9 @@ Available actions are:
 - WAIT: Wait for a specific duration or condition (params: duration)
 - EXTRACT: Extract text from an element or the whole page (params: selector)
 - SUMMARIZE: Summarize the extracted content (params: text)
+- DOCTORALIA_SCRAPE: Navigate and scrape a Doctoralia profile (params: url)
+- ADS_READ_CAMPAIGNS: Extract campaigns from Google Ads (params: url)
+- WP_DRAFT_POST: Draft a WordPress post securely (params: url, title, content)
 
 Provide CSS or XPath selectors based on common web structures if exact selectors are unknown,
 but prioritize semantic HTML elements (e.g., 'input[type="search"]', 'button').
