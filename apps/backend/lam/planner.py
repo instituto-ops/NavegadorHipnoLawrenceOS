@@ -71,6 +71,7 @@ NAVIGATION INTELLIGENCE:
 - DO NOT guess complex URLs with many query parameters (like specific Google Ads campaign IDs). 
 - If a user asks for a specific campaign or data point deep within a dashboard like Google Ads, look for these specific sections: Visão geral, Recomendações, Insights, Informações do leilão, Termos de pesquisa, Performance do canal, Páginas de destino, Campanhas, Grupos de anúncios, Anúncios, Palavras-chave, Públicos-alvo, Locais, Programação de anúncios, Histórico de alterações.
 - Use the current PAGE CONTEXT (Accessibility Tree) to find the correct links or search them.
+- CRITICAL: Check the 'isVisible' and 'readOnly' attributes in the context. If an element says 'readOnly: true', DO NOT try to FILL it. Instead, look for a sibling button or icon (like a search icon) that might activate the field.
 - Always wait for elements to load before clicking.
 
 STRICT CLINICAL AND ETHICAL GUARDRAILS (CFM COMPLIANCE):

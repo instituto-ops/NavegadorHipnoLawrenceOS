@@ -116,10 +116,17 @@ class Executor:
             selector = params.get("selector")
             text = params.get("text")
             if selector and text:
+                # Check if element is readonly or disabled before filling
+                is_readonly = await self.page.evaluate(f"() => document.querySelector('{selector}')?.readOnly || document.querySelector('{selector}')?.getAttribute('aria-readonly') === 'true'")
+                if is_readonly:
+                    print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
+                    await self.page.click(selector)
+                    await self._stealth_delay(1000, 2000)
+                
                 # Organic typing simulation
                 await self.page.fill(selector, "")
-                await self._stealth_delay(1500, 4000) # Pre-fill wait
-                await self.page.type(selector, text, delay=random.randint(100, 300))
+                await self._stealth_delay(1000, 2500) # Pre-fill wait
+                await self.page.type(selector, text, delay=random.randint(50, 150))
                 return f"Filled {selector} with text"
             return "Missing selector or text"
 
@@ -173,16 +180,20 @@ class Executor:
         # We use a custom JS injection to get interactive elements only, which is cheaper and clearer for the LLM
         tree_script = """
         () => {
-            const elements = Array.from(document.querySelectorAll('button, a, input, [role="button"], [role="link"], h1, h2, h3'));
+            const elements = Array.from(document.querySelectorAll('button, a, input, [role="button"], [role="link"], h1, h2, h3, [aria-label]'));
             return elements.map(el => {
+                const rect = el.getBoundingClientRect();
                 return {
                     tag: el.tagName,
                     text: el.innerText || el.placeholder || el.getAttribute('aria-label') || '',
                     id: el.id,
                     role: el.getAttribute('role'),
-                    type: el.getAttribute('type')
+                    type: el.getAttribute('type'),
+                    isVisible: rect.width > 0 && rect.height > 0 && window.getComputedStyle(el).visibility !== 'hidden',
+                    disabled: el.disabled || el.getAttribute('aria-disabled') === 'true',
+                    readOnly: el.readOnly || el.getAttribute('aria-readonly') === 'true'
                 };
-            }).filter(e => e.text.length > 1).slice(0, 50);
+            }).filter(e => e.text.length > 1 && e.isVisible).slice(0, 100);
         }
         """
         try:
