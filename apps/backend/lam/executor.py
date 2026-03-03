@@ -109,12 +109,17 @@ class Executor:
             selector = params.get("selector")
             if selector:
                 try:
-                    await self.page.click(selector, timeout=5000)
+                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
+                    await self.page.click(selector, force=True, timeout=5000)
                     return f"Clicked {selector}"
                 except Exception as e:
                     print(f"Click: Selector {selector} failed. Attempting fallback: Pressing Enter...")
-                    await self.page.keyboard.press("Enter")
-                    return f"Clicked via fallback (Enter) because {selector} failed: {e}"
+                    try:
+                        await self.page.keyboard.press("Enter")
+                        return f"Clicked via fallback (Enter) because {selector} failed: {e}"
+                    except Exception as enter_e:
+                        print(f"Fallback enter failed: {enter_e}")
+                        raise
             return "No selector provided"
 
         elif action_type == "FILL":
@@ -122,11 +127,12 @@ class Executor:
             text = params.get("text")
             if selector and text:
                 try:
+                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
                     # Check if element is readonly or disabled before filling
                     is_readonly = await self.page.evaluate(f"() => {{ const el = document.querySelector('{selector}'); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }}")
                     if is_readonly:
                         print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
-                        await self.page.click(selector)
+                        await self.page.click(selector, force=True)
                         await self._stealth_delay(1000, 2000)
                     
                     # Organic typing simulation
@@ -136,9 +142,14 @@ class Executor:
                     return f"Filled {selector} with text"
                 except Exception as e:
                     print(f"Fill: Selector {selector} failed. Attempting fallback: Global typing...")
-                    # Fallback: Just type globally (useful for focused elements that lose selectors)
-                    await self.page.keyboard.type(text, delay=random.randint(50, 150))
-                    return f"Filled via global typing because {selector} failed: {e}"
+                    try:
+                        # Fallback: Just type globally (useful for focused elements that lose selectors)
+                        await self.page.keyboard.type(text, delay=random.randint(50, 150))
+                        return f"Filled via global typing because {selector} failed: {e}"
+                    except Exception as type_e:
+                        print(f"Fallback typing failed: {type_e}")
+                        raise
+            return "Missing selector or text"
             return "Missing selector or text"
 
         elif action_type == "WAIT":

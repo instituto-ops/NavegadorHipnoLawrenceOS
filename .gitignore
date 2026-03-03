@@ -8,3 +8,9 @@ __pycache__/
 *.sqlite-shm
 *.sqlite-wal
 apps/backend/browser_profile/
+# SQLite databases
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+database/
