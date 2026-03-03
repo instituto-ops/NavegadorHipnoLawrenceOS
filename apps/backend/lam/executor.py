@@ -25,21 +25,32 @@ class Executor:
     async def initialize(self):
         """Initializes the browser session."""
         from playwright.async_api import async_playwright
+        import os
 
         self.playwright = await async_playwright().start()
-        # Launch Chromium (headless=False so navigation is visible as per instructions)
-        self.raw_browser = await self.playwright.chromium.launch(
-            headless=self.headless, slow_mo=50
-        )
-        self.context = await self.raw_browser.new_context(
+        
+        # Setup persistent profile directory so logins (Google Ads, IG) are saved securely
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        user_data_dir = os.path.join(base_dir, "browser_profile")
+        
+        # Launch Chromium with persistent context to retain cookies and states
+        self.context = await self.playwright.chromium.launch_persistent_context(
+            user_data_dir=user_data_dir,
+            headless=self.headless, 
+            slow_mo=50,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
-        self.page = await self.context.new_page()
+        
+        # Persistent contexts create a default page automatically
+        if len(self.context.pages) > 0:
+            self.page = self.context.pages[0]
+        else:
+            self.page = await self.context.new_page()
 
         # We assign it to self.browser for structural tracking
-        self.browser = self.raw_browser
+        self.browser = getattr(self.context, "browser", self.context)
 
-        print("Browser initialized.")
+        print(f"Browser initialized with saved profile at {user_data_dir}")
 
     async def _stealth_delay(self, min_ms: int = 500, max_ms: int = 1500):
         """Adds organic latency to mimic human behavior."""
