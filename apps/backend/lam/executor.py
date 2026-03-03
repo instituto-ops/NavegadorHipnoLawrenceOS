@@ -108,26 +108,37 @@ class Executor:
         elif action_type == "CLICK":
             selector = params.get("selector")
             if selector:
-                await self.page.click(selector)
-                return f"Clicked {selector}"
+                try:
+                    await self.page.click(selector, timeout=5000)
+                    return f"Clicked {selector}"
+                except Exception as e:
+                    print(f"Click: Selector {selector} failed. Attempting fallback: Pressing Enter...")
+                    await self.page.keyboard.press("Enter")
+                    return f"Clicked via fallback (Enter) because {selector} failed: {e}"
             return "No selector provided"
 
         elif action_type == "FILL":
             selector = params.get("selector")
             text = params.get("text")
             if selector and text:
-                # Check if element is readonly or disabled before filling
-                is_readonly = await self.page.evaluate(f"() => document.querySelector('{selector}')?.readOnly || document.querySelector('{selector}')?.getAttribute('aria-readonly') === 'true'")
-                if is_readonly:
-                    print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
-                    await self.page.click(selector)
-                    await self._stealth_delay(1000, 2000)
-                
-                # Organic typing simulation
-                await self.page.fill(selector, "")
-                await self._stealth_delay(1000, 2500) # Pre-fill wait
-                await self.page.type(selector, text, delay=random.randint(50, 150))
-                return f"Filled {selector} with text"
+                try:
+                    # Check if element is readonly or disabled before filling
+                    is_readonly = await self.page.evaluate(f"() => {{ const el = document.querySelector('{selector}'); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }}")
+                    if is_readonly:
+                        print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
+                        await self.page.click(selector)
+                        await self._stealth_delay(1000, 2000)
+                    
+                    # Organic typing simulation
+                    await self.page.fill(selector, "", timeout=5000)
+                    await self._stealth_delay(1000, 2500)
+                    await self.page.type(selector, text, delay=random.randint(50, 150))
+                    return f"Filled {selector} with text"
+                except Exception as e:
+                    print(f"Fill: Selector {selector} failed. Attempting fallback: Global typing...")
+                    # Fallback: Just type globally (useful for focused elements that lose selectors)
+                    await self.page.keyboard.type(text, delay=random.randint(50, 150))
+                    return f"Filled via global typing because {selector} failed: {e}"
             return "Missing selector or text"
 
         elif action_type == "WAIT":

@@ -234,27 +234,31 @@ class LamOrchestrator:
 
         # Check if thread already exists
         snapshot = await self.graph.aget_state(config)
-        if snapshot.next and snapshot.next[0] == "Verification":
-            print("Resuming graph from HITL checkpoint...")
-            # We assume state has been updated externally if needed
+        
+        if snapshot.next:
+            print(f"Resuming graph from checkpoint: {snapshot.next[0]}...")
+            # Continue from where we left off (e.g., Verification)
             async for event in self.graph.astream(None, config):
                 print("Event:", event)
-            # Initialize state
-            initial_state: Any = {
+        else:
+            print(f"Starting NEW graph for task: {task}")
+            # Initialize state only for new tasks
+            initial_state: LamState = {
                 "task": task,
                 "plan": {},
                 "execution_results": [],
                 "status": "started",
-                "hitl_approved": False,  # Changed to False until explicitly approved
+                "hitl_approved": False,
                 "summary": "",
                 "memory_context": "",
                 "agency_routing": {},
                 "copy_asset": {},
                 "ads_asset": {},
                 "seo_asset": {},
+                "last_screenshot": None
             }
 
-            # Run up to the interruption point (Verification)
+            # Run from the start
             async for event in self.graph.astream(initial_state, config):
                 print("Event:", event)
 
