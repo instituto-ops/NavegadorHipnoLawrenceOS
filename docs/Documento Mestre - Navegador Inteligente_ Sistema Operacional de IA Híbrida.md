@@ -103,6 +103,15 @@ Quando o LAM encontra uma barreira técnica — um seletor que mudou, um dashboa
 
 Isso transforma Jules no “sistema imunológico” do NeuroStrategy OS: o código se adapta dinamicamente à realidade dos sites externos, reduzindo a necessidade de manutenção manual contínua.​
 
+## **6.3. Protocolo de Eficiência e Gestão de Sessão**
+
+Para preservar o limite de sessões diárias do Jules CLI, o sistema segue a regra de Escalonamento de Inteligência:
+
+* Triagem Técnica: Falhas simples de navegação (mudança de ID ou seletor CSS) são encaminhadas primeiro ao modelo Groq (Llama 3) para tentativa de correção via IA Híbrida local (Custo Zero).
+* Invocação Cirúrgica: O Jules CLI só é acionado para falhas estruturais ou lógica complexa.
+* Repoless Tasks: O backend deve priorizar o envio de tarefas isoladas (jules task) contendo apenas o arquivo problemático e o contexto do erro, evitando a indexação do monorepo inteiro e reduzindo o tempo de sessão.
+* Batching: Erros de baixa prioridade são acumulados e resolvidos em uma única "Sessão de Sprint" diária pelo Jules.
+
 ---
 
 ## **7\. NeuroEngine: refinaria de dados e memória**
