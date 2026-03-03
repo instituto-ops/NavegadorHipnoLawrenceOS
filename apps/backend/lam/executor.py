@@ -165,6 +165,14 @@ class Executor:
         else:
             return f"Unknown action: {action_type}"
 
+    async def take_screenshot(self) -> str | None:
+        """Captures the current browser state as a base64 string."""
+        if not self.page:
+            return None
+        import base64
+        screenshot_bytes = await self.page.screenshot(type="jpeg", quality=50)
+        return base64.b64encode(screenshot_bytes).decode("utf-8")
+
     async def close(self):
         """Cleans up browser resources and resets state for reuse."""
         if self.page:

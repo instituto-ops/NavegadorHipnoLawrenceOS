@@ -37,6 +37,7 @@ class LamState(TypedDict):
     copy_asset: Dict[str, Any]
     ads_asset: Dict[str, Any]
     seo_asset: Dict[str, Any]
+    last_screenshot: str | None
 
 
 class LamOrchestrator:
@@ -191,7 +192,8 @@ class LamOrchestrator:
         print("Execution Node: Running browser actions...")
         plan = state.get("plan", {})
         results = await self.executor.execute_plan(plan)
-        return {"execution_results": results, "status": "executed"}
+        screenshot = await self.executor.take_screenshot()
+        return {"execution_results": results, "status": "executed", "last_screenshot": screenshot}
 
     async def _node_summarization(self, state: LamState):
         """Wraps up and summarizes."""

@@ -67,8 +67,13 @@ Available actions are:
 - ADS_READ_CAMPAIGNS: Extract campaigns from Google Ads (params: url)
 - WP_DRAFT_POST: Draft a WordPress post securely (params: url, title, content)
 
-Provide CSS or XPath selectors based on common web structures if exact selectors are unknown,
-but prioritize semantic HTML elements (e.g., 'input[type="search"]', 'button').
+NAVIGATION INTELLIGENCE:
+- DO NOT guess complex URLs with many query parameters (like specific Google Ads campaign IDs). 
+- If a user asks for a specific campaign or data point deep within a dashboard like Google Ads or Facebook, the safer plan is to:
+  1. GO_TO the main dashboard URL (e.g., https://ads.google.com).
+  2. SEARCH by clicking the search icon and filling the campaign name.
+  3. CLICK the correct campaign from the results.
+- Always wait for elements to load before clicking.
 
 STRICT CLINICAL AND ETHICAL GUARDRAILS (CFM COMPLIANCE):
 - You must evaluate if the plan involves ANY sensitive operations, defined as:
