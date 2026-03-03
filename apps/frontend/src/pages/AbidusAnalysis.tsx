@@ -1,77 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
-  BarChart,
-  Settings,
-  Key,
-  MapPin,
-  HeartPulse,
-  MousePointerClick,
-  CheckCircle2,
-  AlertCircle,
-  XCircle,
-  Loader2
+  Loader2,
+  TerminalSquare
 } from 'lucide-react';
-
-const MetricCard = ({ title, icon: Icon, children }: { title: string, icon: React.ElementType, children: React.ReactNode }) => (
-  <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm flex flex-col h-full">
-    <div className="flex items-center gap-3 mb-4">
-      <div className="p-2 rounded-lg bg-[#2EED8F]/10 text-[#2EED8F]">
-        <Icon size={20} />
-      </div>
-      <h3 className="text-sm font-bold text-white uppercase tracking-wider">{title}</h3>
-    </div>
-    <div className="flex-1 text-gray-400 text-sm">
-      {children}
-    </div>
-  </div>
-);
-
-const StatusItem = ({ label, status, value }: { label: string, status: 'good' | 'warning' | 'error', value?: string }) => {
-  const icons = {
-    good: <CheckCircle2 size={16} className="text-[#2EED8F]" />,
-    warning: <AlertCircle size={16} className="text-yellow-500" />,
-    error: <XCircle size={16} className="text-red-500" />
-  };
-
-  return (
-    <div className="flex items-center justify-between py-2 border-b border-gray-800/40 last:border-0">
-      <div className="flex items-center gap-2">
-        {icons[status]}
-        <span>{label}</span>
-      </div>
-      {value && <span className="text-white font-mono text-xs">{value}</span>}
-    </div>
-  );
-};
+import { useAgentSocket } from '../hooks/useAgentSocket';
 
 export const AbidusAnalysis: React.FC = () => {
   const [url, setUrl] = useState('www.hipnolawrence.com');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [hasStartedAnalysis, setHasStartedAnalysis] = useState(false);
+  const logsEndRef = useRef<HTMLDivElement>(null);
+
+  const {
+    logs,
+    isConnected,
+    isRunning,
+    sendTask,
+  } = useAgentSocket("ws://localhost:8000/ws");
+
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
 
   const handleAnalyze = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!url.trim()) return;
+    if (!url.trim() || !isConnected || isRunning) return;
 
-    setIsAnalyzing(true);
-    setShowResults(false);
+    setHasStartedAnalysis(true);
 
-    // Simulate analysis delay
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setShowResults(true);
-    }, 2000);
+    const prompt = `Analise a URL ${url} utilizando a metodologia "Análises Abidus".
+A sua resposta deve conter as seguintes seções detalhadas, baseando-se no que você puder inferir, raspar (scraping) ou auditar da página:
+1. Otimização On-Page (Padrão Rank Math)
+2. Auditoria Técnica e Concorrentes (Padrão SEO META in 1 CLICK)
+3. Validação de Palavras-Chave (Padrão Ubersuggest)
+4. SEO Local e Estrutura de Silos
+5. Nicho de Saúde (YMYL) e Compliance CFP
+6. Sinergia com Google Ads
+
+Apresente um relatório textual completo e profissional, formatado em Markdown, com cada uma dessas seções.`;
+
+    sendTask(prompt);
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="mb-8">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="mb-8 flex-shrink-0">
         <h1 className="text-2xl font-bold text-white mb-2">Análises Abidus</h1>
         <p className="text-gray-400 text-sm">Plataforma de auditoria avançada em SEO, SEM e Compliance YMYL.</p>
       </div>
 
-      <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm mb-8">
+      <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm mb-6 flex-shrink-0">
         <form onSubmit={handleAnalyze} className="flex gap-4">
           <div className="flex-1 relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -84,14 +62,15 @@ export const AbidusAnalysis: React.FC = () => {
               placeholder="Digite a URL para analisar (ex: www.hipnolawrence.com)"
               className="w-full bg-[#0A0A0A] border border-gray-800 text-white text-sm rounded-lg focus:ring-[#2EED8F] focus:border-[#2EED8F] block pl-10 p-3"
               required
+              disabled={isRunning || !isConnected}
             />
           </div>
           <button
             type="submit"
-            disabled={isAnalyzing}
+            disabled={isRunning || !isConnected}
             className="bg-[#2EED8F] hover:bg-[#28d681] text-[#0A0A0A] font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isAnalyzing ? (
+            {isRunning ? (
               <>
                 <Loader2 size={18} className="animate-spin" />
                 Analisando...
@@ -104,68 +83,42 @@ export const AbidusAnalysis: React.FC = () => {
             )}
           </button>
         </form>
+        {!isConnected && (
+          <p className="text-red-500 text-xs mt-2">Conectando ao assistente...</p>
+        )}
       </div>
 
-      {showResults && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-          <MetricCard title="Otimização On-Page" icon={BarChart}>
-            <p className="text-xs mb-3 text-gray-500">Padrão Rank Math</p>
-            <StatusItem label="Focus Keyword" status="good" value="Encontrada na URL" />
-            <StatusItem label="Densidade da Palavra" status="warning" value="0.8% (Ideal 1-2%)" />
-            <StatusItem label="Legibilidade do Texto" status="good" value="Flesch Score: 68" />
-            <StatusItem label="UX: Core Web Vitals" status="warning" value="LCP: 2.8s" />
-          </MetricCard>
-
-          <MetricCard title="Auditoria Técnica" icon={Settings}>
-            <p className="text-xs mb-3 text-gray-500">Padrão SEO META in 1 CLICK</p>
-            <StatusItem label="H1 Tag" status="good" value="1 Encontrada" />
-            <StatusItem label="H2/H3 Hierarquia" status="warning" value="H3 antes do H2" />
-            <StatusItem label="Imagens sem Alt" status="error" value="3 Imagens" />
-            <StatusItem label="Word Count" status="good" value="1,245 palavras" />
-          </MetricCard>
-
-          <MetricCard title="Validação de Palavras-Chave" icon={Key}>
-            <p className="text-xs mb-3 text-gray-500">Padrão Ubersuggest</p>
-            <StatusItem label="Volume de Busca (Mensal)" status="good" value="8,400" />
-            <StatusItem label="SEO Difficulty (SD)" status="good" value="34/100" />
-            <StatusItem label="CPC Médio" status="warning" value="R$ 4.50" />
-            <StatusItem label="Variações Long-Tail" status="good" value="12 identificadas" />
-          </MetricCard>
-
-          <MetricCard title="SEO Local e Silos" icon={MapPin}>
-            <p className="text-xs mb-3 text-gray-500">Estrutura Geográfica</p>
-            <StatusItem label="Consistência NAP" status="good" value="Verificada" />
-            <StatusItem label="Modificadores Geográficos" status="good" value="Presentes no H1" />
-            <StatusItem label="Silos Locais" status="warning" value="Links internos fracos" />
-            <StatusItem label="Imagens Geotagueadas" status="error" value="Não encontradas" />
-          </MetricCard>
-
-          <MetricCard title="Saúde (YMYL) e Compliance" icon={HeartPulse}>
-            <p className="text-xs mb-3 text-gray-500">Compliance CFP e E-A-T</p>
-            <StatusItem label="Promessas de Cura" status="good" value="Nenhuma" />
-            <StatusItem label="Depoimentos com Garantias" status="error" value="1 Detectado" />
-            <StatusItem label="Autoridade (E-A-T)" status="good" value="Bio do autor clara" />
-            <StatusItem label="Termos Sensíveis" status="warning" value="2 Ocorrências" />
-          </MetricCard>
-
-          <MetricCard title="Sinergia Google Ads" icon={MousePointerClick}>
-            <p className="text-xs mb-3 text-gray-500">Estrutura STAGs</p>
-            <StatusItem label="Congruência LP/Anúncio" status="good" value="Alta (92%)" />
-            <StatusItem label="Estrutura STAGs" status="warning" value="Grupos muito amplos" />
-            <StatusItem label="Palavras Negativas" status="good" value="Lista aplicada" />
-            <StatusItem label="Índice de Qualidade Est." status="good" value="8/10" />
-          </MetricCard>
-
+      <div className="flex-1 bg-[#111111] border border-gray-800/60 rounded-xl p-5 overflow-hidden flex flex-col shadow-sm">
+        <div className="flex items-center gap-2 mb-4 text-gray-400 border-b border-gray-800/60 pb-3 flex-shrink-0">
+          <TerminalSquare size={18} className="text-[#2EED8F]" />
+          <h2 className="text-sm font-semibold uppercase tracking-wider">Terminal do Assistente</h2>
         </div>
-      )}
 
-      {!showResults && !isAnalyzing && (
-        <div className="flex-1 flex flex-col items-center justify-center text-gray-500 border-2 border-dashed border-gray-800/60 rounded-xl p-8">
-          <Search size={48} className="mb-4 text-gray-700" />
-          <p>Digite uma URL acima e clique em "Analisar" para gerar os relatórios Abidus.</p>
+        <div className="flex-1 overflow-y-auto custom-scrollbar font-mono text-xs pr-4">
+          {!hasStartedAnalysis && logs.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-gray-500 opacity-50">
+              <Search size={32} className="mb-4" />
+              <p>O relatório será gerado ao vivo após clicar em "Analisar".</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {logs.map((log, index) => (
+                <div key={index} className="text-gray-300 whitespace-pre-wrap leading-relaxed">
+                  <span className="text-gray-500 mr-2">[{new Date().toLocaleTimeString()}]</span>
+                  {log}
+                </div>
+              ))}
+              {isRunning && (
+                <div className="flex items-center gap-2 text-[#2EED8F] animate-pulse py-2">
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Aguardando resposta do agente...</span>
+                </div>
+              )}
+              <div ref={logsEndRef} />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
