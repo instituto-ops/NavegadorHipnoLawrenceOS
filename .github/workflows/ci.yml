@@ -56,7 +56,6 @@ jobs:
           commit_message: "style(auto-fix): apply automated format and lint fixes"
           commit_options: '--no-verify'
           branch: ${{ github.head_ref || github.ref_name }}
-          file_pattern: 'apps/backend/**/*.py apps/frontend/src/**/*.{js,jsx,ts,tsx} apps/frontend/**/*.{json,css,md}'
 
   backend-checks:
     needs: auto-fixer
