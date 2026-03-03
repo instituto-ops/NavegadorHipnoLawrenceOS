@@ -6,6 +6,7 @@ import "./index.css";
 import { MainLayout } from "./components/MainLayout";
 import { AgentChat } from "./components/AgentChat";
 import { Dashboard } from "./pages/Dashboard";
+import { AbidusAnalysis } from "./pages/AbidusAnalysis";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "abidus-analysis",
+        element: <AbidusAnalysis />,
       },
     ],
   },
