@@ -128,17 +128,23 @@ class LamOrchestrator:
         self, state: LamState
     ) -> Literal["MarketingCoordinator", "Planning"]:
         task = state.get("task", "").lower()
+        # Make the matching stricter. "google ads" alone shouldn't necessarily trigger the agency if it's just "open".
+        # We look for words that imply generation, strategy, or campaign building.
         marketing_keywords = [
-            "campaign",
-            "copy",
-            "ads",
-            "seo",
-            "marketing",
+            "criar campanha",
+            "gerar copy",
+            "estratégia de marketing",
+            "estrategia de marketing",
             "hypnotherapy campaign",
+            "analisar métricas",
+            "analisar metricas",
+            "planejar seo"
         ]
         if any(keyword in task for keyword in marketing_keywords):
             print("Routing to Marketing Agency Subsystem...")
             return "MarketingCoordinator"
+        # Default route is to the standard execution planner
+        print(f"Routing to Planning for task: {task}")
         return "Planning"
 
     async def _node_goal(self, state: LamState):
