@@ -3,6 +3,7 @@ name: CI Code Review
 on:
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   frontend-checks:
