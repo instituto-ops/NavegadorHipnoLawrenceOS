@@ -38,8 +38,16 @@ class Executor:
             user_data_dir=user_data_dir,
             headless=self.headless, 
             slow_mo=50,
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            ignore_default_args=["--enable-automation"],
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--disable-infobars"
+            ]
         )
+        
+        # Inject script to completely hide webdriver from Google security checks
+        await self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         
         # Persistent contexts create a default page automatically
         if len(self.context.pages) > 0:
