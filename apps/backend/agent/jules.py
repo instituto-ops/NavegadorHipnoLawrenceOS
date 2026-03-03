@@ -54,8 +54,7 @@ async def run_test_loop(goal: str, max_retries: int = 5):
         print("\n[FAILURE] Jules could not obtain a good response after maximum retries.")
 
 def main():
-    parser = argparse.ArgumentParser(description="Jules Engineering CLI")
-    parser.add_argument("--help", action="store_true", help="Show help")
+    parser = argparse.ArgumentParser(description="Jules Engineering CLI", add_help=True)
     subparsers = parser.add_subparsers(dest="command")
     
     # Subcommand: test-loop
@@ -63,14 +62,28 @@ def main():
     test_parser.add_argument("goal", type=str, help="The goal to test")
     test_parser.add_argument("--retries", type=int, default=5, help="Max number of retries")
     
+    # Subcommand: audit-ads
+    audit_parser = subparsers.add_parser("audit-ads", help="Audit visibility across specific Google Ads pages")
+    
     args = parser.parse_args()
     
-    if args.help or not args.command:
+    if not args.command:
         parser.print_help()
         return
 
     if args.command == "test-loop":
         asyncio.run(run_test_loop(args.goal, args.retries))
+    elif args.command == "audit-ads":
+        # Specific navigation targets for Google Ads audit
+        navigation_targets = [
+            "Visão geral", "Recomendações", "Insights", "Informações do leilão",
+            "Termos de pesquisa", "Performance do canal", "Páginas de destino",
+            "Campanhas", "Grupos de anúncios", "Anúncios", "Palavras-chave",
+            "Públicos-alvo", "Locais", "Programação de anúncios"
+        ]
+        print(f"Jules: Starting full Google Ads audit for targets: {navigation_targets}")
+        # In the future, this would iterate through each target
+        asyncio.run(run_test_loop(f"Navigate to {navigation_targets[0]} in Google Ads and verify data collection", 5))
 
 if __name__ == "__main__":
     main()
