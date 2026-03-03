@@ -2,7 +2,7 @@ from pydantic import SecretStr
 import json
 import uuid
 import os
-from typing import List, Dict, Any, Tuple
+from typing import List, Any
 from datetime import datetime, timezone
 
 from langchain_groq import ChatGroq
@@ -35,8 +35,9 @@ def create_summarizer_chain():
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are the NeuroEngine Summarizer. Your goal is to convert raw execution logs, extracted text, and metrics into a highly structured NeuroInsight.
-Analyze the provided raw execution data.
-Provide the insight categorizing it as Priority, Risk, Opportunity, or Trend.
+Analyze the provided raw data (which may include extracted Doctoralia reviews, Google Ads metrics, etc).
+Categorize the insight as Priority, Risk, Opportunity, or Trend.
+If dealing with specific platforms, generate highly specific titles (e.g. "Doctoralia Reputation Risk Insight", "Ads Keyword Opportunity Insight").
 
 {format_instructions}"""),
         ("human", "Here is the raw data from the LAM execution:\n{raw_data}")
