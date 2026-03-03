@@ -10,8 +10,8 @@ try:
     from .executor import Executor  # type: ignore
     from .planner import generate_plan  # type: ignore
 except ImportError:
-    from executor import Executor  # type: ignore
-    from planner import generate_plan  # type: ignore
+    from lam.executor import Executor  # type: ignore
+    from lam.planner import generate_plan  # type: ignore
 try:
     from .agency.ads_agent import ads_agent_node
     from .agency.coordinator import marketing_coordinator_node, route_agency

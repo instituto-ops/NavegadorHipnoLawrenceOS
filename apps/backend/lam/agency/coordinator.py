@@ -33,7 +33,7 @@ def create_supervisor_chain():
     api_key = os.environ.get("GROQ_API_KEY", "")
     llm = ChatGroq(
         temperature=0,
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         api_key=SecretStr(api_key) if api_key else None,
     )
     parser = JsonOutputParser(pydantic_object=RoutingDecision)

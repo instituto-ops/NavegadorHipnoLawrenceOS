@@ -29,7 +29,7 @@ class SummarizerOutput(BaseModel):
 def create_summarizer_chain():
     # Provide fallback if GROQ_API_KEY not set
     api_key = os.environ.get("GROQ_API_KEY", "")
-    llm = ChatGroq(temperature=0.2, model="llama3-70b-8192", api_key=SecretStr(api_key) if api_key else None)
+    llm = ChatGroq(temperature=0.2, model="llama-3.3-70b-versatile", api_key=SecretStr(api_key) if api_key else None)
 
     parser = JsonOutputParser(pydantic_object=SummarizerOutput)
 
