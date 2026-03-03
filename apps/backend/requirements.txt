@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+websockets
+browser-use
+langchain-groq
+langchain-openai
+playwright
+python-dotenv
