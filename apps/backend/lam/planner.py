@@ -42,11 +42,20 @@ class Plan(BaseModel):
 
 
 
-def create_planner_chain():
+def create_planner_chain(model_name: str = "llama-3.3-70b-versatile"):
     # We use Llama 3 via Groq for planning
-    # Provide a fallback if GROQ_API_KEY is not set (it should be in .env)
     api_key = os.environ.get("GROQ_API_KEY", "")
-    llm = ChatGroq(temperature=0, model="llama-3.3-70b-versatile", api_key=SecretStr(api_key) if api_key else None)
+    if not api_key:
+        # Fallback to OpenRouter if Groq key is missing
+        api_key = os.environ.get("OPENROUTER_API_KEY", "")
+        from langchain_openai import ChatOpenAI
+        llm = ChatOpenAI(
+            model="google/gemini-2.0-flash-001", # High performance free-ish model on OpenRouter
+            api_key=SecretStr(api_key) if api_key else None,
+            base_url="https://openrouter.ai/api/v1"
+        )
+    else:
+        llm = ChatGroq(temperature=0, model=model_name, api_key=SecretStr(api_key))
 
     parser = JsonOutputParser(pydantic_object=Plan)
 
@@ -96,13 +105,27 @@ STRICT CLINICAL AND ETHICAL GUARDRAILS (CFM COMPLIANCE):
 
 async def generate_plan(command: str, page_context: str = "No page loaded.") -> Dict[str, Any]:
     """Generates a structured plan of atomic actions from a user command and current page state."""
-    chain = create_planner_chain()
-    
     # We enrich the human prompt with current page context if available
     enriched_command = f"Goal: {command}\n\nCurrent Browser State (Accessibility Tree): {page_context}"
-    
-    plan = await chain.ainvoke({"command": enriched_command})
-    return plan
+
+    try:
+        # Try with the high-end model first (Llama 3.3 70B)
+        chain = create_planner_chain(model_name="llama-3.3-70b-versatile")
+        return await chain.ainvoke({"command": enriched_command})
+    except Exception as e:
+        error_msg = str(e)
+        if "rate_limit_exceeded" in error_msg.lower() or "429" in error_msg:
+            print(f"Planner: High-end model rate limited. Falling back to Llama 3.1 8B...")
+            try:
+                # Fallback to the lighter, high-quota model
+                chain = create_planner_chain(model_name="llama-3.1-8b-instant")
+                return await chain.ainvoke({"command": enriched_command})
+            except Exception as e2:
+                print(f"Planner: Fallback model also failed: {e2}")
+                raise e2
+        else:
+            print(f"Planner error: {e}")
+            raise e
 
 
 if __name__ == "__main__":
