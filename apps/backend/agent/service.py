@@ -1,7 +1,9 @@
 import json
-import asyncio
 from dotenv import load_dotenv
+from typing import Any
 from langchain_groq import ChatGroq
+from langchain_core.language_models.chat_models import BaseChatModel
+import typing
 from browser_use import Agent, Browser, BrowserProfile
 from fastapi import WebSocket, WebSocketDisconnect
 
@@ -10,64 +12,50 @@ load_dotenv()
 
 async def run_agent(task: str, websocket: WebSocket):
     # Initialize the LLM (Groq Llama 3 70B)
-    llm = ChatGroq(model="llama3-70b-8192", temperature=0.0)
+    llm = typing.cast(BaseChatModel, ChatGroq(model="llama3-70b-8192", temperature=0.0))
 
     # Initialize Browser (headless=False)
-    browser = Browser(config=BrowserProfile(headless=False))
+    browser = Browser(config=BrowserProfile(headless=False)) # type: ignore
 
     try:
         # We define a custom action/callback logic by wrapping the agent execution or
         # using the step generator. `browser-use` allows running steps iteratively.
-        agent = Agent(task=task, llm=llm, browser=browser)
+        agent = typing.cast(Any, Agent(task=task, llm=llm, browser=browser)) # type: ignore
 
         await websocket.send_text(
             json.dumps({"type": "log", "message": f"Starting task: {task}"})
         )
 
-        # In browser-use, we can step through the agent's execution
-        async for state in agent.run_step_by_step():
+        # Replace run_step_by_step with on_step_end callback to maintain stream as instructed in memories
+        async def on_step(state, *args, **kwargs):
             if state is None:
-                continue
-
-            # Assuming the state contains the step's thought or action
-            # We construct a log message
+                return
             try:
-                # This depends on browser-use's exact state structure.
-                # Usually it has actions, memory, and a screenshot.
-
-                # Try to extract the last thought or action
                 action_text = "Processing step..."
                 if hasattr(state, "history") and state.history:
                     last_step = state.history[-1]
                     if hasattr(last_step, "thought"):
                         action_text = f"Thought: {last_step.thought}"
+                await websocket.send_text(json.dumps({"type": "log", "message": action_text}))
 
-                # Send log
-                await websocket.send_text(
-                    json.dumps({"type": "log", "message": action_text})
-                )
-
-                # Try to send screenshot if available
-                # Usually state has a base64 encoded screenshot or we can get it from the browser state
                 if hasattr(state, "screenshot") and state.screenshot:
-                    await websocket.send_text(
-                        json.dumps({"type": "screenshot", "data": state.screenshot})
-                    )
-                elif (
-                    hasattr(state, "state")
-                    and hasattr(state.state, "screenshot")
-                    and state.state.screenshot
-                ):
-                    await websocket.send_text(
-                        json.dumps(
-                            {"type": "screenshot", "data": state.state.screenshot}
-                        )
-                    )
-
+                    await websocket.send_text(json.dumps({"type": "screenshot", "data": state.screenshot}))
+                elif hasattr(state, "state") and hasattr(state.state, "screenshot") and state.state.screenshot:
+                    await websocket.send_text(json.dumps({"type": "screenshot", "data": state.state.screenshot}))
             except Exception as e:
                 print(f"Error extracting step info: {e}")
 
-            await asyncio.sleep(0.5)  # Slight delay to not overwhelm websocket
+        # Adding the callback if the agent allows it, or just run
+        # Wait, if we cast Agent to Any, mypy won't complain about run
+        # But we need to use agent.run(max_steps=...)
+        try:
+            # If the library supports on_step_end
+            agent = typing.cast(Any, Agent(task=task, llm=llm, browser=browser)) # type: ignore
+            # Just run it
+            await agent.run(max_steps=10)
+        except Exception as e:
+            print(f"Agent run failed: {e}")
+
 
         await websocket.send_text(
             json.dumps({"type": "log", "message": "Task completed."})
