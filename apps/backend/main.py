@@ -124,7 +124,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif msg.type == "hitl_response" and msg.thread_id:
                 thread_id = msg.thread_id
-                config: Any = {"configurable": {"thread_id": thread_id}}
+                config = {"configurable": {"thread_id": thread_id}}
 
                 if msg.action == "approve":
                     await websocket.send_text(json.dumps({"type": "log", "message": "Plan approved. Resuming..."}))
