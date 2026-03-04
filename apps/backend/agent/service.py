@@ -1,5 +1,4 @@
 import json
-import asyncio
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from browser_use import Agent, Browser, BrowserProfile
@@ -12,11 +11,12 @@ async def run_agent(task: str, websocket: WebSocket):
     # Initialize the LLM (Groq Llama 3 70B)
     from langchain_core.language_models.chat_models import BaseChatModel
     from typing import cast
+
     llm = cast(BaseChatModel, ChatGroq(model="llama3-70b-8192", temperature=0.0))
 
     # Initialize Browser (headless=False)
     # The agent requires an asynchronous browser setup from browser-use
-    browser = Browser(config=BrowserProfile(headless=False)) # type: ignore
+    browser = Browser(config=BrowserProfile(headless=False))  # type: ignore
 
     try:
         # We define a custom action/callback logic by wrapping the agent execution or
@@ -35,8 +35,15 @@ async def run_agent(task: str, websocket: WebSocket):
                 history = getattr(agent_instance, "history", None)
                 if history and hasattr(history, "history") and history.history:
                     last_step = history.history[-1]
-                    if hasattr(last_step, "model_output") and last_step.model_output and hasattr(last_step.model_output, "current_state"):
-                        thought = last_step.model_output.current_state.evaluation_previous_goal or ""
+                    if (
+                        hasattr(last_step, "model_output")
+                        and last_step.model_output
+                        and hasattr(last_step.model_output, "current_state")
+                    ):
+                        thought = (
+                            last_step.model_output.current_state.evaluation_previous_goal
+                            or ""
+                        )
                         next_goal = last_step.model_output.current_state.next_goal or ""
                         action_text = f"Thought: {thought} | Next: {next_goal}"
                     elif hasattr(last_step, "result"):
@@ -51,9 +58,18 @@ async def run_agent(task: str, websocket: WebSocket):
                 if history and hasattr(history, "history") and history.history:
                     last_step = history.history[-1]
                     # browser-use history state typically holds screenshots
-                    if hasattr(last_step, "state") and hasattr(last_step.state, "screenshot") and last_step.state.screenshot:
+                    if (
+                        hasattr(last_step, "state")
+                        and hasattr(last_step.state, "screenshot")
+                        and last_step.state.screenshot
+                    ):
                         await websocket.send_text(
-                            json.dumps({"type": "screenshot", "data": last_step.state.screenshot})
+                            json.dumps(
+                                {
+                                    "type": "screenshot",
+                                    "data": last_step.state.screenshot,
+                                }
+                            )
                         )
 
             except Exception as e:
