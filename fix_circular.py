@@ -1,10 +1,8 @@
-import os
-
 files = [
     "apps/backend/lam/agency/coordinator.py",
     "apps/backend/lam/agency/copy_agent.py",
     "apps/backend/lam/agency/ads_agent.py",
-    "apps/backend/lam/agency/seo_agent.py"
+    "apps/backend/lam/agency/seo_agent.py",
 ]
 
 for file in files:
