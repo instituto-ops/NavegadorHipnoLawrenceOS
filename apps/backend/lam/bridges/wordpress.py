@@ -1,13 +1,21 @@
 from typing import Optional, Any, List
 from pydantic import BaseModel, Field
 
+
 class WPArticle(BaseModel):
     title: str = Field(..., description="The title of the WordPress post")
     content: str = Field(..., description="The full HTML or Markdown content")
-    status: str = Field(default="draft", description="Status: draft, pending, private, publish")
-    categories: List[str] = Field(default_factory=list, description="Categories for the post")
+    status: str = Field(
+        default="draft", description="Status: draft, pending, private, publish"
+    )
+    categories: List[str] = Field(
+        default_factory=list, description="Categories for the post"
+    )
     tags: List[str] = Field(default_factory=list, description="Tags for the post")
-    seo_score: Optional[int] = Field(default=None, description="Yoast or RankMath SEO Score")
+    seo_score: Optional[int] = Field(
+        default=None, description="Yoast or RankMath SEO Score"
+    )
+
 
 async def draft_wordpress_post(page: Any, url: str, title: str, content: str) -> str:
     """
@@ -49,7 +57,7 @@ async def draft_wordpress_post(page: Any, url: str, title: str, content: str) ->
         save_btn = await page.query_selector(".editor-post-save-draft, #save-post")
         if save_btn:
             await save_btn.click()
-            await page.wait_for_timeout(3000) # wait for save to complete
+            await page.wait_for_timeout(3000)  # wait for save to complete
         else:
             return "FAIL: Could not locate 'Save Draft' button. Aborting to prevent accidental publish."
 
