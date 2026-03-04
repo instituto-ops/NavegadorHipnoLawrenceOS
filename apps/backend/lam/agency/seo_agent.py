@@ -9,11 +9,16 @@ from pydantic import SecretStr
 from .schemas import SEOAsset
 
 # Ensure we use Pydantic models correctly for Intention Intelligence Protocol
-try:
-    from ..planner import Plan, generate_plan
+import typing
 
-except ImportError:
+if typing.TYPE_CHECKING:
     from lam.planner import Plan, generate_plan
+else:
+    try:
+        from ..planner import Plan, generate_plan
+
+    except ImportError:
+        from lam.planner import Plan, generate_plan
 
 
 def create_seo_planner_chain():

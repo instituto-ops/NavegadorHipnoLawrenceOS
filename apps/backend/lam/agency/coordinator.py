@@ -10,14 +10,21 @@ from pydantic import BaseModel, Field, SecretStr
 # Import the main state
 
 # Import sub-agents
-try:
-    from .ads_agent import ads_agent_node
-    from .copy_agent import copy_agent_node
-    from .seo_agent import seo_agent_node
-except ImportError:
+import typing
+
+if typing.TYPE_CHECKING:
     from lam.agency.ads_agent import ads_agent_node
     from lam.agency.copy_agent import copy_agent_node
     from lam.agency.seo_agent import seo_agent_node
+else:
+    try:
+        from .ads_agent import ads_agent_node
+        from .copy_agent import copy_agent_node
+        from .seo_agent import seo_agent_node
+    except ImportError:
+        from lam.agency.ads_agent import ads_agent_node
+        from lam.agency.copy_agent import copy_agent_node
+        from lam.agency.seo_agent import seo_agent_node
 
 
 class RoutingDecision(BaseModel):
