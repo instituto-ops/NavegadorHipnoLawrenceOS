@@ -2,26 +2,35 @@ import asyncio
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
-import sqlite3
 import aiosqlite
 
 # Make sure imports point correctly depending on how main.py invokes this module
-try:
+import typing
+
+if typing.TYPE_CHECKING:
     from .executor import Executor  # type: ignore
     from .planner import generate_plan  # type: ignore
-except ImportError:
-    from lam.executor import Executor  # type: ignore
-    from lam.planner import generate_plan  # type: ignore
-try:
     from .agency.ads_agent import ads_agent_node
     from .agency.coordinator import marketing_coordinator_node, route_agency
     from .agency.copy_agent import copy_agent_node
     from .agency.seo_agent import seo_agent_node
-except ImportError:
-    from lam.agency.ads_agent import ads_agent_node
-    from lam.agency.coordinator import marketing_coordinator_node, route_agency
-    from lam.agency.copy_agent import copy_agent_node
-    from lam.agency.seo_agent import seo_agent_node
+else:
+    try:
+        from .executor import Executor  # type: ignore
+        from .planner import generate_plan  # type: ignore
+    except ImportError:
+        from lam.executor import Executor  # type: ignore
+        from lam.planner import generate_plan  # type: ignore
+    try:
+        from .agency.ads_agent import ads_agent_node
+        from .agency.coordinator import marketing_coordinator_node, route_agency
+        from .agency.copy_agent import copy_agent_node
+        from .agency.seo_agent import seo_agent_node
+    except ImportError:
+        from lam.agency.ads_agent import ads_agent_node
+        from lam.agency.coordinator import marketing_coordinator_node, route_agency
+        from lam.agency.copy_agent import copy_agent_node
+        from lam.agency.seo_agent import seo_agent_node
 
 
 # Core state definition for the LAM session
@@ -162,15 +171,15 @@ class LamOrchestrator:
         """Calls the Intention Intelligence planner with real-time browser context."""
         print("Planning Node: Generating DSL...")
         task = state.get("task", "")
-        
+
         # We try to get the current page context if the browser is initialized
         page_context = "No browser session active yet."
         if self.executor.page:
             try:
                 page_context = await self.executor.get_accessibility_tree()
-            except:
+            except Exception:
                 page_context = "Error retrieving browser state."
-        
+
         plan = await generate_plan(task, page_context=page_context)
         return {"plan": plan, "status": "planned", "memory_context": page_context}
 
@@ -234,7 +243,7 @@ class LamOrchestrator:
 
         # Check if thread already exists
         snapshot = await self.graph.aget_state(config)
-        
+
         if snapshot.next:
             print(f"Resuming graph from checkpoint: {snapshot.next[0]}...")
             # Continue from where we left off (e.g., Verification)

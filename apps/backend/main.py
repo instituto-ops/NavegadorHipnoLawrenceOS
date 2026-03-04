@@ -7,12 +7,17 @@ from agent.jules_cli import run_jules_command, JulesRequest
 from pydantic import BaseModel
 import asyncio
 import json
+import os
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
+# Security: Configure CORS to only allow specific origins
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,9 +43,9 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     orchestrator = LamOrchestrator(headless=False)
     await orchestrator.setup()
-    
+
     current_task: asyncio.Task | None = None
-    
+
     async def process_lam_stream(initial_state, config, thread_id):
         try:
             async for event in orchestrator.graph.astream(initial_state, config):
@@ -49,7 +54,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Forward screenshot if present in state update
                     if "last_screenshot" in state and state["last_screenshot"]:
                         await websocket.send_text(json.dumps({"type": "screenshot", "data": state["last_screenshot"]}))
-            
+
             # Check for HITL
             snapshot = await orchestrator.graph.aget_state(config)
             if snapshot.next and snapshot.next[0] == "Verification":
@@ -59,7 +64,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 last_shot = snapshot.values.get("last_screenshot")
                 if last_shot:
                     await websocket.send_text(json.dumps({"type": "screenshot", "data": last_shot}))
-                
+
                 await websocket.send_text(json.dumps({
                     "type": "hitl_request",
                     "thread_id": thread_id,
@@ -112,14 +117,14 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Force close playwright if hanging
                     try:
                         await orchestrator.executor.close()
-                    except:
+                    except Exception:
                         pass
                 else:
                     await websocket.send_text(json.dumps({"type": "log", "message": "No active task to stop."}))
 
             elif msg.type == "hitl_response" and msg.thread_id:
                 thread_id = msg.thread_id
-                config: Any = {"configurable": {"thread_id": thread_id}}
+                config = {"configurable": {"thread_id": thread_id}}
 
                 if msg.action == "approve":
                     await websocket.send_text(json.dumps({"type": "log", "message": "Plan approved. Resuming..."}))
@@ -139,11 +144,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 asyncio.create_task(run_jules_command(request=request, websocket=websocket))
 
     except WebSocketDisconnect:
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
     except Exception as e:
         print(f"WS Error: {e}")
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
 
 

@@ -49,13 +49,13 @@ def create_planner_chain(model_name: str = "llama-3.3-70b-versatile"):
         # Fallback to OpenRouter if Groq key is missing
         api_key = os.environ.get("OPENROUTER_API_KEY", "")
         from langchain_openai import ChatOpenAI
-        llm = ChatOpenAI(
+        llm = ChatOpenAI(  # type: ignore
             model="google/gemini-2.0-flash-001", # High performance free-ish model on OpenRouter
             api_key=SecretStr(api_key) if api_key else None,
             base_url="https://openrouter.ai/api/v1"
         )
     else:
-        llm = ChatGroq(temperature=0, model=model_name, api_key=SecretStr(api_key))
+        llm = ChatGroq(temperature=0, model=model_name, api_key=SecretStr(api_key))  # type: ignore
 
     parser = JsonOutputParser(pydantic_object=Plan)
 
@@ -119,7 +119,7 @@ async def generate_plan(command: str, page_context: str = "No page loaded.") -> 
     except Exception as e:
         error_msg = str(e)
         if "rate_limit_exceeded" in error_msg.lower() or "429" in error_msg:
-            print(f"Planner: High-end model rate limited. Falling back to Llama 3.1 8B...")
+            print("Planner: High-end model rate limited. Falling back to Llama 3.1 8B...")
             try:
                 # Fallback to the lighter, high-quota model
                 chain = create_planner_chain(model_name="llama-3.1-8b-instant")
