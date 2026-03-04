@@ -11,7 +11,10 @@ new_models = """class Plan(BaseModel):
     )
 """
 
-content = content.replace("class Plan(BaseModel):\n    actions: List[AtomicAction] = Field(\n        description=\"Sequence of atomic actions to achieve the goal\"\n    )", new_models)
+content = content.replace(
+    'class Plan(BaseModel):\n    actions: List[AtomicAction] = Field(\n        description="Sequence of atomic actions to achieve the goal"\n    )',
+    new_models,
+)
 
 with open("apps/backend/lam/planner.py", "w") as f:
     f.write(content)
