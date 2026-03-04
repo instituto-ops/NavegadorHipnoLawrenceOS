@@ -55,7 +55,7 @@ def create_planner_chain(model_name: str = "llama-3.3-70b-versatile"):
             base_url="https://openrouter.ai/api/v1"
         )
     else:
-        llm = ChatGroq(temperature=0, model=model_name, api_key=SecretStr(api_key))
+        llm = ChatGroq(temperature=0, model=model_name, api_key=SecretStr(api_key)) # type: ignore
 
     parser = JsonOutputParser(pydantic_object=Plan)
 
