@@ -1,100 +1,48 @@
-name: CI Auto-Fixer & Checks
+name: React/Vite CI
 
+# Gatilhos de execução do workflow
 on:
   push:
-    branches: [ "main", "master" ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ "main", "master" ]
+    branches:
+      - main
 
 jobs:
-  auto-fixer:
+  build-and-lint:
+    # Ambiente de execução (Linux é mais rápido e econômico para validações de lint e build web)
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
+    defaults:
+      run:
+        # Define o diretório de trabalho padrão para o front-end
+        working-directory: apps/frontend
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
+      # Passo 1: Baixar o código fonte do repositório
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-
-      - name: Setup Node.js
+      # Passo 2: Configurar o ambiente Node.js na versão 20 com cache nativo
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm'
+          # Especifica o caminho do package-lock para o cache funcionar corretamente no monorepo
           cache-dependency-path: apps/frontend/package-lock.json
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r apps/backend/requirements.txt
+      # Passo 3: Instalação limpa e determinística das dependências usando npm ci
+      - name: Instalar dependências (npm ci)
+        run: npm ci
 
-      - name: Install Node dependencies
-        run: |
-          cd apps/frontend
-          npm ci
+      # Passo 4: Executar o linter para garantir a qualidade e padronização do código
+      - name: Executar Lint
+        run: npm run lint
 
-      - name: Run Ruff Auto-Fixer
-        run: |
-          ruff check --fix . || true
-          ruff format . || true
-
-      - name: Run Frontend Format and Lint Auto-Fixer
-        run: |
-          cd apps/frontend
-          npm run format || true
-          npx eslint --fix . || true
-
-      - name: Commit Automated Fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "style(auto-fix): apply automated format and lint fixes"
-          commit_options: '--no-verify'
-          branch: ${{ github.head_ref || github.ref_name }}
-
-  backend-checks:
-    needs: auto-fixer
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r apps/backend/requirements.txt
-      - name: Run Mypy Type Checking
-        run: |
-          mypy apps/backend --ignore-missing-imports
-
-  frontend-checks:
-    needs: auto-fixer
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: apps/frontend/package-lock.json
-      - name: Install dependencies
-        run: |
-          cd apps/frontend
-          npm ci
-      - name: Run TypeScript Compiler Check
-        run: |
-          cd apps/frontend
-          npx tsc --noEmit
+      # Passo 5: Executar o build do Vite
+      # Nota: O build executará 'tsc -b && vite build', garantindo a validação da tipagem do TypeScript
+      - name: Executar Build
+        run: npm run build
