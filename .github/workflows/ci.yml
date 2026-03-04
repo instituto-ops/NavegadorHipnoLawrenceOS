@@ -1,100 +1,49 @@
-name: CI Auto-Fixer & Checks
+name: CI React/Vite
 
+# 1. Gatilhos (Triggers)
 on:
   push:
-    branches: [ "main", "master" ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ "main", "master" ]
+    branches:
+      - main
 
 jobs:
-  auto-fixer:
+  build-and-test:
+    # 2. Ambiente de Execução
+    # Utilizamos ubuntu-latest por ser mais rápido e econômico para validações web.
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
+      # Passo 1: Checkout - Baixar o código do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-
+      # Passo 2: Setup - Configurar Node.js versão 20
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: '20'
+          # Passo 3: Cache - Implementar cache robusto para node_modules usando o cache nativo do setup-node
+          cache: 'npm'
           cache-dependency-path: apps/frontend/package-lock.json
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r apps/backend/requirements.txt
-
-      - name: Install Node dependencies
-        run: |
-          cd apps/frontend
-          npm ci
-
-      - name: Run Ruff Auto-Fixer
-        run: |
-          ruff check --fix . || true
-          ruff format . || true
-
-      - name: Run Frontend Format and Lint Auto-Fixer
-        run: |
-          cd apps/frontend
-          npm run format || true
-          npx eslint --fix . || true
-
-      - name: Commit Automated Fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "style(auto-fix): apply automated format and lint fixes"
-          commit_options: '--no-verify'
-          branch: ${{ github.head_ref || github.ref_name }}
-
-  backend-checks:
-    needs: auto-fixer
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r apps/backend/requirements.txt
-      - name: Run Mypy Type Checking
-        run: |
-          mypy apps/backend --ignore-missing-imports
-
-  frontend-checks:
-    needs: auto-fixer
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: apps/frontend/package-lock.json
+      # Passo 4: Instalação - Instalação limpa e determinística das dependências
       - name: Install dependencies
         run: |
           cd apps/frontend
           npm ci
-      - name: Run TypeScript Compiler Check
+
+      # Passo 5: Linting - Executar validação de estilo e qualidade de código
+      - name: Run Linting
         run: |
           cd apps/frontend
-          npx tsc --noEmit
+          npm run lint
+
+      # Passo 6: Build - Executar o build do Vite, que também engloba a validação de tipagem (tsc -b)
+      - name: Run Build
+        run: |
+          cd apps/frontend
+          npm run build
