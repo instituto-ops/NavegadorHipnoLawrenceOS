@@ -14,3 +14,4 @@ apps/backend/browser_profile/
 *.sqlite-shm
 *.sqlite-wal
 database/
+credentials/

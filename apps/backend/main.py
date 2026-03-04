@@ -7,6 +7,10 @@ from agent.jules_cli import run_jules_command, JulesRequest
 from pydantic import BaseModel
 import asyncio
 import json
+from analytics.ga4_service import ga4_service
+from analytics.ads_service import ads_service
+from analytics.gbp_service import gbp_service
+from analytics.wordpress_service import wp_service
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
@@ -31,6 +35,30 @@ class WebSocketMessage(BaseModel):
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+
+@app.get("/api/analytics/active-users")
+async def get_active_users():
+    data = ga4_service.run_city_report()
+    return data
+
+
+@app.get("/api/analytics/ads-performance")
+async def get_ads_performance():
+    data = ads_service.get_campaign_performance()
+    return data
+
+
+@app.get("/api/analytics/gbp-performance")
+async def get_gbp_performance():
+    data = gbp_service.get_performance_data()
+    return data
+
+
+@app.get("/api/analytics/wp-stats")
+async def get_wp_stats():
+    data = await wp_service.get_site_stats()
+    return data
 
 
 @app.websocket("/ws")
