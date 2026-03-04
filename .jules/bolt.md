@@ -1,0 +1,3 @@
+## 2024-05-24 - [O(n) Array Consolidation in React useMemo]
+**Learning:** In dashboards like `Dashboard.tsx` with extensive Recharts data parsing, multiple isolated `useMemo` hooks calling `.reduce` or `.forEach` on the same large array (`adsData`) silently create O(4n) bottlenecks during render cycles.
+**Action:** Always group related derived data into a single `useMemo` object using a single `for...of` loop to traverse the array exactly once (O(n)), yielding multiple aggregated results simultaneously.
