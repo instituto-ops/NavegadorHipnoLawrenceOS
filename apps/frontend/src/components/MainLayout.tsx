@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { Globe2, LayoutDashboard, Search } from 'lucide-react';
+import { Globe2, LayoutDashboard, Search, Sparkles } from 'lucide-react';
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 
@@ -47,6 +47,10 @@ export const MainLayout: React.FC = () => {
               <NavLink to="/abidus-analysis" className={navLinkClass}>
                 <Search size={18} className="text-[#2EED8F]" />
                 <span>Análises Abidus</span>
+              </NavLink>
+              <NavLink to="/seo-intelligence" className={navLinkClass}>
+                <Sparkles size={18} className="text-[#2EED8F]" />
+                <span>Inteligência de SEO</span>
               </NavLink>
             </nav>
           </div>

@@ -13,6 +13,7 @@ from analytics.gbp_service import gbp_service
 from analytics.wordpress_service import wp_service
 from analytics.n8n_service import n8n_service
 from analytics.instagram_service import instagram_service
+from analytics.pagespeed_service import pagespeed_service
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
@@ -83,6 +84,12 @@ async def reply_instagram(recipient_id: str, message: str):
 @app.post("/api/wordpress/publish")
 async def publish_to_wp(title: str, content: str):
     data = await wp_service.create_post(title, content)
+    return data
+
+
+@app.get("/api/analytics/pagespeed")
+async def get_pagespeed_report(url: str, strategy: str = "MOBILE"):
+    data = await pagespeed_service.run_analysis(url, strategy)
     return data
 
 

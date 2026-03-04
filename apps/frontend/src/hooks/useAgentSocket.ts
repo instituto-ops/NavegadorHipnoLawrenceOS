@@ -2,14 +2,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 export interface AgentMessage {
   type:
-    | 'log'
-    | 'screenshot'
-    | 'done'
-    | 'error'
-    | 'jules_output'
-    | 'jules_error'
-    | 'jules_done'
-    | 'hitl_request';
+  | 'log'
+  | 'screenshot'
+  | 'done'
+  | 'error'
+  | 'jules_output'
+  | 'jules_error'
+  | 'jules_done'
+  | 'hitl_request';
   message?: string;
   data?: string; // base64 screenshot data
   exit_code?: number;
@@ -17,7 +17,19 @@ export interface AgentMessage {
   plan?: unknown;
 }
 
-export function useAgentSocket(url: string) {
+export function useAgentSocket(url: string): {
+  logs: string[];
+  julesLogs: string[];
+  screenshot: string | null;
+  isConnected: boolean;
+  isRunning: boolean;
+  isJulesRunning: boolean;
+  hitlRequest: { thread_id: string; plan: unknown } | null;
+  sendTask: (task: string) => void;
+  sendJulesCommand: (command: string) => void;
+  sendPanicStop: () => void;
+  sendHitlResponse: (thread_id: string, action: 'approve' | 'reject' | 'edit', plan?: unknown) => void;
+} {
   const [logs, setLogs] = useState<string[]>([]);
   const [julesLogs, setJulesLogs] = useState<string[]>([]);
   const [screenshot, setScreenshot] = useState<string | null>(null);

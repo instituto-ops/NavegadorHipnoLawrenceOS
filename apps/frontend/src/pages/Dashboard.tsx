@@ -90,9 +90,9 @@ export const Dashboard: React.FC = () => {
       // Direct CORS proxy
       const response = await fetch(
         'https://corsproxy.io/?url=' +
-          encodeURIComponent(
-            'https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv'
-          )
+        encodeURIComponent(
+          'https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv'
+        )
       );
       const csvText = await response.text();
 
@@ -243,8 +243,8 @@ export const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchSpreadsheetData();
-    fetchGA4Data();
+    void fetchSpreadsheetData();
+    void fetchGA4Data();
   }, []);
 
   // Aggregate data for Metric Cards

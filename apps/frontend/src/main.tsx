@@ -7,6 +7,7 @@ import { AgentChat } from './components/AgentChat';
 import { MainLayout } from './components/MainLayout';
 import { AbidusAnalysis } from './pages/AbidusAnalysis';
 import { Dashboard } from './pages/Dashboard';
+import { SeoIntelligence } from './pages/SeoIntelligence';
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: 'abidus-analysis',
         element: <AbidusAnalysis />,
+      },
+      {
+        path: 'seo-intelligence',
+        element: <SeoIntelligence />,
       },
     ],
   },
