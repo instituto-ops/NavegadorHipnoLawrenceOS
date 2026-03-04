@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from "react";
-import { Code2, Loader2 } from "lucide-react";
+import { Code2, Loader2 } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
 
 interface JulesTerminalProps {
   logs: string[];
@@ -21,7 +21,7 @@ export const JulesTerminal: React.FC<JulesTerminalProps> = ({
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
   return (
@@ -33,15 +33,11 @@ export const JulesTerminal: React.FC<JulesTerminalProps> = ({
 
       <div className="flex-1 p-4 overflow-y-auto text-gray-300 font-mono text-sm">
         <div className="mb-4 text-blue-400">
-          Welcome to Jules CLI. Type commands starting with "jules" (e.g.,
-          `jules --help`)
+          Welcome to Jules CLI. Type commands starting with "jules" (e.g., `jules --help`)
         </div>
 
         {logs.map((log, index) => (
-          <div
-            key={index}
-            className="whitespace-pre-wrap font-mono text-sm leading-snug"
-          >
+          <div key={index} className="whitespace-pre-wrap font-mono text-sm leading-snug">
             {log}
           </div>
         ))}

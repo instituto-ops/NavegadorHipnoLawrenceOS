@@ -1,19 +1,15 @@
+import classNames from 'classnames';
+import { Globe2, LayoutDashboard, Search } from 'lucide-react';
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import {
-  Globe2,
-  LayoutDashboard,
-  Search
-} from 'lucide-react';
-import classNames from 'classnames';
 
 export const MainLayout: React.FC = () => {
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     classNames(
-      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium",
+      'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium',
       isActive
-        ? "bg-[#2EED8F] text-[#0A0A0A] shadow-[0_0_15px_rgba(46,237,143,0.3)]"
-        : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
+        ? 'bg-[#2EED8F] text-[#0A0A0A] shadow-[0_0_15px_rgba(46,237,143,0.3)]'
+        : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
     );
 
   return (
@@ -27,14 +23,18 @@ export const MainLayout: React.FC = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-white">Maestro OS</h1>
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Neural Assistant v5.1</p>
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">
+              Neural Assistant v5.1
+            </p>
           </div>
         </div>
 
         {/* Navigation Groups */}
         <div className="flex-1 flex flex-col gap-6">
           <div>
-            <h2 className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider mb-3 px-2">Sistemas Core</h2>
+            <h2 className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider mb-3 px-2">
+              Sistemas Core
+            </h2>
             <nav className="flex flex-col gap-1">
               <NavLink to="/" end className={navLinkClass}>
                 <Globe2 size={18} />
@@ -56,7 +56,7 @@ export const MainLayout: React.FC = () => {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 bg-[#0A0A0A] overflow-hidden">
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 relative">
-           <Outlet />
+          <Outlet />
         </div>
       </main>
     </div>

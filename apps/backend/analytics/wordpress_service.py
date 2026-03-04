@@ -52,5 +52,34 @@ class WordPressService:
         except Exception as e:
             return {"error": str(e)}
 
+    async def create_post(self, title: str, content: str, status: str = "publish", categories: list = None, tags: list = None):
+        """Create a new post in WordPress."""
+        if not self.base_api_url:
+            return {"error": "WP_URL not configured in .env"}
+        
+        auth = self._get_auth()
+        if not auth:
+            return {"error": "WP_USERNAME or WP_APP_PASSWORD not configured."}
+
+        payload = {
+            "title": title,
+            "content": content,
+            "status": status
+        }
+        if categories:
+            payload["categories"] = categories
+        if tags:
+            payload["tags"] = tags
+
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.post(f"{self.base_api_url}/posts", json=payload, auth=auth)
+                # Check for errors before trying to parse json
+                if resp.status_code >= 400:
+                    return {"error": f"WordPress API error: {resp.status_code}", "details": resp.text}
+                return resp.json()
+        except Exception as e:
+            return {"error": str(e)}
+
 # Singleton instance
 wp_service = WordPressService()

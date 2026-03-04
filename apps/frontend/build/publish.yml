@@ -1,0 +1,5 @@
+provider: github
+owner: instituto-ops
+repo: NavegadorHipnoLawrenceOS
+releaseType: release
+publishAutoUpdate: true

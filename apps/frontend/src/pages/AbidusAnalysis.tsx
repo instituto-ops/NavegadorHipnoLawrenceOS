@@ -1,9 +1,5 @@
+import { Search, Loader2, TerminalSquare } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Search,
-  Loader2,
-  TerminalSquare
-} from 'lucide-react';
 import { useAgentSocket } from '../hooks/useAgentSocket';
 
 export const AbidusAnalysis: React.FC = () => {
@@ -11,15 +7,10 @@ export const AbidusAnalysis: React.FC = () => {
   const [hasStartedAnalysis, setHasStartedAnalysis] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
-  const {
-    logs,
-    isConnected,
-    isRunning,
-    sendTask,
-  } = useAgentSocket("ws://localhost:8000/ws");
+  const { logs, isConnected, isRunning, sendTask } = useAgentSocket('ws://localhost:8000/ws');
 
   useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
   const handleAnalyze = (e: React.FormEvent) => {
@@ -46,7 +37,9 @@ Apresente um relatório textual completo e profissional, formatado em Markdown, 
     <div className="flex flex-col h-full overflow-hidden">
       <div className="mb-8 flex-shrink-0">
         <h1 className="text-2xl font-bold text-white mb-2">Análises Abidus</h1>
-        <p className="text-gray-400 text-sm">Plataforma de auditoria avançada em SEO, SEM e Compliance YMYL.</p>
+        <p className="text-gray-400 text-sm">
+          Plataforma de auditoria avançada em SEO, SEM e Compliance YMYL.
+        </p>
       </div>
 
       <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm mb-6 flex-shrink-0">
@@ -83,9 +76,7 @@ Apresente um relatório textual completo e profissional, formatado em Markdown, 
             )}
           </button>
         </form>
-        {!isConnected && (
-          <p className="text-red-500 text-xs mt-2">Conectando ao assistente...</p>
-        )}
+        {!isConnected && <p className="text-red-500 text-xs mt-2">Conectando ao assistente...</p>}
       </div>
 
       <div className="flex-1 bg-[#111111] border border-gray-800/60 rounded-xl p-5 overflow-hidden flex flex-col shadow-sm">

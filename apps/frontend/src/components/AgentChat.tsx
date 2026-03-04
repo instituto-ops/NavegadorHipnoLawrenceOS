@@ -1,4 +1,3 @@
-import React, { useState, useRef, useEffect } from "react";
 import {
   Send,
   TerminalSquare,
@@ -7,15 +6,16 @@ import {
   OctagonPause,
   Activity,
   Globe2,
-  Cpu
-} from "lucide-react";
-import { useAgentSocket } from "../hooks/useAgentSocket";
-import { ActionReviewCard } from "./ActionReviewCard";
-import { JulesTerminal } from "./JulesTerminal";
+  Cpu,
+} from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useAgentSocket } from '../hooks/useAgentSocket';
+import { ActionReviewCard } from './ActionReviewCard';
+import { JulesTerminal } from './JulesTerminal';
 
 export const AgentChat: React.FC = () => {
-  const [input, setInput] = useState("");
-  const [julesInput, setJulesInput] = useState("");
+  const [input, setInput] = useState('');
+  const [julesInput, setJulesInput] = useState('');
 
   const {
     logs,
@@ -29,26 +29,26 @@ export const AgentChat: React.FC = () => {
     sendJulesCommand,
     sendPanicStop,
     sendHitlResponse,
-  } = useAgentSocket("ws://localhost:8000/ws");
+  } = useAgentSocket('ws://localhost:8000/ws');
 
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || !isConnected || isRunning) return;
     sendTask(input);
-    setInput("");
+    setInput('');
   };
 
   const handleJulesSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!julesInput.trim() || !isConnected || isJulesRunning) return;
     sendJulesCommand(julesInput);
-    setJulesInput("");
+    setJulesInput('');
   };
 
   return (
@@ -57,25 +57,36 @@ export const AgentChat: React.FC = () => {
       <header className="mb-4 flex gap-4">
         <div className="flex-1 bg-[#111111] rounded-xl border border-gray-800/60 p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-             <Activity className={isRunning ? "text-[#2EED8F] animate-pulse" : "text-gray-500"} size={20} />
-             <div>
-               <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Status do Núcleo</p>
-               <p className={`text-sm font-semibold ${isRunning ? "text-[#2EED8F]" : "text-gray-400"}`}>
-                 {isRunning ? "Processando" : "Ocioso"}
-               </p>
-             </div>
+            <Activity
+              className={isRunning ? 'text-[#2EED8F] animate-pulse' : 'text-gray-500'}
+              size={20}
+            />
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">
+                Status do Núcleo
+              </p>
+              <p
+                className={`text-sm font-semibold ${isRunning ? 'text-[#2EED8F]' : 'text-gray-400'}`}
+              >
+                {isRunning ? 'Processando' : 'Ocioso'}
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 border-l border-gray-800 pl-4 ml-4">
-             <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${isConnected ? 'bg-[#2EED8F]/10 border-[#2EED8F]/20' : 'bg-red-500/10 border-red-500/20'}`}>
-               <Cpu size={16} className={isConnected ? "text-[#2EED8F]" : "text-red-500"} />
-             </div>
-             <div>
-               <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Conexão WebSocket</p>
-               <p className={`text-sm font-semibold ${isConnected ? 'text-white' : 'text-red-500'}`}>
-                 {isConnected ? 'Online' : 'Offline'}
-               </p>
-             </div>
+            <div
+              className={`w-8 h-8 rounded-lg flex items-center justify-center border ${isConnected ? 'bg-[#2EED8F]/10 border-[#2EED8F]/20' : 'bg-red-500/10 border-red-500/20'}`}
+            >
+              <Cpu size={16} className={isConnected ? 'text-[#2EED8F]' : 'text-red-500'} />
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">
+                Conexão WebSocket
+              </p>
+              <p className={`text-sm font-semibold ${isConnected ? 'text-white' : 'text-red-500'}`}>
+                {isConnected ? 'Online' : 'Offline'}
+              </p>
+            </div>
           </div>
         </div>
       </header>
@@ -83,7 +94,6 @@ export const AgentChat: React.FC = () => {
       <div className="flex flex-1 gap-6 overflow-hidden">
         {/* Left Column: Logs / Chat */}
         <div className="flex-[0.4] flex flex-col gap-4 overflow-hidden">
-
           {/* LAM Logs */}
           <div className="flex-[0.6] flex flex-col bg-[#111111] rounded-xl border border-gray-800/60 overflow-hidden shadow-sm">
             <div className="px-4 py-3 flex items-center gap-2 border-b border-gray-800/60">
@@ -94,13 +104,13 @@ export const AgentChat: React.FC = () => {
             </div>
             <div className="flex-1 p-4 overflow-y-auto bg-[#0F0F0F] text-green-400/80 font-mono text-sm">
               {logs.length === 0 ? (
-                <p className="text-gray-600 italic">Aguardando inicialização do motor cognitivo...</p>
+                <p className="text-gray-600 italic">
+                  Aguardando inicialização do motor cognitivo...
+                </p>
               ) : (
                 logs.map((log, index) => (
                   <div key={index} className="mb-1 leading-relaxed">
-                    <span className="text-gray-600 mr-2">
-                      [{new Date().toLocaleTimeString()}]
-                    </span>
+                    <span className="text-gray-600 mr-2">[{new Date().toLocaleTimeString()}]</span>
                     {log}
                   </div>
                 ))
@@ -118,10 +128,12 @@ export const AgentChat: React.FC = () => {
           {/* LAM Input */}
           {hitlRequest && (
             <ActionReviewCard
-              plan={hitlRequest.plan as unknown as React.ComponentProps<typeof ActionReviewCard>["plan"]}
-              onApprove={() => sendHitlResponse(hitlRequest.thread_id, "approve")}
-              onReject={() => sendHitlResponse(hitlRequest.thread_id, "reject")}
-              onEdit={(editedPlan) => sendHitlResponse(hitlRequest.thread_id, "edit", editedPlan)}
+              plan={
+                hitlRequest.plan as unknown as React.ComponentProps<typeof ActionReviewCard>['plan']
+              }
+              onApprove={() => sendHitlResponse(hitlRequest.thread_id, 'approve')}
+              onReject={() => sendHitlResponse(hitlRequest.thread_id, 'reject')}
+              onEdit={(editedPlan) => sendHitlResponse(hitlRequest.thread_id, 'edit', editedPlan)}
             />
           )}
           <div className="bg-[#111111] rounded-xl border border-gray-800/60 p-2 shadow-sm">
@@ -133,11 +145,7 @@ export const AgentChat: React.FC = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={!isConnected || isRunning}
-                  placeholder={
-                    !isConnected
-                      ? "Conectando ao sistema..."
-                      : "Comando para o Maestro"
-                  }
+                  placeholder={!isConnected ? 'Conectando ao sistema...' : 'Comando para o Maestro'}
                   className="flex-1 py-3 bg-transparent text-gray-300 border-none focus:outline-none focus:ring-0 placeholder-gray-600 font-mono text-sm min-w-0"
                 />
               </div>
@@ -159,7 +167,9 @@ export const AgentChat: React.FC = () => {
                 {isRunning ? (
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
-                  <>Enviar <Send size={16} /></>
+                  <>
+                    Enviar <Send size={16} />
+                  </>
                 )}
               </button>
             </form>
@@ -168,47 +178,47 @@ export const AgentChat: React.FC = () => {
 
         {/* Right Column: Jules & Live View */}
         <div className="flex-[0.6] flex flex-col gap-4 overflow-hidden">
-            <div className="flex-[0.4] overflow-hidden rounded-xl border border-gray-800/60 shadow-sm flex flex-col bg-[#111111]">
-              <JulesTerminal
-                logs={julesLogs}
-                isRunning={isJulesRunning}
-                isConnected={isConnected}
-                input={julesInput}
-                setInput={setJulesInput}
-                onSubmit={handleJulesSubmit}
-              />
-            </div>
+          <div className="flex-[0.4] overflow-hidden rounded-xl border border-gray-800/60 shadow-sm flex flex-col bg-[#111111]">
+            <JulesTerminal
+              logs={julesLogs}
+              isRunning={isJulesRunning}
+              isConnected={isConnected}
+              input={julesInput}
+              setInput={setJulesInput}
+              onSubmit={handleJulesSubmit}
+            />
+          </div>
 
-            <div className="flex-[0.6] flex flex-col bg-[#111111] rounded-xl border border-gray-800/60 overflow-hidden shadow-sm">
+          <div className="flex-[0.6] flex flex-col bg-[#111111] rounded-xl border border-gray-800/60 overflow-hidden shadow-sm">
             <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-800/60">
-                <div className="flex gap-1.5">
+              <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
+              </div>
+              <div className="flex-1 flex items-center justify-center">
                 <div className="bg-[#1A1A1A] text-gray-300 text-xs py-1.5 px-32 rounded-md font-mono border border-gray-800">
-                    <ImageIcon size={12} className="inline mr-2 opacity-50" />
-                    Visualização em Tempo Real (LAM)
+                  <ImageIcon size={12} className="inline mr-2 opacity-50" />
+                  Visualização em Tempo Real (LAM)
                 </div>
-                </div>
+              </div>
             </div>
             <div className="flex-1 bg-[#FDFDFD] flex items-center justify-center overflow-auto relative rounded-b-xl p-2">
-                {screenshot ? (
+              {screenshot ? (
                 <img
-                    src={screenshot}
-                    alt="Agent Browser View"
-                    className="w-full h-full object-contain rounded border border-gray-200"
+                  src={screenshot}
+                  alt="Agent Browser View"
+                  className="w-full h-full object-contain rounded border border-gray-200"
                 />
-                ) : (
+              ) : (
                 <div className="flex flex-col items-center justify-center text-gray-400">
-                    <Globe2 size={64} className="mb-4 opacity-20" />
-                    <h3 className="text-xl font-medium text-gray-500 mb-2">Navegador em Standby</h3>
-                    <p className="text-sm">Envie um comando para iniciar a automação.</p>
+                  <Globe2 size={64} className="mb-4 opacity-20" />
+                  <h3 className="text-xl font-medium text-gray-500 mb-2">Navegador em Standby</h3>
+                  <p className="text-sm">Envie um comando para iniciar a automação.</p>
                 </div>
-                )}
+              )}
             </div>
-            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,16 +1,16 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./index.css";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import './index.css';
 
-import { MainLayout } from "./components/MainLayout";
-import { AgentChat } from "./components/AgentChat";
-import { Dashboard } from "./pages/Dashboard";
-import { AbidusAnalysis } from "./pages/AbidusAnalysis";
+import { AgentChat } from './components/AgentChat';
+import { MainLayout } from './components/MainLayout';
+import { AbidusAnalysis } from './pages/AbidusAnalysis';
+import { Dashboard } from './pages/Dashboard';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <MainLayout />,
     children: [
       {
@@ -18,18 +18,18 @@ const router = createBrowserRouter([
         element: <AgentChat />,
       },
       {
-        path: "dashboard",
+        path: 'dashboard',
         element: <Dashboard />,
       },
       {
-        path: "abidus-analysis",
+        path: 'abidus-analysis',
         element: <AbidusAnalysis />,
       },
     ],
   },
 ]);
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>

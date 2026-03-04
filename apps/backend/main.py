@@ -11,6 +11,8 @@ from analytics.ga4_service import ga4_service
 from analytics.ads_service import ads_service
 from analytics.gbp_service import gbp_service
 from analytics.wordpress_service import wp_service
+from analytics.n8n_service import n8n_service
+from analytics.instagram_service import instagram_service
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
@@ -58,6 +60,29 @@ async def get_gbp_performance():
 @app.get("/api/analytics/wp-stats")
 async def get_wp_stats():
     data = await wp_service.get_site_stats()
+    return data
+
+
+@app.post("/api/automations/n8n/trigger")
+async def trigger_n8n_workflow(payload: dict, webhook_url: str | None = None):
+    # If a specific webhook URL is not provided in the query, use the default from .env
+    url_to_use = webhook_url if webhook_url else n8n_service.webhook_lead_capture
+    if not url_to_use:
+        return {"error": "Webhook URL is missing."}
+        
+    data = await n8n_service.trigger_webhook(url_to_use, payload)
+    return data
+
+
+@app.post("/api/social/instagram/reply")
+async def reply_instagram(recipient_id: str, message: str):
+    data = await instagram_service.reply_to_message(recipient_id, message)
+    return data
+
+
+@app.post("/api/wordpress/publish")
+async def publish_to_wp(title: str, content: str):
+    data = await wp_service.create_post(title, content)
     return data
 
 

@@ -1,8 +1,26 @@
+import {
+  TrendingUp,
+  Users,
+  DollarSign,
+  Target,
+  MousePointerClick,
+  Zap,
+  Activity,
+  Loader2,
+} from 'lucide-react';
 import React, { useMemo, useEffect, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
 } from 'recharts';
-import { TrendingUp, Users, DollarSign, Target, MousePointerClick, Zap, Activity, Loader2 } from 'lucide-react';
 
 interface AdData {
   date: string;
@@ -26,14 +44,28 @@ interface GA4CityData {
   activeUsers: string;
 }
 
-const MetricCard = ({ title, value, icon: Icon, trend, trendUp }: { title: string, value: string | number, icon: React.ElementType, trend: string, trendUp: boolean }) => (
+const MetricCard = ({
+  title,
+  value,
+  icon: Icon,
+  trend,
+  trendUp,
+}: {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  trend: string;
+  trendUp: boolean;
+}) => (
   <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm">
     <div className="flex justify-between items-start">
       <div>
         <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1">{title}</p>
         <h3 className="text-2xl font-bold text-white font-mono">{value}</h3>
       </div>
-      <div className={`p-2 rounded-lg ${trendUp ? 'bg-[#2EED8F]/10 text-[#2EED8F]' : 'bg-red-500/10 text-red-500'}`}>
+      <div
+        className={`p-2 rounded-lg ${trendUp ? 'bg-[#2EED8F]/10 text-[#2EED8F]' : 'bg-red-500/10 text-red-500'}`}
+      >
         <Icon size={20} />
       </div>
     </div>
@@ -56,7 +88,12 @@ export const Dashboard: React.FC = () => {
     setIsLoading(true);
     try {
       // Direct CORS proxy
-      const response = await fetch("https://corsproxy.io/?url=" + encodeURIComponent("https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv"));
+      const response = await fetch(
+        'https://corsproxy.io/?url=' +
+          encodeURIComponent(
+            'https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv'
+          )
+      );
       const csvText = await response.text();
 
       const rows = csvText.split('\n');
@@ -80,24 +117,99 @@ export const Dashboard: React.FC = () => {
       }
 
       // Fallback behavior if missing data
-      if (data.length === 0 || (data.length === 1 && data[0].cliques === 0 && data[0].custo === 0)) {
-         setAdsData([
-            { date: '01/03/2026', campaign: 'Search_Hipnose', cliques: 120, impressoes: 2500, custo: 45.50, conversoes: 3, cpa: 15.16, roas: 4.5 },
-            { date: '02/03/2026', campaign: 'PMax_Conversao', cliques: 145, impressoes: 2800, custo: 52.00, conversoes: 5, cpa: 10.40, roas: 5.2 },
-            { date: '03/03/2026', campaign: 'Display_Retarget', cliques: 110, impressoes: 2200, custo: 40.00, conversoes: 2, cpa: 20.00, roas: 3.8 },
-            { date: '04/03/2026', campaign: 'Search_Hipnose', cliques: 160, impressoes: 3100, custo: 60.50, conversoes: 7, cpa: 8.64, roas: 6.1 },
-            { date: '05/03/2026', campaign: 'PMax_Conversao', cliques: 185, impressoes: 3500, custo: 75.00, conversoes: 8, cpa: 9.37, roas: 5.8 },
-            { date: '06/03/2026', campaign: 'Display_Retarget', cliques: 210, impressoes: 4000, custo: 85.00, conversoes: 12, cpa: 7.08, roas: 7.2 },
-            { date: '07/03/2026', campaign: 'Search_Hipnose', cliques: 190, impressoes: 3800, custo: 78.00, conversoes: 9, cpa: 8.66, roas: 6.5 },
-         ]);
+      if (
+        data.length === 0 ||
+        (data.length === 1 && data[0].cliques === 0 && data[0].custo === 0)
+      ) {
+        setAdsData([
+          {
+            date: '01/03/2026',
+            campaign: 'Search_Hipnose',
+            cliques: 120,
+            impressoes: 2500,
+            custo: 45.5,
+            conversoes: 3,
+            cpa: 15.16,
+            roas: 4.5,
+          },
+          {
+            date: '02/03/2026',
+            campaign: 'PMax_Conversao',
+            cliques: 145,
+            impressoes: 2800,
+            custo: 52.0,
+            conversoes: 5,
+            cpa: 10.4,
+            roas: 5.2,
+          },
+          {
+            date: '03/03/2026',
+            campaign: 'Display_Retarget',
+            cliques: 110,
+            impressoes: 2200,
+            custo: 40.0,
+            conversoes: 2,
+            cpa: 20.0,
+            roas: 3.8,
+          },
+          {
+            date: '04/03/2026',
+            campaign: 'Search_Hipnose',
+            cliques: 160,
+            impressoes: 3100,
+            custo: 60.5,
+            conversoes: 7,
+            cpa: 8.64,
+            roas: 6.1,
+          },
+          {
+            date: '05/03/2026',
+            campaign: 'PMax_Conversao',
+            cliques: 185,
+            impressoes: 3500,
+            custo: 75.0,
+            conversoes: 8,
+            cpa: 9.37,
+            roas: 5.8,
+          },
+          {
+            date: '06/03/2026',
+            campaign: 'Display_Retarget',
+            cliques: 210,
+            impressoes: 4000,
+            custo: 85.0,
+            conversoes: 12,
+            cpa: 7.08,
+            roas: 7.2,
+          },
+          {
+            date: '07/03/2026',
+            campaign: 'Search_Hipnose',
+            cliques: 190,
+            impressoes: 3800,
+            custo: 78.0,
+            conversoes: 9,
+            cpa: 8.66,
+            roas: 6.5,
+          },
+        ]);
       } else {
-         setAdsData(data);
+        setAdsData(data);
       }
     } catch (error) {
-      console.error("Failed to fetch spreadsheet:", error);
+      console.error('Failed to fetch spreadsheet:', error);
       // Fallback data
       setAdsData([
-        { date: '01/03/2026', campaign: 'Error_Fallback', cliques: 120, impressoes: 2500, custo: 45.50, conversoes: 3, cpa: 15.16, roas: 4.5 },
+        {
+          date: '01/03/2026',
+          campaign: 'Error_Fallback',
+          cliques: 120,
+          impressoes: 2500,
+          custo: 45.5,
+          conversoes: 3,
+          cpa: 15.16,
+          roas: 4.5,
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -107,23 +219,23 @@ export const Dashboard: React.FC = () => {
   const fetchGA4Data = async () => {
     setIsGaLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/analytics/active-users");
+      const response = await fetch('http://localhost:8000/api/analytics/active-users');
       const data = await response.json();
       if (Array.isArray(data)) {
         setGaData(data);
       } else {
-        console.error("GA4 Data error:", data);
+        console.error('GA4 Data error:', data);
         setGaData([]);
       }
     } catch (error) {
-      console.error("Failed to fetch GA4 data:", error);
+      console.error('Failed to fetch GA4 data:', error);
       // Fallback
       setGaData([
-        { city: "São Paulo", activeUsers: "42" },
-        { city: "Rio de Janeiro", activeUsers: "28" },
-        { city: "Belo Horizonte", activeUsers: "15" },
-        { city: "Curitiba", activeUsers: "12" },
-        { city: "Porto Alegre", activeUsers: "9" }
+        { city: 'São Paulo', activeUsers: '42' },
+        { city: 'Rio de Janeiro', activeUsers: '28' },
+        { city: 'Belo Horizonte', activeUsers: '15' },
+        { city: 'Curitiba', activeUsers: '12' },
+        { city: 'Porto Alegre', activeUsers: '9' },
       ]);
     } finally {
       setIsGaLoading(false);
@@ -137,25 +249,33 @@ export const Dashboard: React.FC = () => {
 
   // Aggregate data for Metric Cards
   const totalCost = useMemo(() => adsData.reduce((acc, curr) => acc + curr.custo, 0), [adsData]);
-  const totalClicks = useMemo(() => adsData.reduce((acc, curr) => acc + curr.cliques, 0), [adsData]);
-  const totalConversions = useMemo(() => adsData.reduce((acc, curr) => acc + curr.conversoes, 0), [adsData]);
+  const totalClicks = useMemo(
+    () => adsData.reduce((acc, curr) => acc + curr.cliques, 0),
+    [adsData]
+  );
+  const totalConversions = useMemo(
+    () => adsData.reduce((acc, curr) => acc + curr.conversoes, 0),
+    [adsData]
+  );
   const avgCpa = totalConversions > 0 ? (totalCost / totalConversions).toFixed(2) : '0.00';
 
   // Aggregate data dynamically for the Bar Chart by CampaignName
   const campaignData = useMemo(() => {
     const summary: Record<string, CampaignSummary> = {};
 
-    adsData.forEach(ad => {
-        // Fallback for empty campaign names
-        const campName = ad.campaign || "Unknown Campaign";
-        if (!summary[campName]) {
-            summary[campName] = { name: campName, custo: 0, conversoes: 0 };
-        }
-        summary[campName].custo += ad.custo;
-        summary[campName].conversoes += ad.conversoes;
+    adsData.forEach((ad) => {
+      // Fallback for empty campaign names
+      const campName = ad.campaign || 'Unknown Campaign';
+      if (!summary[campName]) {
+        summary[campName] = { name: campName, custo: 0, conversoes: 0 };
+      }
+      summary[campName].custo += ad.custo;
+      summary[campName].conversoes += ad.conversoes;
     });
 
-    return Object.values(summary).sort((a, b) => b.conversoes - a.conversoes).slice(0, 5); // Top 5
+    return Object.values(summary)
+      .sort((a, b) => b.conversoes - a.conversoes)
+      .slice(0, 5); // Top 5
   }, [adsData]);
 
   if (isLoading) {
@@ -185,15 +305,38 @@ export const Dashboard: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard title="Investimento Total" value={`R$ ${totalCost.toFixed(2)}`} icon={DollarSign} trend="12.5%" trendUp={false} />
-        <MetricCard title="Cliques" value={totalClicks} icon={MousePointerClick} trend="8.2%" trendUp={true} />
-        <MetricCard title="Conversões" value={totalConversions} icon={Target} trend="24.5%" trendUp={true} />
-        <MetricCard title="CPA Médio" value={`R$ ${avgCpa}`} icon={TrendingUp} trend="5.1%" trendUp={true} />
+        <MetricCard
+          title="Investimento Total"
+          value={`R$ ${totalCost.toFixed(2)}`}
+          icon={DollarSign}
+          trend="12.5%"
+          trendUp={false}
+        />
+        <MetricCard
+          title="Cliques"
+          value={totalClicks}
+          icon={MousePointerClick}
+          trend="8.2%"
+          trendUp={true}
+        />
+        <MetricCard
+          title="Conversões"
+          value={totalConversions}
+          icon={Target}
+          trend="24.5%"
+          trendUp={true}
+        />
+        <MetricCard
+          title="CPA Médio"
+          value={`R$ ${avgCpa}`}
+          icon={TrendingUp}
+          trend="5.1%"
+          trendUp={true}
+        />
       </div>
 
       {/* Charts Area */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[400px]">
-
         {/* Main Trend Chart */}
         <div className="lg:col-span-2 bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm flex flex-col">
           <h2 className="text-sm font-semibold text-gray-300 mb-6 flex items-center gap-2">
@@ -205,25 +348,67 @@ export const Dashboard: React.FC = () => {
               <AreaChart data={adsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorCliques" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2EED8F" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#2EED8F" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#2EED8F" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#2EED8F" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorCusto" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                <XAxis dataKey="date" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="left" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="right" orientation="right" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
+                <XAxis
+                  dataKey="date"
+                  stroke="#666"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  yAxisId="left"
+                  stroke="#666"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  stroke="#666"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1A1A1A', borderColor: '#333', borderRadius: '8px', color: '#fff' }}
+                  contentStyle={{
+                    backgroundColor: '#1A1A1A',
+                    borderColor: '#333',
+                    borderRadius: '8px',
+                    color: '#fff',
+                  }}
                   itemStyle={{ color: '#E5E7EB' }}
                 />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }}/>
-                <Area yAxisId="left" type="monotone" dataKey="cliques" stroke="#2EED8F" strokeWidth={2} fillOpacity={1} fill="url(#colorCliques)" name="Cliques" />
-                <Area yAxisId="right" type="monotone" dataKey="custo" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#colorCusto)" name="Custo (R$)" />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="cliques"
+                  stroke="#2EED8F"
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#colorCliques)"
+                  name="Cliques"
+                />
+                <Area
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="custo"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#colorCusto)"
+                  name="Custo (R$)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -237,15 +422,44 @@ export const Dashboard: React.FC = () => {
           </h2>
           <div className="flex-1 w-full min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={campaignData} layout="vertical" margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
+              <BarChart
+                data={campaignData}
+                layout="vertical"
+                margin={{ top: 0, right: 20, left: 20, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
-                <XAxis type="number" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis dataKey="name" type="category" stroke="#999" fontSize={11} tickLine={false} axisLine={false} width={120} />
-                <Tooltip
-                  cursor={{fill: '#1A1A1A'}}
-                  contentStyle={{ backgroundColor: '#1A1A1A', borderColor: '#333', borderRadius: '8px', color: '#fff' }}
+                <XAxis
+                  type="number"
+                  stroke="#666"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
                 />
-                <Bar dataKey="conversoes" fill="#2EED8F" radius={[0, 4, 4, 0]} barSize={20} name="Conversões" />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  stroke="#999"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  width={120}
+                />
+                <Tooltip
+                  cursor={{ fill: '#1A1A1A' }}
+                  contentStyle={{
+                    backgroundColor: '#1A1A1A',
+                    borderColor: '#333',
+                    borderRadius: '8px',
+                    color: '#fff',
+                  }}
+                />
+                <Bar
+                  dataKey="conversoes"
+                  fill="#2EED8F"
+                  radius={[0, 4, 4, 0]}
+                  barSize={20}
+                  name="Conversões"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -264,10 +478,17 @@ export const Dashboard: React.FC = () => {
               </div>
             ) : gaData.length > 0 ? (
               gaData.map((item, idx) => (
-                <div key={idx} className="bg-[#1A1A1A] p-4 rounded-lg border border-gray-800 flex justify-between items-center">
+                <div
+                  key={idx}
+                  className="bg-[#1A1A1A] p-4 rounded-lg border border-gray-800 flex justify-between items-center"
+                >
                   <div>
-                    <p className="text-gray-500 text-[10px] uppercase font-bold tracking-tighter">Cidade</p>
-                    <p className="text-white font-medium text-sm truncate max-w-[100px]">{item.city}</p>
+                    <p className="text-gray-500 text-[10px] uppercase font-bold tracking-tighter">
+                      Cidade
+                    </p>
+                    <p className="text-white font-medium text-sm truncate max-w-[100px]">
+                      {item.city}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="text-[#2EED8F] font-mono font-bold text-lg">{item.activeUsers}</p>
@@ -282,7 +503,6 @@ export const Dashboard: React.FC = () => {
             )}
           </div>
         </div>
-
       </div>
     </div>
   );

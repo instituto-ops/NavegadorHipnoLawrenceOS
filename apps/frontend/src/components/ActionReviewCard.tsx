@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { CheckCircle2, XCircle, Edit3, ShieldAlert } from "lucide-react";
+import { CheckCircle2, XCircle, Edit3, ShieldAlert } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface ActionParam {
   selector?: string;
@@ -33,9 +33,7 @@ export const ActionReviewCard: React.FC<ActionReviewCardProps> = ({
   onEdit,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedPlanJson, setEditedPlanJson] = useState(
-    JSON.stringify(plan, null, 2)
-  );
+  const [editedPlanJson, setEditedPlanJson] = useState(JSON.stringify(plan, null, 2));
 
   const handleSaveEdit = () => {
     try {
@@ -43,7 +41,7 @@ export const ActionReviewCard: React.FC<ActionReviewCardProps> = ({
       onEdit(newPlan);
       setIsEditing(false);
     } catch {
-      alert("Invalid JSON format.");
+      alert('Invalid JSON format.');
     }
   };
 
@@ -57,7 +55,8 @@ export const ActionReviewCard: React.FC<ActionReviewCardProps> = ({
       </div>
 
       <p className="text-gray-600 text-sm mb-4">
-        The LAM has proposed a plan that involves sensitive operations (e.g., spending, posting, or messaging). Please review and approve before execution.
+        The LAM has proposed a plan that involves sensitive operations (e.g., spending, posting, or
+        messaging). Please review and approve before execution.
       </p>
 
       {isEditing ? (

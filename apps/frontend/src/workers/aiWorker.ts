@@ -2,7 +2,10 @@ import { pipeline } from '@xenova/transformers';
 import type { PipelineType } from '@xenova/transformers';
 
 // Define the signature we expect from the feature-extraction pipeline
-type FeatureExtractionPipeline = (text: string, options?: Record<string, unknown>) => Promise<{ data: Float32Array }>;
+type FeatureExtractionPipeline = (
+  text: string,
+  options?: Record<string, unknown>
+) => Promise<{ data: Float32Array }>;
 
 // Singleton instance to prevent multiple model loads
 class PipelineSingleton {
@@ -13,9 +16,9 @@ class PipelineSingleton {
   static async getInstance(progress_callback?: (progress: unknown) => void) {
     if (this.instance === null) {
       // The @xenova/transformers types are generic, so we cast to our expected signature
-      this.instance = await pipeline(this.task, this.model, {
+      this.instance = (await pipeline(this.task, this.model, {
         progress_callback,
-      }) as unknown as FeatureExtractionPipeline;
+      })) as unknown as FeatureExtractionPipeline;
     }
     return this.instance;
   }
@@ -41,7 +44,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
       self.postMessage({
         id,
         status: 'complete',
-        result: Array.from(output.data)
+        result: Array.from(output.data),
       });
     } else {
       self.postMessage({ id, status: 'error', error: `Unknown task type: ${type}` });
@@ -50,7 +53,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
     self.postMessage({
       id: event.data?.id,
       status: 'error',
-      error: (error as Error).message || 'An error occurred during inference'
+      error: (error as Error).message || 'An error occurred during inference',
     });
   }
 });
