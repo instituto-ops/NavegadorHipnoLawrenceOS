@@ -142,6 +142,7 @@ export const Dashboard: React.FC = () => {
         <div className="flex gap-2">
           <button
             onClick={fetchSpreadsheetData}
+            aria-label="Sincronizar Dados de Anúncios"
             className="px-4 py-2 bg-[#2EED8F] text-[#0A0A0A] rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(46,237,143,0.3)] hover:bg-[#20c978] transition-colors flex items-center gap-2"
           >
             <Zap size={16} /> Sincronizar Dados
