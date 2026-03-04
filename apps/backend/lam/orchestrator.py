@@ -162,7 +162,7 @@ class LamOrchestrator:
         """Calls the Intention Intelligence planner with real-time browser context."""
         print("Planning Node: Generating DSL...")
         task = state.get("task", "")
-        
+
         # We try to get the current page context if the browser is initialized
         page_context = "No browser session active yet."
         if self.executor.page:
@@ -170,7 +170,7 @@ class LamOrchestrator:
                 page_context = await self.executor.get_accessibility_tree()
             except:
                 page_context = "Error retrieving browser state."
-        
+
         plan = await generate_plan(task, page_context=page_context)
         return {"plan": plan, "status": "planned", "memory_context": page_context}
 
@@ -234,7 +234,7 @@ class LamOrchestrator:
 
         # Check if thread already exists
         snapshot = await self.graph.aget_state(config)
-        
+
         if snapshot.next:
             print(f"Resuming graph from checkpoint: {snapshot.next[0]}...")
             # Continue from where we left off (e.g., Verification)
