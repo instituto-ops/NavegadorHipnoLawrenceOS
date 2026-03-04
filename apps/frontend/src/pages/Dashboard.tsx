@@ -142,9 +142,11 @@ export const Dashboard: React.FC = () => {
         <div className="flex gap-2">
           <button
             onClick={fetchSpreadsheetData}
-            className="px-4 py-2 bg-[#2EED8F] text-[#0A0A0A] rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(46,237,143,0.3)] hover:bg-[#20c978] transition-colors flex items-center gap-2"
+            disabled={isLoading}
+            className="px-4 py-2 bg-[#2EED8F] text-[#0A0A0A] rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(46,237,143,0.3)] hover:bg-[#20c978] transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Zap size={16} /> Sincronizar Dados
+            {isLoading ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Zap size={16} aria-hidden="true" />}
+            {isLoading ? "Sincronizando..." : "Sincronizar Dados"}
           </button>
         </div>
       </header>
