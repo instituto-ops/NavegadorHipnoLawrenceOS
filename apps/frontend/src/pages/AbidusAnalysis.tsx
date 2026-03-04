@@ -13,7 +13,7 @@ export const AbidusAnalysis: React.FC = () => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
-  const handleAnalyze = (e: React.FormEvent) => {
+  const handleAnalyze = (e: React.FormEvent): void => {
     e.preventDefault();
     if (!url.trim() || !isConnected || isRunning) return;
 

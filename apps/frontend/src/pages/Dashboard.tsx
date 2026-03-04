@@ -56,7 +56,7 @@ const MetricCard = ({
   icon: React.ElementType;
   trend: string;
   trendUp: boolean;
-}) => (
+}): JSX.Element => (
   <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm">
     <div className="flex justify-between items-start">
       <div>
@@ -84,15 +84,15 @@ export const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGaLoading, setIsGaLoading] = useState(true);
 
-  const fetchSpreadsheetData = async () => {
+  const fetchSpreadsheetData = async (): Promise<void> => {
     setIsLoading(true);
     try {
       // Direct CORS proxy
       const response = await fetch(
         'https://corsproxy.io/?url=' +
-        encodeURIComponent(
-          'https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv'
-        )
+          encodeURIComponent(
+            'https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv'
+          )
       );
       const csvText = await response.text();
 
@@ -216,7 +216,7 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const fetchGA4Data = async () => {
+  const fetchGA4Data = async (): Promise<void> => {
     setIsGaLoading(true);
     try {
       const response = await fetch('http://localhost:8000/api/analytics/active-users');

@@ -14,6 +14,7 @@ from analytics.wordpress_service import wp_service
 from analytics.n8n_service import n8n_service
 from analytics.instagram_service import instagram_service
 from analytics.pagespeed_service import pagespeed_service
+from analytics.browser_agent import browser_agent
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
@@ -90,6 +91,12 @@ async def publish_to_wp(title: str, content: str):
 @app.get("/api/analytics/pagespeed")
 async def get_pagespeed_report(url: str, strategy: str = "MOBILE"):
     data = await pagespeed_service.run_analysis(url, strategy)
+    return data
+
+
+@app.get("/api/analytics/visual-audit")
+async def get_visual_audit(url: str, device: str = "desktop"):
+    data = await browser_agent.run_visual_audit(url, device)
     return data
 
 
