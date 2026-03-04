@@ -126,13 +126,14 @@ export const AgentChat: React.FC = () => {
           )}
           <div className="bg-[#111111] rounded-xl border border-gray-800/60 p-2 shadow-sm">
             <form onSubmit={handleSubmit} className="flex gap-2">
-              <div className="flex-1 flex items-center bg-[#1A1A1A] rounded-lg border border-gray-800 px-3">
-                <span className="text-gray-500 font-mono text-sm mr-2">&gt;_</span>
+              <div className="flex-1 flex items-center bg-[#1A1A1A] rounded-lg border border-gray-800 px-3 focus-within:ring-1 focus-within:ring-[#2EED8F] focus-within:border-[#2EED8F]/50 transition-colors">
+                <span className="text-gray-500 font-mono text-sm mr-2" aria-hidden="true">&gt;_</span>
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={!isConnected || isRunning}
+                  aria-label="Comando para o Maestro"
                   placeholder={
                     !isConnected
                       ? "Conectando ao sistema..."
@@ -145,7 +146,7 @@ export const AgentChat: React.FC = () => {
                 <button
                   type="button"
                   onClick={sendPanicStop}
-                  className="bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-500 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                  className="bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-500 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
                 >
                   <OctagonPause size={18} />
                   Parar
@@ -154,7 +155,7 @@ export const AgentChat: React.FC = () => {
               <button
                 type="submit"
                 disabled={!input.trim() || !isConnected || isRunning}
-                className="bg-[#2EED8F] hover:bg-[#20c978] text-[#0A0A0A] px-4 py-2 rounded-lg font-bold transition-colors disabled:opacity-50 flex items-center gap-2 shadow-[0_0_15px_rgba(46,237,143,0.2)]"
+                className="bg-[#2EED8F] hover:bg-[#20c978] text-[#0A0A0A] px-4 py-2 rounded-lg font-bold transition-colors disabled:opacity-50 flex items-center gap-2 shadow-[0_0_15px_rgba(46,237,143,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2EED8F] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
               >
                 {isRunning ? (
                   <Loader2 size={18} className="animate-spin" />
