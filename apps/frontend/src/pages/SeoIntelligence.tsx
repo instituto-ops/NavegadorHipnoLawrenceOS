@@ -1,6 +1,5 @@
 import {
   Search,
-  Zap,
   ShieldCheck,
   Globe,
   BarChart3,
@@ -9,10 +8,9 @@ import {
   Info,
   Loader2,
   ArrowRight,
-  Gauge,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface PageSpeedData {
   id: string;
@@ -52,7 +50,7 @@ const ScoreGauge = ({ score, title }: { score: number; title: string }) => {
               dataKey="value"
               stroke="none"
             >
-              {data.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
               ))}
             </Pie>
@@ -71,11 +69,11 @@ export const SeoIntelligence: React.FC = () => {
   const [url, setUrl] = useState('https://hipnolawrence.com');
   const [isLoading, setIsLoading] = useState(false);
   const [pageSpeed, setPageSpeed] = useState<PageSpeedData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const runAnalysis = async () => {
     setIsLoading(true);
-    setError(null);
+    setErrorMsg(null);
     try {
       const response = await fetch(
         `http://localhost:8000/api/analytics/pagespeed?url=${encodeURIComponent(url)}`
@@ -84,7 +82,7 @@ export const SeoIntelligence: React.FC = () => {
       if (data.error) throw new Error(data.error);
       setPageSpeed(data);
     } catch (err: any) {
-      setError(err.message);
+      setErrorMsg(err.message);
       // Mock for demo if error
       setPageSpeed({
         id: url,
@@ -128,6 +126,12 @@ export const SeoIntelligence: React.FC = () => {
           </button>
         </div>
       </header>
+
+      {errorMsg && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm mb-4">
+          Erro ao analisar URL: {errorMsg}
+        </div>
+      )}
 
       {/* Main Stats Row */}
       {pageSpeed && (
