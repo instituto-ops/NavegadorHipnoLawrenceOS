@@ -142,6 +142,7 @@ export const AgentChat: React.FC = () => {
                 <span className="text-gray-500 font-mono text-sm mr-2">&gt;_</span>
                 <input
                   type="text"
+                  aria-label="Comando para o Maestro"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={!isConnected || isRunning}
