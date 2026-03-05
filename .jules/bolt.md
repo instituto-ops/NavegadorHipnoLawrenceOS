@@ -1,0 +1,3 @@
+## 2025-03-05 - Consolidate Redundant Array Traversals in Dashboard
+**Learning:** In React components dealing with large data arrays (like `adsData` in the Dashboard), mapping over the same array multiple times with separate `reduce` or `forEach` calls within different `useMemo` hooks causes redundant O(n) operations per render cycle. This results in unnecessary CPU cycles and performance bottlenecks when array sizes scale up.
+**Action:** When extracting multiple aggregated metrics from a single array, consolidate the array traversal logic into a single-pass `for` loop inside a single `useMemo` block. This reduces an O(x*n) traversal complexity to O(n). Always look for contiguous array iterations over the same data source that can be grouped together.
