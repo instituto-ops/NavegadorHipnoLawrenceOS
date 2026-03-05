@@ -1,0 +1,3 @@
+## 2024-05-24 - [Optimize Dashboard Aggregations]
+**Learning:** Consolidated multiple redundant array traversals (`.reduce` calls) into a single pass within a `useMemo` block in React components (like `Dashboard.tsx`). This reduces O(3N) operations to O(N), which is noticeably faster when processing large datasets on the client side.
+**Action:** When calculating multiple aggregate metrics (e.g., total cost, total clicks, total conversions) from the same array, always combine them into a single `.reduce` operation returning an object, rather than calling `.reduce` multiple times.
