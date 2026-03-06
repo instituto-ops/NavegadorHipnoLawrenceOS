@@ -1,0 +1,3 @@
+## 2026-03-06 - Consolidate redundant array traversals in React components
+**Learning:** Large data visualizations like those in `Dashboard.tsx` often use multiple `useMemo` hooks to reduce an array into distinct metrics (e.g., total cost, clicks, conversions). This causes redundant O(n) array traversals per metric.
+**Action:** Always refactor redundant `useMemo` iterations over the same large dataset into a single-pass `for...of` loop within a single `useMemo` to return all required metrics together, reducing time complexity and memory overhead.

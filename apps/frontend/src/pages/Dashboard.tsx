@@ -247,23 +247,18 @@ export const Dashboard: React.FC = () => {
     void fetchGA4Data();
   }, []);
 
-  // Aggregate data for Metric Cards
-  const totalCost = useMemo(() => adsData.reduce((acc, curr) => acc + curr.custo, 0), [adsData]);
-  const totalClicks = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.cliques, 0),
-    [adsData]
-  );
-  const totalConversions = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.conversoes, 0),
-    [adsData]
-  );
-  const avgCpa = totalConversions > 0 ? (totalCost / totalConversions).toFixed(2) : '0.00';
-
-  // Aggregate data dynamically for the Bar Chart by CampaignName
-  const campaignData = useMemo(() => {
+  // Consolidate redundant array traversals into a single-pass loop to optimize performance
+  const { totalCost, totalClicks, totalConversions, campaignData } = useMemo(() => {
+    let cost = 0;
+    let clicks = 0;
+    let conversions = 0;
     const summary: Record<string, CampaignSummary> = {};
 
-    adsData.forEach((ad) => {
+    for (const ad of adsData) {
+      cost += ad.custo;
+      clicks += ad.cliques;
+      conversions += ad.conversoes;
+
       // Fallback for empty campaign names
       const campName = ad.campaign || 'Unknown Campaign';
       if (!summary[campName]) {
@@ -271,12 +266,21 @@ export const Dashboard: React.FC = () => {
       }
       summary[campName].custo += ad.custo;
       summary[campName].conversoes += ad.conversoes;
-    });
+    }
 
-    return Object.values(summary)
+    const sortedCampaigns = Object.values(summary)
       .sort((a, b) => b.conversoes - a.conversoes)
       .slice(0, 5); // Top 5
+
+    return {
+      totalCost: cost,
+      totalClicks: clicks,
+      totalConversions: conversions,
+      campaignData: sortedCampaigns,
+    };
   }, [adsData]);
+
+  const avgCpa = totalConversions > 0 ? (totalCost / totalConversions).toFixed(2) : '0.00';
 
   if (isLoading) {
     return (
