@@ -20,7 +20,9 @@ class ActionParam(BaseModel):
         default=None, description="Time to wait in milliseconds"
     )
     title: Optional[str] = Field(default=None, description="Title for WP_DRAFT_POST")
-    content: Optional[str] = Field(default=None, description="Content for WP_DRAFT_POST")
+    content: Optional[str] = Field(
+        default=None, description="Content for WP_DRAFT_POST"
+    )
 
 
 class AtomicAction(BaseModel):
@@ -37,9 +39,8 @@ class Plan(BaseModel):
     )
     requires_hitl: bool = Field(
         default=False,
-        description="Must be True if ANY action in the plan involves financial spending, publishing posts, or sending public messages."
+        description="Must be True if ANY action in the plan involves financial spending, publishing posts, or sending public messages.",
     )
-
 
 
 def create_planner_chain(model_name: str = "llama-3.3-70b-versatile"):
@@ -49,10 +50,11 @@ def create_planner_chain(model_name: str = "llama-3.3-70b-versatile"):
         # Fallback to OpenRouter if Groq key is missing
         api_key = os.environ.get("OPENROUTER_API_KEY", "")
         from langchain_openai import ChatOpenAI
+
         llm = ChatOpenAI(
-            model="google/gemini-2.0-flash-001", # High performance free-ish model on OpenRouter
+            model="google/gemini-2.0-flash-001",  # High performance free-ish model on OpenRouter
             api_key=SecretStr(api_key) if api_key else None,
-            base_url="https://openrouter.ai/api/v1"
+            base_url="https://openrouter.ai/api/v1",
         )
     else:
         llm = ChatGroq(temperature=0, model=model_name, api_key=SecretStr(api_key))
@@ -107,10 +109,14 @@ STRICT CLINICAL AND ETHICAL GUARDRAILS (CFM COMPLIANCE):
     return chain
 
 
-async def generate_plan(command: str, page_context: str = "No page loaded.") -> Dict[str, Any]:
+async def generate_plan(
+    command: str, page_context: str = "No page loaded."
+) -> Dict[str, Any]:
     """Generates a structured plan of atomic actions from a user command and current page state."""
     # We enrich the human prompt with current page context if available
-    enriched_command = f"Goal: {command}\n\nCurrent Browser State (Accessibility Tree): {page_context}"
+    enriched_command = (
+        f"Goal: {command}\n\nCurrent Browser State (Accessibility Tree): {page_context}"
+    )
 
     try:
         # Try with the high-end model first (Llama 3.3 70B)
@@ -119,7 +125,9 @@ async def generate_plan(command: str, page_context: str = "No page loaded.") -> 
     except Exception as e:
         error_msg = str(e)
         if "rate_limit_exceeded" in error_msg.lower() or "429" in error_msg:
-            print(f"Planner: High-end model rate limited. Falling back to Llama 3.1 8B...")
+            print(
+                "Planner: High-end model rate limited. Falling back to Llama 3.1 8B..."
+            )
             try:
                 # Fallback to the lighter, high-quota model
                 chain = create_planner_chain(model_name="llama-3.1-8b-instant")

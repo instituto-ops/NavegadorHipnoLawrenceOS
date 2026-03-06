@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class GA4Service:
     def __init__(self):
         self.property_id = os.getenv("GA4_PROPERTY_ID", "YOUR-GA4-PROPERTY-ID")
@@ -39,14 +40,17 @@ class GA4Service:
 
             results = []
             for row in response.rows:
-                results.append({
-                    "city": row.dimension_values[0].value,
-                    "activeUsers": row.metric_values[0].value
-                })
-            
+                results.append(
+                    {
+                        "city": row.dimension_values[0].value,
+                        "activeUsers": row.metric_values[0].value,
+                    }
+                )
+
             return results
         except Exception as e:
             return {"error": str(e)}
+
 
 # Singleton instance
 ga4_service = GA4Service()
