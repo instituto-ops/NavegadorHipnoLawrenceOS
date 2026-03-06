@@ -82,8 +82,8 @@ export const SeoIntelligence: React.FC = () => {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setPageSpeed(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError((err as Error).message);
       // Mock for demo if error
       setPageSpeed({
         id: url,

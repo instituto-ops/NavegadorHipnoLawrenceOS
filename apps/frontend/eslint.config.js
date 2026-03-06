@@ -22,6 +22,7 @@ export default [
   },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
+
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: 'module',
@@ -32,7 +33,7 @@ export default [
       parser: typescriptEslint.parser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: './tsconfig.app.json',
+        project: ['./tsconfig.app.json', './tsconfig.node.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -71,7 +72,7 @@ export default [
         },
       ],
       '@typescript-eslint/explicit-function-return-type': [
-        'warn',
+        'off',
         {
           allowExpressions: true,
           allowTypedFunctionExpressions: true,
