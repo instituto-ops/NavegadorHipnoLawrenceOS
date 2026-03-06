@@ -10,16 +10,11 @@ from pydantic import BaseModel, Field, SecretStr
 
 # Import sub-agents
 import typing
-
 if typing.TYPE_CHECKING:
-    from lam.agency.ads_agent import ads_agent_node
-    from lam.agency.copy_agent import copy_agent_node
-    from lam.agency.seo_agent import seo_agent_node
+    pass
 else:
     try:
-        from .ads_agent import ads_agent_node
-        from .copy_agent import copy_agent_node
-        from .seo_agent import seo_agent_node
+        pass
     except ImportError:
         pass
 

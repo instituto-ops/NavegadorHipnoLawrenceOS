@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class GoogleAdsService:
     def __init__(self):
         self.developer_token = os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN")
@@ -26,7 +25,7 @@ class GoogleAdsService:
                 config = {
                     "developer_token": self.developer_token,
                     "json_key_file_path": self.json_key_file,
-                    "use_proto_plus": True,
+                    "use_proto_plus": True
                 }
                 self.client = GoogleAdsClient.load_from_dict(config)
             else:
@@ -37,7 +36,7 @@ class GoogleAdsService:
                     "client_secret": os.getenv("GOOGLE_ADS_CLIENT_SECRET"),
                     "refresh_token": os.getenv("GOOGLE_ADS_REFRESH_TOKEN"),
                     "login_customer_id": os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID"),
-                    "use_proto_plus": True,
+                    "use_proto_plus": True
                 }
                 if not config["refresh_token"]:
                     return False
@@ -50,9 +49,7 @@ class GoogleAdsService:
     def get_campaign_performance(self):
         """Fetches performance metrics for campaigns."""
         if not self._initialize_client():
-            return {
-                "error": "Google Ads Client not initialized. Check your credentials in .env"
-            }
+            return {"error": "Google Ads Client not initialized. Check your credentials in .env"}
 
         if not self.customer_id:
             return {"error": "GOOGLE_ADS_CUSTOMER_ID not set in .env"}
@@ -75,22 +72,18 @@ class GoogleAdsService:
             results = []
             for batch in stream:
                 for row in batch.results:
-                    results.append(
-                        {
-                            "campaign": row.campaign.name,
-                            "clicks": row.metrics.clicks,
-                            "impressions": row.metrics.impressions,
-                            "cost": row.metrics.cost_micros / 1000000,
-                            "conversions": row.metrics.conversions,
-                            "value": row.metrics.conversions_value,
-                        }
-                    )
+                    results.append({
+                        "campaign": row.campaign.name,
+                        "clicks": row.metrics.clicks,
+                        "impressions": row.metrics.impressions,
+                        "cost": row.metrics.cost_micros / 1000000,
+                        "conversions": row.metrics.conversions,
+                        "value": row.metrics.conversions_value
+                    })
             return results
         except GoogleAdsException as ex:
-            print(
-                f"Request with ID '{ex.request_id}' failed with status "
-                f"'{ex.error.code().name}' and includes the following errors:"
-            )
+            print(f"Request with ID '{ex.request_id}' failed with status "
+                  f"'{ex.error.code().name}' and includes the following errors:")
             error_msgs = []
             for error in ex.failure.errors:
                 print(f"\tError with message '{error.message}'.")
@@ -101,7 +94,6 @@ class GoogleAdsService:
             return {"error": ", ".join(error_msgs)}
         except Exception as e:
             return {"error": str(e)}
-
 
 # Singleton instance
 ads_service = GoogleAdsService()

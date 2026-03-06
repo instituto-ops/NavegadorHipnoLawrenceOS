@@ -10,12 +10,11 @@ from .schemas import CopyAsset
 
 # Ensure we use Pydantic models correctly for Intention Intelligence Protocol
 import typing
-
 if typing.TYPE_CHECKING:
-    from lam.planner import Plan, generate_plan
+    pass
 else:
     try:
-        from ..planner import Plan, generate_plan
+        pass
     except ImportError:
         pass
 
