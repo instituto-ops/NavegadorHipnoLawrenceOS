@@ -1,6 +1,5 @@
 import {
   Search,
-  Zap,
   ShieldCheck,
   Globe,
   BarChart3,
@@ -9,10 +8,9 @@ import {
   Info,
   Loader2,
   ArrowRight,
-  Gauge,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface PageSpeedData {
   id: string;
@@ -52,7 +50,7 @@ const ScoreGauge = ({ score, title }: { score: number; title: string }) => {
               dataKey="value"
               stroke="none"
             >
-              {data.map((entry, index) => (
+              {data.map((_entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
               ))}
             </Pie>
@@ -71,9 +69,10 @@ export const SeoIntelligence: React.FC = () => {
   const [url, setUrl] = useState('https://hipnolawrence.com');
   const [isLoading, setIsLoading] = useState(false);
   const [pageSpeed, setPageSpeed] = useState<PageSpeedData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
-  const runAnalysis = async () => {
+  const runAnalysis = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsLoading(true);
     setError(null);
     try {
@@ -107,26 +106,30 @@ export const SeoIntelligence: React.FC = () => {
           <h1 className="text-2xl font-bold text-white tracking-tight">Inteligência de SEO</h1>
           <p className="text-gray-500 text-sm mt-1">NeuroStrategy SEO Engine & Content Ideas</p>
         </div>
-        <div className="flex gap-4 items-center bg-[#111111] border border-gray-800 p-1.5 rounded-xl">
+        <form
+          onSubmit={runAnalysis}
+          className="flex gap-4 items-center bg-[#111111] border border-gray-800 p-1.5 rounded-xl"
+        >
           <div className="relative">
             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
             <input
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              aria-label="URL para análise"
               className="bg-transparent border-none text-white text-sm pl-10 pr-4 py-2 w-64 focus:ring-0 font-mono"
               placeholder="https://exemplo.com"
             />
           </div>
           <button
-            onClick={runAnalysis}
+            type="submit"
             disabled={isLoading}
             className="px-4 py-2 bg-[#2EED8F] text-[#0A0A0A] rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(46,237,143,0.3)] hover:bg-[#20c978] transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             {isLoading ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}
             Analisar Agora
           </button>
-        </div>
+        </form>
       </header>
 
       {/* Main Stats Row */}
