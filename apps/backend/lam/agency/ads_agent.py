@@ -10,6 +10,7 @@ from .schemas import AdsAsset
 
 # Ensure we use Pydantic models correctly for Intention Intelligence Protocol
 import typing
+
 if typing.TYPE_CHECKING:
     pass
 else:
