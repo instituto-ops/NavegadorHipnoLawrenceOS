@@ -247,16 +247,18 @@ export const Dashboard: React.FC = () => {
     void fetchGA4Data();
   }, []);
 
-  // Aggregate data for Metric Cards
-  const totalCost = useMemo(() => adsData.reduce((acc, curr) => acc + curr.custo, 0), [adsData]);
-  const totalClicks = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.cliques, 0),
-    [adsData]
-  );
-  const totalConversions = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.conversoes, 0),
-    [adsData]
-  );
+  // Aggregate data for Metric Cards in a single pass to optimize performance O(3n) -> O(n)
+  const { totalCost, totalClicks, totalConversions } = useMemo(() => {
+    let cost = 0;
+    let clicks = 0;
+    let conversions = 0;
+    for (const ad of adsData) {
+      cost += ad.custo;
+      clicks += ad.cliques;
+      conversions += ad.conversoes;
+    }
+    return { totalCost: cost, totalClicks: clicks, totalConversions: conversions };
+  }, [adsData]);
   const avgCpa = totalConversions > 0 ? (totalCost / totalConversions).toFixed(2) : '0.00';
 
   // Aggregate data dynamically for the Bar Chart by CampaignName
