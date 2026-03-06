@@ -1,7 +1,6 @@
 with open("apps/backend/lam/orchestrator.py", "r") as f:
     content = f.read()
 
-import re
 
 # Update edges definition in _build_graph
 old_edges = """        # --- Edges Definition ---
@@ -34,7 +33,9 @@ new_route = """    def _route_after_planning(self, state: LamState) -> Literal["
 
     async def _node_verification(self, state: LamState):"""
 
-content = content.replace("    async def _node_verification(self, state: LamState):", new_route)
+content = content.replace(
+    "    async def _node_verification(self, state: LamState):", new_route
+)
 
 # In run_task, we need to adapt to the async setup
 run_task_old = """    async def run_task(self, task: str, thread_id: str = "default_thread"):

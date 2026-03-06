@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -9,11 +9,15 @@ from pydantic import SecretStr
 from .schemas import CopyAsset
 
 # Ensure we use Pydantic models correctly for Intention Intelligence Protocol
-try:
-    from ..planner import Plan, generate_plan
+import typing
 
-except ImportError:
-    from lam.planner import Plan, generate_plan
+if typing.TYPE_CHECKING:
+    pass
+else:
+    try:
+        pass
+    except ImportError:
+        pass
 
 
 def create_copywriter_chain():
