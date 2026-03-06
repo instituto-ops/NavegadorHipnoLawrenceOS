@@ -2,25 +2,34 @@ import asyncio
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+import sqlite3
 import aiosqlite
 
+import typing
+
 # Make sure imports point correctly depending on how main.py invokes this module
-try:
-    from .executor import Executor  # type: ignore
-    from .planner import generate_plan  # type: ignore
-except ImportError:
-    from lam.executor import Executor  # type: ignore
-    from lam.planner import generate_plan  # type: ignore
-try:
-    from .agency.ads_agent import ads_agent_node
-    from .agency.coordinator import marketing_coordinator_node, route_agency
-    from .agency.copy_agent import copy_agent_node
-    from .agency.seo_agent import seo_agent_node
-except ImportError:
+if typing.TYPE_CHECKING:
+    from lam.executor import Executor
+    from lam.planner import generate_plan
     from lam.agency.ads_agent import ads_agent_node
     from lam.agency.coordinator import marketing_coordinator_node, route_agency
     from lam.agency.copy_agent import copy_agent_node
     from lam.agency.seo_agent import seo_agent_node
+else:
+    try:
+        from .executor import Executor
+        from .planner import generate_plan
+        from .agency.ads_agent import ads_agent_node
+        from .agency.coordinator import marketing_coordinator_node, route_agency
+        from .agency.copy_agent import copy_agent_node
+        from .agency.seo_agent import seo_agent_node
+    except ImportError:
+        from lam.executor import Executor
+        from lam.planner import generate_plan
+        from lam.agency.ads_agent import ads_agent_node
+        from lam.agency.coordinator import marketing_coordinator_node, route_agency
+        from lam.agency.copy_agent import copy_agent_node
+        from lam.agency.seo_agent import seo_agent_node
 
 
 # Core state definition for the LAM session
@@ -57,7 +66,7 @@ class LamOrchestrator:
 
     async def close(self):
         """Cleanup resources."""
-        if hasattr(self, "memory_conn") and self.memory_conn:
+        if hasattr(self, 'memory_conn') and self.memory_conn:
             await self.memory_conn.close()
         await self.executor.close()
 
@@ -105,7 +114,7 @@ class LamOrchestrator:
         builder.add_conditional_edges(
             "Planning",
             self._route_after_planning,
-            {"verify": "Verification", "execute": "Execution"},
+            {"verify": "Verification", "execute": "Execution"}
         )
 
         # Conditional edge based on HITL approval
@@ -118,7 +127,7 @@ class LamOrchestrator:
         builder.add_conditional_edges(
             "Execution",
             self._route_after_execution,
-            {"summarize": "Summarization", "replan": "Planning"},
+            {"summarize": "Summarization", "replan": "Planning"}
         )
         builder.add_edge("Summarization", END)
 
@@ -142,7 +151,7 @@ class LamOrchestrator:
             "hypnotherapy campaign",
             "analisar métricas",
             "analisar metricas",
-            "planejar seo",
+            "planejar seo"
         ]
         if any(keyword in task for keyword in marketing_keywords):
             print("Routing to Marketing Agency Subsystem...")
@@ -176,11 +185,7 @@ class LamOrchestrator:
     def _route_after_planning(self, state: LamState) -> Literal["verify", "execute"]:
         """Check if the generated plan requires HITL."""
         plan = state.get("plan", {})
-        requires_hitl = (
-            plan.get("requires_hitl", False)
-            if isinstance(plan, dict)
-            else getattr(plan, "requires_hitl", False)
-        )
+        requires_hitl = plan.get("requires_hitl", False) if isinstance(plan, dict) else getattr(plan, "requires_hitl", False)
         if requires_hitl:
             print("HITL Required. Routing to Verification node.")
             return "verify"
@@ -209,11 +214,7 @@ class LamOrchestrator:
         plan = state.get("plan", {})
         results = await self.executor.execute_plan(plan)
         screenshot = await self.executor.take_screenshot()
-        return {
-            "execution_results": results,
-            "status": "executed",
-            "last_screenshot": screenshot,
-        }
+        return {"execution_results": results, "status": "executed", "last_screenshot": screenshot}
 
     async def _node_summarization(self, state: LamState):
         """Wraps up and summarizes."""
@@ -228,9 +229,7 @@ class LamOrchestrator:
         results = state.get("execution_results", [])
         # If any step failed, we route back to Planning to try a different approach
         if any("Error" in str(res) for res in results):
-            print(
-                "Execution Node: Error detected. Routing back to Planning for recovery..."
-            )
+            print("Execution Node: Error detected. Routing back to Planning for recovery...")
             return "replan"
         return "summarize"
 
@@ -264,7 +263,7 @@ class LamOrchestrator:
                 "copy_asset": {},
                 "ads_asset": {},
                 "seo_asset": {},
-                "last_screenshot": None,
+                "last_screenshot": None
             }
 
             # Run from the start
@@ -276,10 +275,8 @@ class LamOrchestrator:
 
 
 if __name__ == "__main__":
-
     async def test():
         import os
-
         os.makedirs("database", exist_ok=True)
         orc = LamOrchestrator(headless=True)
         await orc.setup()

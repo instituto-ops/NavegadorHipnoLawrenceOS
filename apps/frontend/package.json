@@ -15,6 +15,7 @@
     "lint:fix": "eslint src electron --fix && prettier --write src electron",
     "format": "prettier --write src electron",
     "format:check": "prettier --check src electron",
+    "type-check": "tsc --noEmit",
     "preview": "vite preview",
     "prepare": "husky"
   },

@@ -10,10 +10,7 @@ with open("apps/backend/lam/orchestrator.py", "w") as f:
 with open("apps/backend/main.py", "r") as f:
     content = f.read()
 
-content = content.replace(
-    'config = {"configurable": {"thread_id": thread_id}}',
-    'config: Any = {"configurable": {"thread_id": thread_id}}',
-)
+content = content.replace("config = {\"configurable\": {\"thread_id\": thread_id}}", "config: Any = {\"configurable\": {\"thread_id\": thread_id}}")
 content = content.replace("initial_state = {", "initial_state: Any = {")
 
 with open("apps/backend/main.py", "w") as f:
