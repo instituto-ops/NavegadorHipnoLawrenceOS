@@ -1,7 +1,6 @@
 with open("apps/frontend/src/hooks/useAgentSocket.ts", "r") as f:
     content = f.read()
 
-import re
 
 # Update AgentMessage type
 msg_old = """export interface AgentMessage {
