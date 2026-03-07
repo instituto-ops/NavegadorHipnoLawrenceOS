@@ -19,7 +19,7 @@ class GBPService:
     def _get_credentials(self):
         if not self.refresh_token or not self.client_id or not self.client_secret:
             return None
-        
+
         creds = Credentials(
             None,
             refresh_token=self.refresh_token,
@@ -28,10 +28,10 @@ class GBPService:
             client_secret=self.client_secret,
             scopes=self.scopes
         )
-        
+
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
-        
+
         return creds
 
     def get_performance_data(self):
@@ -48,12 +48,11 @@ class GBPService:
 
         try:
             # Performance API: businessprofileperformance
-            service = build('businessprofileperformance', 'v1', credentials=creds)
-            
+            build('businessprofileperformance', 'v1', credentials=creds)
+
             # Example: Fetching impressions
             # This will fail until the API access is approved
-            location_name = f"locations/{self.location_id}"
-            
+
             # Simplified placeholder response for now
             return {
                 "status": "connected",

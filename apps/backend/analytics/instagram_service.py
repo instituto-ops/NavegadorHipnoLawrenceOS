@@ -14,7 +14,7 @@ class InstagramService:
         """Fetch Instagram DMs."""
         if not self.base_url or not self.access_token:
             return {"error": "Instagram credentials not configured."}
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 # Graph API for IG DMs
@@ -30,15 +30,15 @@ class InstagramService:
         """Send a DM reply via Instagram Graph API."""
         if not self.access_token:
             return {"error": "Instagram access token not configured."}
-        
+
         # Meta Messaging API endpoint
         url = f"https://graph.facebook.com/v19.0/me/messages?access_token={self.access_token}"
-        
+
         payload = {
             "recipient": {"id": recipient_id},
             "message": {"text": message_text}
         }
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 resp = await client.post(url, json=payload)

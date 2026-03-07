@@ -1,5 +1,4 @@
 import os
-import sys
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 from dotenv import load_dotenv
@@ -16,7 +15,7 @@ class GoogleAdsService:
     def _initialize_client(self):
         if self.client:
             return True
-        
+
         if not self.developer_token:
             return False
 

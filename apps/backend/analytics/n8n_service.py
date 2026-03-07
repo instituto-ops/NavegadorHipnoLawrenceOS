@@ -48,7 +48,7 @@ class N8NService:
         """
         if not self.base_url or not self.api_key:
             return {"error": "N8N_BASE_URL ou N8N_API_KEY não configurados."}
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
