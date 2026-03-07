@@ -1,7 +1,6 @@
 with open("apps/backend/lam/orchestrator.py", "r") as f:
     content = f.read()
 
-import re
 
 # Update edges definition in _build_graph
 old_edges = """        # --- Edges Definition ---

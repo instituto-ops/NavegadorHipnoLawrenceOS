@@ -1,6 +1,6 @@
-import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { app, BrowserWindow } from 'electron';
 import { setupUpdater } from './updater';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,11 +26,11 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 let win: BrowserWindow | null;
 
-function createWindow() {
+function createWindow(): void {
   win = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
+    icon: path.join(process.env.VITE_PUBLIC || '', 'favicon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -47,10 +47,10 @@ function createWindow() {
   });
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
+    void win.loadURL(VITE_DEV_SERVER_URL);
   } else {
     // win.loadFile('dist/index.html')
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'));
+    void win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   }
 }
 
@@ -72,7 +72,12 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(() => {
-  setupUpdater();
-  createWindow();
-});
+app
+  .whenReady()
+  .then(() => {
+    setupUpdater();
+    createWindow();
+  })
+  .catch((err) => {
+    console.error('Failed to initialize app', err);
+  });

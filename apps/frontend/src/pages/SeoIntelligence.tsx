@@ -23,7 +23,7 @@ interface PageSpeedData {
   };
 }
 
-const ScoreGauge = ({ score, title }: { score: number; title: string }) => {
+const ScoreGauge = ({ score, title }: { score: number; title: string }): React.ReactElement => {
   const data = [
     { name: 'Score', value: score },
     { name: 'Remaining', value: 100 - score },
@@ -71,7 +71,7 @@ export const SeoIntelligence: React.FC = () => {
   const [pageSpeed, setPageSpeed] = useState<PageSpeedData | null>(null);
   const [_error, setError] = useState<string | null>(null);
 
-  const runAnalysis = async () => {
+  const runAnalysis = async (): Promise<void> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -81,8 +81,8 @@ export const SeoIntelligence: React.FC = () => {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setPageSpeed(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
       // Mock for demo if error
       setPageSpeed({
         id: url,

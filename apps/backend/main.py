@@ -172,38 +172,40 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Force close playwright if hanging
                     try:
                         await orchestrator.executor.close()
-                    except:
+                    except Exception:
                         pass
                 else:
                     await websocket.send_text(json.dumps({"type": "log", "message": "No active task to stop."}))
 
             elif msg.type == "hitl_response" and msg.thread_id:
                 thread_id = msg.thread_id
-                config: Any = {"configurable": {"thread_id": thread_id}}
+                hitl_config: Any = {"configurable": {"thread_id": thread_id}}
 
                 if msg.action == "approve":
                     await websocket.send_text(json.dumps({"type": "log", "message": "Plan approved. Resuming..."}))
-                    await orchestrator.graph.aupdate_state(config, {"hitl_approved": True})
-                    current_task = asyncio.create_task(process_lam_stream(None, config, thread_id))
+                    await orchestrator.graph.aupdate_state(hitl_config, {"hitl_approved": True})
+                    current_task = asyncio.create_task(process_lam_stream(None, hitl_config, thread_id))
                 elif msg.action == "edit":
                     await websocket.send_text(json.dumps({"type": "log", "message": "Plan edited. Resuming..."}))
-                    await orchestrator.graph.aupdate_state(config, {"plan": msg.plan, "hitl_approved": True})
-                    current_task = asyncio.create_task(process_lam_stream(None, config, thread_id))
+                    await orchestrator.graph.aupdate_state(hitl_config, {"plan": msg.plan, "hitl_approved": True})
+                    current_task = asyncio.create_task(process_lam_stream(None, hitl_config, thread_id))
                 elif msg.action in ["reject", "cancel"]:
                     await websocket.send_text(json.dumps({"type": "log", "message": "Task aborted."}))
-                    await orchestrator.graph.aupdate_state(config, {"hitl_approved": False})
-                    current_task = asyncio.create_task(process_lam_stream(None, config, thread_id))
+                    await orchestrator.graph.aupdate_state(hitl_config, {"hitl_approved": False})
+                    current_task = asyncio.create_task(process_lam_stream(None, hitl_config, thread_id))
 
             elif msg.type == "jules" and msg.command:
                 request = JulesRequest(command=msg.command)
                 asyncio.create_task(run_jules_command(request=request, websocket=websocket))
 
     except WebSocketDisconnect:
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
     except Exception as e:
         print(f"WS Error: {e}")
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
 
 

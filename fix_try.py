@@ -1,4 +1,3 @@
-import os
 
 files = [
     "apps/backend/lam/agency/coordinator.py",
