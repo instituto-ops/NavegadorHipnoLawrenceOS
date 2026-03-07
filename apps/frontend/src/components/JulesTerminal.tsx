@@ -52,9 +52,13 @@ export const JulesTerminal: React.FC<JulesTerminalProps> = ({
       </div>
 
       <div className="p-2 border-t border-gray-800 bg-[#2d2d2d]">
-        <form onSubmit={onSubmit} className="flex gap-2">
+        <form
+          onSubmit={onSubmit}
+          className="flex gap-2 rounded-md focus-within:ring-1 focus-within:ring-blue-400 focus-within:border-blue-400"
+        >
           <span className="text-green-500 font-mono py-2 pl-2">❯</span>
           <input
+            aria-label="Comando do terminal Jules"
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
