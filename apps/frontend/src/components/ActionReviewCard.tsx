@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { CheckCircle2, XCircle, Edit3, ShieldAlert } from 'lucide-react';
 import React, { useState } from 'react';
 

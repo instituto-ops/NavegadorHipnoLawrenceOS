@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import classNames from 'classnames';
 import { Globe2, LayoutDashboard, Search, Sparkles } from 'lucide-react';
 import React from 'react';

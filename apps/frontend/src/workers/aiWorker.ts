@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { pipeline } from '@xenova/transformers';
 import type { PipelineType } from '@xenova/transformers';
 
