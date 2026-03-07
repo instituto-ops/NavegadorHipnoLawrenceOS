@@ -1,0 +1,6 @@
+🧹 [Replace bare except with except Exception in executor.py]
+
+🎯 What: Replaced a bare except clause on line 224 with except Exception as e.
+💡 Why: Bare excepts catch system-exiting exceptions like KeyboardInterrupt, which can mask critical errors and prevent graceful shutdowns. Catching Exception specifically prevents this while maintaining the original error handling logic for the Javascript accessibility tree evaluation.
+✅ Verification: Ran uv run ruff check, uv run pytest apps/backend, and uv run mypy apps/backend/lam/executor.py.
+✨ Result: Improved error handling robustness and maintainability without altering functionality.
