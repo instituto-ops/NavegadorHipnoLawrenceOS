@@ -28,7 +28,12 @@ new_class = """class LamOrchestrator:
 
     def _build_graph(self):"""
 
-content = re.sub(r'class LamOrchestrator:\n    def __init__\(self, headless: bool = False\):\n.*?def _build_graph\(self\):', new_class, content, flags=re.DOTALL)
+content = re.sub(
+    r"class LamOrchestrator:\n    def __init__\(self, headless: bool = False\):\n.*?def _build_graph\(self\):",
+    new_class,
+    content,
+    flags=re.DOTALL,
+)
 
 with open("apps/backend/lam/orchestrator.py", "w") as f:
     f.write(content)
