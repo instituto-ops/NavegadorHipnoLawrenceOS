@@ -12,7 +12,16 @@ import {
   Gauge,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
+interface AuditResult {
+  analysis: { health_score: number };
+  react_episode?: {
+    thoughts: string[];
+    actions: string[];
+    observations: string[];
+  };
+}
 
 interface PageSpeedData {
   id: string;
@@ -25,7 +34,7 @@ interface PageSpeedData {
   };
 }
 
-const ScoreGauge = ({ score, title }: { score: number; title: string }): JSX.Element => {
+const ScoreGauge = ({ score, title }: { score: number; title: string }): React.ReactElement => {
   const data = [
     { name: 'Score', value: score },
     { name: 'Remaining', value: 100 - score },
@@ -52,7 +61,7 @@ const ScoreGauge = ({ score, title }: { score: number; title: string }): JSX.Ele
               dataKey="value"
               stroke="none"
             >
-              {data.map((entry, index) => (
+              {data.map((_entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
               ))}
             </Pie>
@@ -71,13 +80,10 @@ export const SeoIntelligence: React.FC = () => {
   const [url, setUrl] = useState('https://hipnolawrence.com');
   const [isLoading, setIsLoading] = useState(false);
   const [pageSpeed, setPageSpeed] = useState<PageSpeedData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const [auditResult, setAuditResult] = useState<any>(null);
+  const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
 
   const runAnalysis = async (): Promise<void> => {
     setIsLoading(true);
-    setError(null);
     setAuditResult(null);
     try {
       // 1. Run PageSpeed
@@ -93,9 +99,7 @@ export const SeoIntelligence: React.FC = () => {
       );
       const vaData = await vaResponse.json();
       setAuditResult(vaData);
-
-    } catch (err: any) {
-      setError(err.message);
+    } catch (_err: unknown) {
       // Fallback for demo
       setPageSpeed({
         id: url,
@@ -131,8 +135,8 @@ export const SeoIntelligence: React.FC = () => {
         if (data.error) throw new Error(data.error);
         alert('Ação executada com sucesso via Agente Antigravity!');
       }
-    } catch (err: any) {
-      alert(`Erro ao executar: ${err.message}`);
+    } catch (err: unknown) {
+      alert(`Erro ao executar: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsPublishing(false);
       setPendingAction(null);
@@ -236,7 +240,9 @@ export const SeoIntelligence: React.FC = () => {
               Auditoria On-Page (Antigravity Visual Audit)
             </h2>
             <div className="px-2 py-1 bg-green-500/10 text-green-500 text-[10px] font-bold rounded uppercase tracking-tighter">
-              {auditResult ? `${auditResult.analysis.health_score}% Health Score` : 'Aguardando Análise'}
+              {auditResult
+                ? `${auditResult.analysis.health_score}% Health Score`
+                : 'Aguardando Análise'}
             </div>
           </div>
 

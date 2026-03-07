@@ -56,7 +56,7 @@ const MetricCard = ({
   icon: React.ElementType;
   trend: string;
   trendUp: boolean;
-}): JSX.Element => (
+}): React.ReactElement => (
   <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm">
     <div className="flex justify-between items-start">
       <div>
@@ -90,9 +90,9 @@ export const Dashboard: React.FC = () => {
       // Direct CORS proxy
       const response = await fetch(
         'https://corsproxy.io/?url=' +
-          encodeURIComponent(
-            'https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv'
-          )
+        encodeURIComponent(
+          'https://docs.google.com/spreadsheets/d/1vAho1pFtyn8StKdZHrSrzSksFnY281g8BTA_hKbHsKw/export?format=csv'
+        )
       );
       const csvText = await response.text();
 
