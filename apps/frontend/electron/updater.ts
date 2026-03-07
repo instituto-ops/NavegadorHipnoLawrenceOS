@@ -6,7 +6,7 @@ export function setupUpdater() {
   autoUpdater.logger = console;
 
   // Check for updates every hour
-  autoUpdater.checkForUpdatesAndNotify();
+  void autoUpdater.checkForUpdatesAndNotify();
 
   autoUpdater.on('error', (error) => {
     console.error('Update error:', error);

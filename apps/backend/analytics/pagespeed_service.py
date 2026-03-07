@@ -1,3 +1,4 @@
+from typing import Optional
 import os
 import httpx
 from dotenv import load_dotenv
@@ -9,7 +10,7 @@ class PageSpeedService:
         self.api_key = os.getenv("PAGESPEED_API_KEY")
         self.base_url = "https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed"
 
-    async def run_analysis(self, url: str, strategy: str = "MOBILE", categories: list = None):
+    async def run_analysis(self, url: str, strategy: str = "MOBILE", categories: Optional[list] = None):
         """
         Runs PageSpeed analysis on a specific URL.
         :param url: The URL to analyze.
