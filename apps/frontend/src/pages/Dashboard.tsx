@@ -248,15 +248,19 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   // Aggregate data for Metric Cards
-  const totalCost = useMemo(() => adsData.reduce((acc, curr) => acc + curr.custo, 0), [adsData]);
-  const totalClicks = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.cliques, 0),
-    [adsData]
-  );
-  const totalConversions = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.conversoes, 0),
-    [adsData]
-  );
+  // ⚡ Bolt: Consolidating three O(n) array traversals (totalCost, totalClicks, totalConversions)
+  // into a single O(n) reduce pass for better performance, especially on large datasets.
+  const { totalCost, totalClicks, totalConversions } = useMemo(() => {
+    return adsData.reduce(
+      (acc, curr) => {
+        acc.totalCost += curr.custo;
+        acc.totalClicks += curr.cliques;
+        acc.totalConversions += curr.conversoes;
+        return acc;
+      },
+      { totalCost: 0, totalClicks: 0, totalConversions: 0 }
+    );
+  }, [adsData]);
   const avgCpa = totalConversions > 0 ? (totalCost / totalConversions).toFixed(2) : '0.00';
 
   // Aggregate data dynamically for the Bar Chart by CampaignName
