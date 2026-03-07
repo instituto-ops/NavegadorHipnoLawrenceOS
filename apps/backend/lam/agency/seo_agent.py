@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -10,10 +10,10 @@ from .schemas import SEOAsset
 
 # Ensure we use Pydantic models correctly for Intention Intelligence Protocol
 try:
-    from ..planner import Plan, generate_plan
+    from ..planner import Plan, generate_plan  # noqa: F401
 
 except ImportError:
-    from lam.planner import Plan, generate_plan
+    pass
 
 
 def create_seo_planner_chain():

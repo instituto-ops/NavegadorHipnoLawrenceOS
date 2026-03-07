@@ -26,7 +26,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 let win: BrowserWindow | null;
 
-function createWindow() {
+function createWindow(): void {
   win = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -47,10 +47,10 @@ function createWindow() {
   });
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
+    void win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    // win.loadFile('dist/index.html')
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'));
+    // void win.loadFile('dist/index.html')
+    void win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   }
 }
 
@@ -72,7 +72,12 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(() => {
-  setupUpdater();
-  createWindow();
-});
+app
+  .whenReady()
+  .then(() => {
+    setupUpdater();
+    createWindow();
+  })
+  .catch((e: unknown) => {
+    console.error(e);
+  });
