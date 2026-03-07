@@ -75,7 +75,7 @@ jobs:
           pip install -r apps/backend/requirements.txt
       - name: Run Mypy Type Checking
         run: |
-          mypy apps/backend --ignore-missing-imports
+          cd apps/backend && python -m pip install mypy && mypy . --ignore-missing-imports
 
   frontend-checks:
     needs: auto-fixer

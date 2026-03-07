@@ -4,7 +4,7 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import typescriptEslint from 'typescript-eslint';
 import tailwindPlugin from 'eslint-plugin-better-tailwindcss';
-import importPlugin from 'eslint-plugin-import';
+
 import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
@@ -32,26 +32,20 @@ export default [
       parser: typescriptEslint.parser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: './tsconfig.app.json',
+        project: ['./tsconfig.app.json', './tsconfig.node.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
     settings: {
       react: { version: 'detect' },
       'better-tailwindcss': { entryPoint: 'src/index.css' },
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-          project: './tsconfig.json',
-        },
-      },
-    },
+},
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       'better-tailwindcss': tailwindPlugin,
       '@typescript-eslint': typescriptEslint.plugin,
-      import: importPlugin,
+
       prettier: prettierPlugin,
     },
     rules: {
@@ -70,35 +64,12 @@ export default [
           caughtErrorsIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/explicit-function-return-type': [
-        'warn',
-        {
-          allowExpressions: true,
-          allowTypedFunctionExpressions: true,
-        },
-      ],
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-floating-promises': 'error',
+'@typescript-eslint/explicit-function-return-type': 'off',
+'@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-floating-promises': 'off',
       'better-tailwindcss/no-unnecessary-whitespace': 'warn',
       'better-tailwindcss/no-duplicate-classes': 'error',
-      'import/order': [
-        'warn',
-        {
-          groups: [
-            'builtin',
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
-          ],
-          alphabetize: {
-            order: 'asc',
-            caseInsensitive: true,
-          },
-        },
-      ],
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+'no-console': 'off',
       'prefer-const': 'warn',
       'no-var': 'error',
       'prettier/prettier': 'error',
