@@ -1,7 +1,6 @@
 import asyncio
 import chromadb
-from typing import List, Dict, Any, Optional
-import json
+from typing import Any
 
 # Adjust imports based on the actual path context if necessary
 from lam.neuro_engine import NeuroInsight
@@ -71,7 +70,6 @@ ltm_db = LTMDatabase()
 
 if __name__ == "__main__":
     async def test():
-        from datetime import datetime
         import uuid
         from lam.neuro_engine import InsightCategory
 
