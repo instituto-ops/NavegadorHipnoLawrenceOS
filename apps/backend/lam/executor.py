@@ -129,7 +129,7 @@ class Executor:
                 try:
                     await self.page.wait_for_selector(selector, timeout=10000, state="attached")
                     # Check if element is readonly or disabled before filling
-                    is_readonly = await self.page.evaluate(f"() => {{ const el = document.querySelector('{selector}'); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }}")
+                    is_readonly = await self.page.evaluate("(sel) => { const el = document.querySelector(sel); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }", selector)
                     if is_readonly:
                         print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
                         await self.page.click(selector, force=True)
@@ -221,7 +221,7 @@ class Executor:
         try:
             tree = await self.page.evaluate(tree_script)
             return str(tree)
-        except:
+        except Exception:
             return "Error extracting page structure."
 
     async def take_screenshot(self) -> str | None:
