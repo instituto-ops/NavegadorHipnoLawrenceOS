@@ -1,6 +1,5 @@
 import {
   Search,
-  Zap,
   ShieldCheck,
   Globe,
   BarChart3,
@@ -9,10 +8,9 @@ import {
   Info,
   Loader2,
   ArrowRight,
-  Gauge,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface PageSpeedData {
   id: string;
@@ -25,7 +23,7 @@ interface PageSpeedData {
   };
 }
 
-const ScoreGauge = ({ score, title }: { score: number; title: string }) => {
+const ScoreGauge = ({ score, title }: { score: number; title: string }): React.ReactElement => {
   const data = [
     { name: 'Score', value: score },
     { name: 'Remaining', value: 100 - score },
@@ -52,7 +50,7 @@ const ScoreGauge = ({ score, title }: { score: number; title: string }) => {
               dataKey="value"
               stroke="none"
             >
-              {data.map((entry, index) => (
+              {data.map((_entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
               ))}
             </Pie>
@@ -67,13 +65,13 @@ const ScoreGauge = ({ score, title }: { score: number; title: string }) => {
   );
 };
 
-export const SeoIntelligence: React.FC = () => {
+export const SeoIntelligence: React.FC = (): React.ReactElement => {
   const [url, setUrl] = useState('https://hipnolawrence.com');
   const [isLoading, setIsLoading] = useState(false);
   const [pageSpeed, setPageSpeed] = useState<PageSpeedData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
-  const runAnalysis = async () => {
+  const runAnalysis = async (): Promise<void> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -83,8 +81,14 @@ export const SeoIntelligence: React.FC = () => {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setPageSpeed(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (err && typeof err === 'object' && 'message' in err) {
+        setError(String(err.message));
+      } else {
+        setError('Unknown error occurred');
+      }
       // Mock for demo if error
       setPageSpeed({
         id: url,
