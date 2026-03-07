@@ -1,3 +1,4 @@
+import os
 from typing import Any
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,9 +18,12 @@ from analytics.pagespeed_service import pagespeed_service
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -152,7 +156,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 thread_id = msg.thread_id or str(uuid.uuid4())
                 await websocket.send_text(json.dumps({"type": "log", "message": f"Starting task: {msg.task} (Thread: {thread_id})"}))
 
-                config: Any = {"configurable": {"thread_id": thread_id}}
+                config: Any = {"configurable": {"thread_id": thread_id}}  # type: ignore[no-redef]
                 initial_state: Any = {
                     "task": msg.task,
                     "plan": {},
@@ -172,14 +176,14 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Force close playwright if hanging
                     try:
                         await orchestrator.executor.close()
-                    except:
+                    except Exception:
                         pass
                 else:
                     await websocket.send_text(json.dumps({"type": "log", "message": "No active task to stop."}))
 
             elif msg.type == "hitl_response" and msg.thread_id:
                 thread_id = msg.thread_id
-                config: Any = {"configurable": {"thread_id": thread_id}}
+                config: Any = {"configurable": {"thread_id": thread_id}}  # type: ignore[no-redef]
 
                 if msg.action == "approve":
                     await websocket.send_text(json.dumps({"type": "log", "message": "Plan approved. Resuming..."}))
@@ -199,11 +203,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 asyncio.create_task(run_jules_command(request=request, websocket=websocket))
 
     except WebSocketDisconnect:
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
     except Exception as e:
         print(f"WS Error: {e}")
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
 
 
