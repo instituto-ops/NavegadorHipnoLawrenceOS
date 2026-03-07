@@ -8,7 +8,7 @@ import {
   Info,
   Loader2,
   ArrowRight,
-  } from 'lucide-react';
+} from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as _RechartsTooltip } from 'recharts';
 
