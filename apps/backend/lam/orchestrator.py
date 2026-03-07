@@ -2,7 +2,6 @@ import asyncio
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
-import sqlite3
 import aiosqlite
 
 # Make sure imports point correctly depending on how main.py invokes this module
@@ -18,10 +17,10 @@ try:
     from .agency.copy_agent import copy_agent_node
     from .agency.seo_agent import seo_agent_node
 except ImportError:
-    from lam.agency.ads_agent import ads_agent_node
-    from lam.agency.coordinator import marketing_coordinator_node, route_agency
-    from lam.agency.copy_agent import copy_agent_node
-    from lam.agency.seo_agent import seo_agent_node
+    from lam.agency.ads_agent import ads_agent_node  # type: ignore
+    from lam.agency.coordinator import marketing_coordinator_node, route_agency  # type: ignore
+    from lam.agency.copy_agent import copy_agent_node  # type: ignore
+    from lam.agency.seo_agent import seo_agent_node  # type: ignore
 
 
 # Core state definition for the LAM session
@@ -168,7 +167,7 @@ class LamOrchestrator:
         if self.executor.page:
             try:
                 page_context = await self.executor.get_accessibility_tree()
-            except:
+            except Exception:
                 page_context = "Error retrieving browser state."
         
         plan = await generate_plan(task, page_context=page_context)

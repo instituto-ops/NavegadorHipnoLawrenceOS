@@ -12,6 +12,7 @@
     "package:win": "electron-builder --win",
     "package:linux": "electron-builder --linux",
     "lint": "eslint src electron",
+    "type-check": "tsc --noEmit",
     "lint:fix": "eslint src electron --fix && prettier --write src electron",
     "format": "prettier --write src electron",
     "format:check": "prettier --check src electron",
