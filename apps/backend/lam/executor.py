@@ -2,6 +2,7 @@ import asyncio
 import random
 from typing import List, Dict, Any
 from playwright.async_api import Page
+
 try:
     from .bridges.doctoralia import scrape_doctoralia_profile
     from .bridges.google_ads import read_ads_campaigns
@@ -28,27 +29,29 @@ class Executor:
         import os
 
         self.playwright = await async_playwright().start()
-        
+
         # Setup persistent profile directory so logins (Google Ads, IG) are saved securely
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         user_data_dir = os.path.join(base_dir, "browser_profile")
-        
+
         # Launch Chromium with persistent context to retain cookies and states
         self.context = await self.playwright.chromium.launch_persistent_context(
             user_data_dir=user_data_dir,
-            headless=self.headless, 
+            headless=self.headless,
             slow_mo=50,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             ignore_default_args=["--enable-automation"],
             args=[
                 "--disable-blink-features=AutomationControlled",
-                "--disable-infobars"
-            ]
+                "--disable-infobars",
+            ],
         )
-        
+
         # Inject script to completely hide webdriver from Google security checks
-        await self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        
+        await self.context.add_init_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+        )
+
         # Persistent contexts create a default page automatically
         if len(self.context.pages) > 0:
             self.page = self.context.pages[0]
@@ -109,11 +112,15 @@ class Executor:
             selector = params.get("selector")
             if selector:
                 try:
-                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
+                    await self.page.wait_for_selector(
+                        selector, timeout=10000, state="attached"
+                    )
                     await self.page.click(selector, force=True, timeout=5000)
                     return f"Clicked {selector}"
                 except Exception as e:
-                    print(f"Click: Selector {selector} failed. Attempting fallback: Pressing Enter...")
+                    print(
+                        f"Click: Selector {selector} failed. Attempting fallback: Pressing Enter..."
+                    )
                     try:
                         await self.page.keyboard.press("Enter")
                         return f"Clicked via fallback (Enter) because {selector} failed: {e}"
@@ -127,25 +134,37 @@ class Executor:
             text = params.get("text")
             if selector and text:
                 try:
-                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
+                    await self.page.wait_for_selector(
+                        selector, timeout=10000, state="attached"
+                    )
                     # Check if element is readonly or disabled before filling
-                    is_readonly = await self.page.evaluate(f"() => {{ const el = document.querySelector('{selector}'); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }}")
+                    is_readonly = await self.page.evaluate(
+                        f"() => {{ const el = document.querySelector('{selector}'); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }}"
+                    )
                     if is_readonly:
-                        print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
+                        print(
+                            f"Fill: Element {selector} is readonly. Attempting to click it first to activate..."
+                        )
                         await self.page.click(selector, force=True)
                         await self._stealth_delay(1000, 2000)
-                    
+
                     # Organic typing simulation
                     await self.page.fill(selector, "", timeout=5000)
                     await self._stealth_delay(1000, 2500)
                     await self.page.type(selector, text, delay=random.randint(50, 150))
                     return f"Filled {selector} with text"
                 except Exception as e:
-                    print(f"Fill: Selector {selector} failed. Attempting fallback: Global typing...")
+                    print(
+                        f"Fill: Selector {selector} failed. Attempting fallback: Global typing..."
+                    )
                     try:
                         # Fallback: Just type globally (useful for focused elements that lose selectors)
-                        await self.page.keyboard.type(text, delay=random.randint(50, 150))
-                        return f"Filled via global typing because {selector} failed: {e}"
+                        await self.page.keyboard.type(
+                            text, delay=random.randint(50, 150)
+                        )
+                        return (
+                            f"Filled via global typing because {selector} failed: {e}"
+                        )
                     except Exception as type_e:
                         print(f"Fallback typing failed: {type_e}")
                         raise
@@ -198,7 +217,7 @@ class Executor:
         """Captures a simplified version of the accessibility tree for LLM reasoning."""
         if not self.page:
             return "No page loaded."
-        
+
         # We use a custom JS injection to get interactive elements only, which is cheaper and clearer for the LLM
         tree_script = """
         () => {
@@ -229,6 +248,7 @@ class Executor:
         if not self.page:
             return None
         import base64
+
         screenshot_bytes = await self.page.screenshot(type="jpeg", quality=50)
         return base64.b64encode(screenshot_bytes).decode("utf-8")
 

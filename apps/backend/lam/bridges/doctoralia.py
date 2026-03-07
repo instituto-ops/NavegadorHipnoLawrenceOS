@@ -1,17 +1,30 @@
 from typing import List, Optional, Any
 from pydantic import BaseModel, Field
 
+
 class DoctoraliaReview(BaseModel):
-    author: Optional[str] = Field(default=None, description="Name or alias of the reviewer")
+    author: Optional[str] = Field(
+        default=None, description="Name or alias of the reviewer"
+    )
     content: str = Field(..., description="The body of the review")
-    rating: Optional[float] = Field(default=None, description="Numeric rating, e.g., out of 5")
+    rating: Optional[float] = Field(
+        default=None, description="Numeric rating, e.g., out of 5"
+    )
     date: Optional[str] = Field(default=None, description="Date of the review")
+
 
 class DoctoraliaProfile(BaseModel):
     name: str = Field(..., description="Doctor's name")
-    specialties: List[str] = Field(default_factory=list, description="List of medical specialties")
-    reviews: List[DoctoraliaReview] = Field(default_factory=list, description="Extracted reviews")
-    services: List[str] = Field(default_factory=list, description="Provided services or treatments")
+    specialties: List[str] = Field(
+        default_factory=list, description="List of medical specialties"
+    )
+    reviews: List[DoctoraliaReview] = Field(
+        default_factory=list, description="Extracted reviews"
+    )
+    services: List[str] = Field(
+        default_factory=list, description="Provided services or treatments"
+    )
+
 
 async def scrape_doctoralia_profile(page: Any, url: str) -> str:
     """

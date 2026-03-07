@@ -8,6 +8,7 @@ from pydantic import SecretStr
 
 from .schemas import AdsAsset
 
+
 def create_ads_analyzer_chain():
     api_key = os.environ.get("GROQ_API_KEY", "")
     llm = ChatGroq(
