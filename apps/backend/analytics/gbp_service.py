@@ -48,11 +48,11 @@ class GBPService:
 
         try:
             # Performance API: businessprofileperformance
-            service = build('businessprofileperformance', 'v1', credentials=creds)
+            _service = build('businessprofileperformance', 'v1', credentials=creds)
             
             # Example: Fetching impressions
             # This will fail until the API access is approved
-            location_name = f"locations/{self.location_id}"
+            _location_name = f"locations/{self.location_id}"
             
             # Simplified placeholder response for now
             return {

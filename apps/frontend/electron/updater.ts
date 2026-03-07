@@ -6,18 +6,18 @@ export function setupUpdater() {
   autoUpdater.logger = console;
 
   // Check for updates every hour
-  autoUpdater.checkForUpdatesAndNotify();
+  void autoUpdater.checkForUpdatesAndNotify();
 
   autoUpdater.on('error', (error) => {
     console.error('Update error:', error);
   });
 
   autoUpdater.on('update-available', () => {
-    console.log('Update available');
+    console.warn('Update available');
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    dialog
+    void dialog
       .showMessageBox({
         type: 'info',
         title: 'Nova versão disponível!',
