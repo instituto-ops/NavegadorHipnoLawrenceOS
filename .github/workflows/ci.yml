@@ -76,8 +76,10 @@ jobs:
           pip install -r apps/backend/requirements.txt
           pip install mypy ruff
       - name: Run Mypy Type Checking
+        env:
+          MYPYPATH: apps/backend
         run: |
-          mypy apps/backend --ignore-missing-imports
+          mypy apps/backend --ignore-missing-imports --explicit-package-bases
 
   frontend-checks:
     needs: auto-fixer

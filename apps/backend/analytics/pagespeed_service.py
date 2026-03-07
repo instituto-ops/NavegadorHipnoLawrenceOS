@@ -4,17 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class PageSpeedService:
     def __init__(self):
         self.api_key = os.getenv("PAGESPEED_API_KEY")
-        self.base_url = (
-            "https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed"
-        )
+        self.base_url = "https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed"
 
-    async def run_analysis(
-        self, url: str, strategy: str = "MOBILE", categories: list | None = None
-    ):
+    async def run_analysis(self, url: str, strategy: str = "MOBILE", categories: list | None = None):
         """
         Runs PageSpeed analysis on a specific URL.
         :param url: The URL to analyze.
@@ -28,7 +23,11 @@ class PageSpeedService:
         if not categories:
             categories = ["PERFORMANCE", "ACCESSIBILITY", "BEST_PRACTICES", "SEO"]
 
-        params = {"url": url, "strategy": strategy, "category": categories}
+        params = {
+            "url": url,
+            "strategy": strategy,
+            "category": categories
+        }
 
         if self.api_key:
             params["key"] = self.api_key
@@ -40,7 +39,7 @@ class PageSpeedService:
                 if response.status_code != 200:
                     return {
                         "error": f"PageSpeed API call failed with status {response.status_code}",
-                        "details": response.text,
+                        "details": response.text
                     }
 
                 data = response.json()
@@ -49,7 +48,7 @@ class PageSpeedService:
                 result = {
                     "id": data.get("id"),
                     "fetchTime": data.get("analysisUTCTimestamp"),
-                    "scores": {},
+                    "scores": {}
                 }
 
                 lighthouse_res = data.get("lighthouseResult", {})
@@ -64,7 +63,6 @@ class PageSpeedService:
                 return result
         except Exception as e:
             return {"error": str(e)}
-
 
 # Singleton instance
 pagespeed_service = PageSpeedService()

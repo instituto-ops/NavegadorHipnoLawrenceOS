@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class N8NService:
     def __init__(self):
         self.base_url = os.getenv("N8N_BASE_URL", "").rstrip("/")
@@ -32,19 +31,14 @@ class N8NService:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    webhook_url, json=payload, headers=self._get_headers()
+                    webhook_url,
+                    json=payload,
+                    headers=self._get_headers()
                 )
                 response.raise_for_status()
-                return {
-                    "status": "success",
-                    "message": "Webhook disparado no n8n com sucesso.",
-                    "data": response.json() if response.content else None,
-                }
+                return {"status": "success", "message": "Webhook disparado no n8n com sucesso.", "data": response.json() if response.content else None}
         except httpx.HTTPStatusError as e:
-            return {
-                "error": f"Erro do n8n: Status {e.response.status_code}",
-                "details": e.response.text,
-            }
+            return {"error": f"Erro do n8n: Status {e.response.status_code}", "details": e.response.text}
         except Exception as e:
             return {"error": str(e)}
 
@@ -58,20 +52,15 @@ class N8NService:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{self.base_url}/api/v1/workflows", headers=self._get_headers()
+                    f"{self.base_url}/api/v1/workflows",
+                    headers=self._get_headers()
                 )
                 response.raise_for_status()
-                return {
-                    "status": "success",
-                    "message": "Conexão com a API do n8n bem-sucedida!",
-                }
+                return {"status": "success", "message": "Conexão com a API do n8n bem-sucedida!"}
         except httpx.HTTPStatusError as e:
-            return {
-                "error": f"Erro de Autorização ou Api do n8n: {e.response.status_code}"
-            }
+            return {"error": f"Erro de Autorização ou Api do n8n: {e.response.status_code}"}
         except Exception as e:
             return {"error": str(e)}
-
 
 # Singleton instance
 n8n_service = N8NService()
