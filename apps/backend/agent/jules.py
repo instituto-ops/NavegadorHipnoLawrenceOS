@@ -2,6 +2,7 @@ import sys
 import argparse
 import asyncio
 import os
+import json
 from dotenv import load_dotenv
 
 # We import the orchestrator to simulate the assistant's behavior
@@ -65,7 +66,7 @@ def main():
     test_parser.add_argument("--retries", type=int, default=5, help="Max number of retries")
     
     # Subcommand: audit-ads
-    subparsers.add_parser("audit-ads", help="Audit visibility across specific Google Ads pages")
+    audit_parser = subparsers.add_parser("audit-ads", help="Audit visibility across specific Google Ads pages")
     
     args = parser.parse_args()
     

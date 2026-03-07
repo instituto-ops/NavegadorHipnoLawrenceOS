@@ -9,7 +9,7 @@ class PageSpeedService:
         self.api_key = os.getenv("PAGESPEED_API_KEY")
         self.base_url = "https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed"
 
-    async def run_analysis(self, url: str, strategy: str = "MOBILE", categories: list | None = None):
+    async def run_analysis(self, url: str, strategy: str = "MOBILE", categories: list = None):
         """
         Runs PageSpeed analysis on a specific URL.
         :param url: The URL to analyze.

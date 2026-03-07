@@ -19,7 +19,6 @@ interface Plan {
   requires_hitl?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ActionReviewCardProps {
   plan: Plan;
   onApprove: () => void;
@@ -27,7 +26,12 @@ interface ActionReviewCardProps {
   onEdit: (editedPlan: Plan) => void;
 }
 
-export const ActionReviewCard = ({ plan, onApprove, onReject, onEdit }) => {
+export const ActionReviewCard: React.FC<ActionReviewCardProps> = ({
+  plan,
+  onApprove,
+  onReject,
+  onEdit,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedPlanJson, setEditedPlanJson] = useState(JSON.stringify(plan, null, 2));
 

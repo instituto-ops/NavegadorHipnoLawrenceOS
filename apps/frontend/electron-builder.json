@@ -16,7 +16,9 @@
         ],
         "category": "public.app-category.utilities",
         "signingIdentity": "Developer ID Application",
-        "notarize": false
+        "notarize": {
+            "teamId": "${APPLE_TEAM_ID}"
+        }
     },
     "win": {
         "target": [
@@ -26,6 +28,9 @@
                     "x64"
                 ]
             }
+        ],
+        "signingHashAlgorithms": [
+            "sha256"
         ]
     },
     "linux": {
