@@ -1,0 +1,14 @@
+from fastapi.testclient import TestClient  # type: ignore
+
+from apps.backend.main import app
+
+client = TestClient(app)
+
+
+def test_health_check():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "ok",
+        "service": "Navegador Hipnótico Lawrence OS (NeuroOS)",
+    }

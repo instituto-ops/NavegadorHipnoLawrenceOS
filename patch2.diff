@@ -1,0 +1,7 @@
+--- apps/backend/tests/test_main.py
++++ apps/backend/tests/test_main.py
+@@ -1,4 +1,4 @@
+-from fastapi.testclient import TestClient
++from fastapi.testclient import TestClient # type: ignore
+
+ from apps.backend.main import app

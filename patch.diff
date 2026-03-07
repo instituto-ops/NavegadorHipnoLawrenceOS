@@ -1,0 +1,14 @@
+--- apps/backend/main.py
++++ apps/backend/main.py
+@@ -32,9 +32,9 @@
+     plan: dict | None = None # For edited plan
+
+
+-@app.get("/health")
++@app.get("/")
+ async def health_check():
+-    return {"status": "ok"}
++    return {"status": "ok", "service": "Navegador Hipnótico Lawrence OS (NeuroOS)"}
+
+
+ @app.get("/api/analytics/active-users")
