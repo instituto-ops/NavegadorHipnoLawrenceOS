@@ -15,10 +15,8 @@
             "zip"
         ],
         "category": "public.app-category.utilities",
-        "signingIdentity": "Developer ID Application",
-        "notarize": {
-            "teamId": "${APPLE_TEAM_ID}"
-        }
+        "identity": "Developer ID Application",
+        "notarize": false
     },
     "win": {
         "target": [
@@ -28,9 +26,6 @@
                     "x64"
                 ]
             }
-        ],
-        "signingHashAlgorithms": [
-            "sha256"
         ]
     },
     "linux": {

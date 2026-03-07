@@ -56,7 +56,7 @@ const MetricCard = ({
   icon: React.ElementType;
   trend: string;
   trendUp: boolean;
-}) => (
+}): React.ReactElement => (
   <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm">
     <div className="flex justify-between items-start">
       <div>
@@ -84,7 +84,7 @@ export const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGaLoading, setIsGaLoading] = useState(true);
 
-  const fetchSpreadsheetData = async () => {
+  const fetchSpreadsheetData = async (): Promise<void> => {
     setIsLoading(true);
     try {
       // Direct CORS proxy
@@ -216,7 +216,7 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const fetchGA4Data = async () => {
+  const fetchGA4Data = async (): Promise<void> => {
     setIsGaLoading(true);
     try {
       const response = await fetch('http://localhost:8000/api/analytics/active-users');
@@ -247,23 +247,18 @@ export const Dashboard: React.FC = () => {
     void fetchGA4Data();
   }, []);
 
-  // Aggregate data for Metric Cards
-  const totalCost = useMemo(() => adsData.reduce((acc, curr) => acc + curr.custo, 0), [adsData]);
-  const totalClicks = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.cliques, 0),
-    [adsData]
-  );
-  const totalConversions = useMemo(
-    () => adsData.reduce((acc, curr) => acc + curr.conversoes, 0),
-    [adsData]
-  );
-  const avgCpa = totalConversions > 0 ? (totalCost / totalConversions).toFixed(2) : '0.00';
-
-  // Aggregate data dynamically for the Bar Chart by CampaignName
-  const campaignData = useMemo(() => {
+  // Aggregate data dynamically in a single pass for both Metric Cards and Campaign Bar Chart
+  const { totalCost, totalClicks, totalConversions, campaignData } = useMemo(() => {
+    let cost = 0;
+    let clicks = 0;
+    let conversions = 0;
     const summary: Record<string, CampaignSummary> = {};
 
-    adsData.forEach((ad) => {
+    for (const ad of adsData) {
+      cost += ad.custo;
+      clicks += ad.cliques;
+      conversions += ad.conversoes;
+
       // Fallback for empty campaign names
       const campName = ad.campaign || 'Unknown Campaign';
       if (!summary[campName]) {
@@ -271,12 +266,21 @@ export const Dashboard: React.FC = () => {
       }
       summary[campName].custo += ad.custo;
       summary[campName].conversoes += ad.conversoes;
-    });
+    }
 
-    return Object.values(summary)
+    const topCampaigns = Object.values(summary)
       .sort((a, b) => b.conversoes - a.conversoes)
       .slice(0, 5); // Top 5
+
+    return {
+      totalCost: cost,
+      totalClicks: clicks,
+      totalConversions: conversions,
+      campaignData: topCampaigns,
+    };
   }, [adsData]);
+
+  const avgCpa = totalConversions > 0 ? (totalCost / totalConversions).toFixed(2) : '0.00';
 
   if (isLoading) {
     return (
