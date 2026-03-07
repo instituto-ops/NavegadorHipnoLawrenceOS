@@ -65,7 +65,7 @@ def main():
     test_parser.add_argument("--retries", type=int, default=5, help="Max number of retries")
     
     # Subcommand: audit-ads
-    audit_parser = subparsers.add_parser("audit-ads", help="Audit visibility across specific Google Ads pages")
+    _audit_parser = subparsers.add_parser("audit-ads", help="Audit visibility across specific Google Ads pages")
     
     args = parser.parse_args()
     
