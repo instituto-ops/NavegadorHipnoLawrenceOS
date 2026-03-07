@@ -1,29 +1,20 @@
 from typing import List, Optional, Any
 from pydantic import BaseModel, Field
 
-
 class AdsKeyword(BaseModel):
     text: str = Field(..., description="The keyword or search term")
-    match_type: Optional[str] = Field(
-        default=None, description="Exact, Phrase, or Broad match"
-    )
+    match_type: Optional[str] = Field(default=None, description="Exact, Phrase, or Broad match")
     clicks: Optional[int] = Field(default=0, description="Total clicks")
     impressions: Optional[int] = Field(default=0, description="Total impressions")
-    ctr: Optional[float] = Field(
-        default=0.0, description="Click-through rate (percentage)"
-    )
+    ctr: Optional[float] = Field(default=0.0, description="Click-through rate (percentage)")
     cpc: Optional[float] = Field(default=0.0, description="Cost per click")
     cpa: Optional[float] = Field(default=0.0, description="Cost per acquisition")
-
 
 class AdsCampaign(BaseModel):
     name: str = Field(..., description="Campaign name")
     status: str = Field(default="Active", description="Campaign status")
-    keywords: List[AdsKeyword] = Field(
-        default_factory=list, description="Keywords in the campaign"
-    )
+    keywords: List[AdsKeyword] = Field(default_factory=list, description="Keywords in the campaign")
     total_cost: Optional[float] = Field(default=0.0, description="Total spend")
-
 
 async def read_ads_campaigns(page: Any, url: str) -> str:
     """

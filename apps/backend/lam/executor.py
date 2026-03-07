@@ -2,7 +2,6 @@ import asyncio
 import random
 from typing import List, Dict, Any
 from playwright.async_api import Page
-
 try:
     from .bridges.doctoralia import scrape_doctoralia_profile
     from .bridges.google_ads import read_ads_campaigns
@@ -43,14 +42,12 @@ class Executor:
             ignore_default_args=["--enable-automation"],
             args=[
                 "--disable-blink-features=AutomationControlled",
-                "--disable-infobars",
-            ],
+                "--disable-infobars"
+            ]
         )
 
         # Inject script to completely hide webdriver from Google security checks
-        await self.context.add_init_script(
-            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
-        )
+        await self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
         # Persistent contexts create a default page automatically
         if len(self.context.pages) > 0:
@@ -112,15 +109,11 @@ class Executor:
             selector = params.get("selector")
             if selector:
                 try:
-                    await self.page.wait_for_selector(
-                        selector, timeout=10000, state="attached"
-                    )
+                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
                     await self.page.click(selector, force=True, timeout=5000)
                     return f"Clicked {selector}"
                 except Exception as e:
-                    print(
-                        f"Click: Selector {selector} failed. Attempting fallback: Pressing Enter..."
-                    )
+                    print(f"Click: Selector {selector} failed. Attempting fallback: Pressing Enter...")
                     try:
                         await self.page.keyboard.press("Enter")
                         return f"Clicked via fallback (Enter) because {selector} failed: {e}"
@@ -134,17 +127,11 @@ class Executor:
             text = params.get("text")
             if selector and text:
                 try:
-                    await self.page.wait_for_selector(
-                        selector, timeout=10000, state="attached"
-                    )
+                    await self.page.wait_for_selector(selector, timeout=10000, state="attached")
                     # Check if element is readonly or disabled before filling
-                    is_readonly = await self.page.evaluate(
-                        f"() => {{ const el = document.querySelector('{selector}'); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }}"
-                    )
+                    is_readonly = await self.page.evaluate(f"() => {{ const el = document.querySelector('{selector}'); return el?.readOnly || el?.getAttribute('aria-readonly') === 'true'; }}")
                     if is_readonly:
-                        print(
-                            f"Fill: Element {selector} is readonly. Attempting to click it first to activate..."
-                        )
+                        print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
                         await self.page.click(selector, force=True)
                         await self._stealth_delay(1000, 2000)
 
@@ -154,17 +141,11 @@ class Executor:
                     await self.page.type(selector, text, delay=random.randint(50, 150))
                     return f"Filled {selector} with text"
                 except Exception as e:
-                    print(
-                        f"Fill: Selector {selector} failed. Attempting fallback: Global typing..."
-                    )
+                    print(f"Fill: Selector {selector} failed. Attempting fallback: Global typing...")
                     try:
                         # Fallback: Just type globally (useful for focused elements that lose selectors)
-                        await self.page.keyboard.type(
-                            text, delay=random.randint(50, 150)
-                        )
-                        return (
-                            f"Filled via global typing because {selector} failed: {e}"
-                        )
+                        await self.page.keyboard.type(text, delay=random.randint(50, 150))
+                        return f"Filled via global typing because {selector} failed: {e}"
                     except Exception as type_e:
                         print(f"Fallback typing failed: {type_e}")
                         raise
@@ -248,7 +229,6 @@ class Executor:
         if not self.page:
             return None
         import base64
-
         screenshot_bytes = await self.page.screenshot(type="jpeg", quality=50)
         return base64.b64encode(screenshot_bytes).decode("utf-8")
 
