@@ -1,19 +1,20 @@
 import { dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import type { BrowserWindow } from 'electron';
 
-export function setupUpdater() {
+export function setupUpdater(_win: BrowserWindow | null): void {
   // Configure logging
   autoUpdater.logger = console;
 
   // Check for updates every hour
-  autoUpdater.checkForUpdatesAndNotify();
+  void autoUpdater.checkForUpdatesAndNotify();
 
   autoUpdater.on('error', (error) => {
     console.error('Update error:', error);
   });
 
   autoUpdater.on('update-available', () => {
-    console.log('Update available');
+    console.warn('Update available');
   });
 
   autoUpdater.on('update-downloaded', (info) => {
@@ -30,6 +31,9 @@ export function setupUpdater() {
         if (result.response === 0) {
           autoUpdater.quitAndInstall();
         }
+      })
+      .catch((err) => {
+        console.error(err);
       });
   });
 }

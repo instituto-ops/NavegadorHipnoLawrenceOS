@@ -2,14 +2,9 @@ import asyncio
 import random
 from typing import List, Dict, Any
 from playwright.async_api import Page
-try:
-    from .bridges.doctoralia import scrape_doctoralia_profile
-    from .bridges.google_ads import read_ads_campaigns
-    from .bridges.wordpress import draft_wordpress_post
-except ImportError:
-    from lam.bridges.doctoralia import scrape_doctoralia_profile
-    from lam.bridges.google_ads import read_ads_campaigns
-    from lam.bridges.wordpress import draft_wordpress_post
+from .bridges.doctoralia import scrape_doctoralia_profile
+from .bridges.google_ads import read_ads_campaigns
+from .bridges.wordpress import draft_wordpress_post
 
 # Playwright execution engine mapping DSL to real browser actions
 
@@ -221,7 +216,7 @@ class Executor:
         try:
             tree = await self.page.evaluate(tree_script)
             return str(tree)
-        except:
+        except Exception:
             return "Error extracting page structure."
 
     async def take_screenshot(self) -> str | None:
