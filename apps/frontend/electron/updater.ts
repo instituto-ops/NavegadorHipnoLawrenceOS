@@ -1,23 +1,24 @@
 import { dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 
-export function setupUpdater() {
+export function setupUpdater(): void {
   // Configure logging
   autoUpdater.logger = console;
 
   // Check for updates every hour
-  autoUpdater.checkForUpdatesAndNotify();
+  void autoUpdater.checkForUpdatesAndNotify();
 
   autoUpdater.on('error', (error) => {
     console.error('Update error:', error);
   });
 
   autoUpdater.on('update-available', () => {
+    /* eslint-disable-next-line no-console */
     console.log('Update available');
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    dialog
+    void dialog
       .showMessageBox({
         type: 'info',
         title: 'Nova versão disponível!',
