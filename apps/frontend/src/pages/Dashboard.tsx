@@ -105,7 +105,10 @@ export const Dashboard: React.FC = () => {
         if (cols.length > 15 && cols[1]) {
           data.push({
             date: cols[1].trim(), // Data_Analise
-            campaign: cols[3].trim().replace(/^"|"$/g, ''), // CampaignName
+            campaign:
+              cols[3].trim().startsWith('"') && cols[3].trim().endsWith('"')
+                ? cols[3].trim().slice(1, -1)
+                : cols[3].trim().replace(/^"|"$/g, ''), // CampaignName
             cliques: parseInt(cols[4]) || 0, // Cliques
             impressoes: parseInt(cols[5]) || 0, // Impressoes
             custo: parseFloat(cols[8]) || 0, // Custo_Total
