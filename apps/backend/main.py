@@ -172,7 +172,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Force close playwright if hanging
                     try:
                         await orchestrator.executor.close()
-                    except:
+                    except Exception:
                         pass
                 else:
                     await websocket.send_text(json.dumps({"type": "log", "message": "No active task to stop."}))

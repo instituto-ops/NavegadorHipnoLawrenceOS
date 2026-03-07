@@ -168,7 +168,7 @@ class LamOrchestrator:
         if self.executor.page:
             try:
                 page_context = await self.executor.get_accessibility_tree()
-            except:
+            except Exception:
                 page_context = "Error retrieving browser state."
         
         plan = await generate_plan(task, page_context=page_context)
