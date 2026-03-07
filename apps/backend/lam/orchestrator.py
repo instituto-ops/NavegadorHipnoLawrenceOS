@@ -2,7 +2,6 @@ import asyncio
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
-import sqlite3
 import aiosqlite
 
 # Make sure imports point correctly depending on how main.py invokes this module
@@ -168,7 +167,7 @@ class LamOrchestrator:
         if self.executor.page:
             try:
                 page_context = await self.executor.get_accessibility_tree()
-            except:
+            except Exception:
                 page_context = "Error retrieving browser state."
         
         plan = await generate_plan(task, page_context=page_context)

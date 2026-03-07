@@ -1,3 +1,14 @@
+#!/bin/bash
+cd apps/backend
+
+# Fix syntax errors by adding 'pass' to empty try blocks
+sed -i 's/# from \.\.planner import Plan, generate_plan/pass/g' lam/agency/ads_agent.py
+sed -i 's/# from \.\.planner import Plan, generate_plan/pass/g' lam/agency/copy_agent.py
+sed -i 's/# from \.\.planner import Plan, generate_plan/pass/g' lam/agency/seo_agent.py
+
+# Fix lam/agency/coordinator.py try block
+cat << 'COORD_EOF' > lam/agency/coordinator.py
+import json
 import os
 from typing import Any, Dict
 
@@ -57,12 +68,4 @@ If the goal is fully achieved, respond with 'FINISH'.
 
 # Note: The actual graph assembly (StateGraph) is typically done in the orchestrator
 # or a main agency setup script. This file serves as the definition hub.
-
-
-def marketing_coordinator_node(state: Dict[str, Any]) -> Dict[str, Any]:
-    print("Marketing Coordinator executing...")
-    return {"messages": ["Coordinator routed."]}
-
-def route_agency(state: Dict[str, Any]) -> str:
-    print("Routing agency...")
-    return "FINISH"
+COORD_EOF

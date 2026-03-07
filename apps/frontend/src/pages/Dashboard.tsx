@@ -78,7 +78,7 @@ const MetricCard = ({
   </div>
 );
 
-export const Dashboard: React.FC = () => {
+export const Dashboard: React.FC = (): React.ReactElement => {
   const [adsData, setAdsData] = useState<AdData[]>([]);
   const [gaData, setGaData] = useState<GA4CityData[]>([]);
   const [isLoading, setIsLoading] = useState(true);

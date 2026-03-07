@@ -2,7 +2,7 @@ import { Search, Loader2, TerminalSquare } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAgentSocket } from '../hooks/useAgentSocket';
 
-export const AbidusAnalysis: React.FC = () => {
+export const AbidusAnalysis: React.FC = (): React.ReactElement => {
   const [url, setUrl] = useState('www.hipnolawrence.com');
   const [hasStartedAnalysis, setHasStartedAnalysis] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
