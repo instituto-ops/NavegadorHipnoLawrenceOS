@@ -32,7 +32,7 @@ export default [
       parser: typescriptEslint.parser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: ['./tsconfig.app.json', './tsconfig.node.json'],
+        project: './tsconfig.app.json',
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -63,7 +63,7 @@ export default [
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       '@typescript-eslint/no-unused-vars': [
-        'off',
+        'warn',
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
@@ -71,14 +71,14 @@ export default [
         },
       ],
       '@typescript-eslint/explicit-function-return-type': [
-        'off',
+        'warn',
         {
           allowExpressions: true,
           allowTypedFunctionExpressions: true,
         },
       ],
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-floating-promises': 'error',
       'better-tailwindcss/no-unnecessary-whitespace': 'warn',
       'better-tailwindcss/no-duplicate-classes': 'error',
       'import/order': [
@@ -98,7 +98,7 @@ export default [
           },
         },
       ],
-      'no-console': 'off',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
       'prefer-const': 'warn',
       'no-var': 'error',
       'prettier/prettier': 'error',

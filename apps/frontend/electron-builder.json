@@ -15,7 +15,6 @@
             "zip"
         ],
         "category": "public.app-category.utilities",
-        "signingIdentity": "Developer ID Application",
         "notarize": false
     },
     "win": {

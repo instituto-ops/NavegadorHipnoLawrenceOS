@@ -1,4 +1,3 @@
-import os
 from typing import Any
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,13 +17,9 @@ from analytics.pagespeed_service import pagespeed_service
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
-# Retrieve allowed origins from environment or default to localhost
-allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
-allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -177,7 +172,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Force close playwright if hanging
                     try:
                         await orchestrator.executor.close()
-                    except Exception:
+                    except:
                         pass
                 else:
                     await websocket.send_text(json.dumps({"type": "log", "message": "No active task to stop."}))
@@ -204,13 +199,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 asyncio.create_task(run_jules_command(request=request, websocket=websocket))
 
     except WebSocketDisconnect:
-        if current_task:
-            current_task.cancel()
+        if current_task: current_task.cancel()
         await orchestrator.close()
     except Exception as e:
         print(f"WS Error: {e}")
-        if current_task:
-            current_task.cancel()
+        if current_task: current_task.cancel()
         await orchestrator.close()
 
 
