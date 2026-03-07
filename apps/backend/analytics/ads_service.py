@@ -1,5 +1,4 @@
 import os
-import sys
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 from dotenv import load_dotenv
