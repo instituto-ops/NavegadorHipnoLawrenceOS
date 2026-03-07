@@ -1,0 +1,4 @@
+## 2024-05-20 - Overly Permissive CORS Configuration
+**Vulnerability:** The FastAPI backend used a wildcard `allow_origins=["*"]` in combination with `allow_credentials=True` within the `CORSMiddleware`. This is an overly permissive configuration that allows any domain to send cross-origin requests and read the responses, posing a significant Cross-Origin Resource Sharing (CORS) security risk.
+**Learning:** Hardcoding wildcards for CORS configuration is a common pitfall during early development that can easily leak into production. Using environment variables to define allowed origins ensures flexibility and security across different deployment environments.
+**Prevention:** Always use a restrictive, configurable list of allowed origins (e.g., via `ALLOWED_ORIGINS` environment variable) instead of a wildcard, especially when `allow_credentials` is set to `True`. Make sure to validate and sanitize the input list to prevent misconfigurations.
