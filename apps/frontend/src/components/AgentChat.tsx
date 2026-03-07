@@ -37,14 +37,14 @@ export const AgentChat: React.FC = () => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     if (!input.trim() || !isConnected || isRunning) return;
     sendTask(input);
     setInput('');
   };
 
-  const handleJulesSubmit = (e: React.FormEvent) => {
+  const handleJulesSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     if (!julesInput.trim() || !isConnected || isJulesRunning) return;
     sendJulesCommand(julesInput);

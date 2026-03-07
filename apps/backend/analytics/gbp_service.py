@@ -1,5 +1,4 @@
 import os
-from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from dotenv import load_dotenv
@@ -48,11 +47,11 @@ class GBPService:
 
         try:
             # Performance API: businessprofileperformance
-            service = build('businessprofileperformance', 'v1', credentials=creds)
+            # service = build('businessprofileperformance', 'v1', credentials=creds)
             
             # Example: Fetching impressions
             # This will fail until the API access is approved
-            location_name = f"locations/{self.location_id}"
+            # location_name = f"locations/{self.location_id}"
             
             # Simplified placeholder response for now
             return {
