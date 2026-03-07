@@ -16,7 +16,8 @@
     "format": "prettier --write src electron",
     "format:check": "prettier --check src electron",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "type-check": "tsc -b"
   },
   "dependencies": {
     "@xenova/transformers": "^2.17.2",
