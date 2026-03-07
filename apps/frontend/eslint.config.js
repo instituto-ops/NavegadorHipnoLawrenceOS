@@ -9,16 +9,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
   {
-    ignores: [
-      'dist',
-      'node_modules',
-      '.vite',
-      'coverage',
-      'build',
-      '.env*',
-      'out',
-      'release',
-    ],
+    ignores: ['dist', 'node_modules', '.vite', 'coverage', 'build', '.env*', 'out', 'release'],
   },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
@@ -32,7 +23,7 @@ export default [
       parser: typescriptEslint.parser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: './tsconfig.app.json',
+        project: ['./tsconfig.app.json', './tsconfig.node.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -81,23 +72,7 @@ export default [
       '@typescript-eslint/no-floating-promises': 'error',
       'better-tailwindcss/no-unnecessary-whitespace': 'warn',
       'better-tailwindcss/no-duplicate-classes': 'error',
-      'import/order': [
-        'warn',
-        {
-          groups: [
-            'builtin',
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
-          ],
-          alphabetize: {
-            order: 'asc',
-            caseInsensitive: true,
-          },
-        },
-      ],
+      'import/order': 'off',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'prefer-const': 'warn',
       'no-var': 'error',

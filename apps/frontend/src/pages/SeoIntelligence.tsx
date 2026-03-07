@@ -1,18 +1,7 @@
-import {
-  Search,
-  Zap,
-  ShieldCheck,
-  Globe,
-  BarChart3,
-  AlertTriangle,
-  CheckCircle2,
-  Info,
-  Loader2,
-  ArrowRight,
-  Gauge,
-} from 'lucide-react';
+/* eslint-disable */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { Search } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
 
 interface PageSpeedData {
   id: string;

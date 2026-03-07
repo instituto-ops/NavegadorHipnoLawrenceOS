@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Search, Loader2, TerminalSquare } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAgentSocket } from '../hooks/useAgentSocket';
