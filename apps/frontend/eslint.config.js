@@ -32,7 +32,7 @@ export default [
       parser: typescriptEslint.parser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: ['./tsconfig.app.json', './tsconfig.node.json'],
+        project: './tsconfig.app.json',
         tsconfigRootDir: import.meta.dirname,
       },
     },

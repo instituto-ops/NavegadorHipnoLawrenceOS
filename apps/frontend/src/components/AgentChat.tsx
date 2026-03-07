@@ -141,7 +141,7 @@ export const AgentChat: React.FC = () => {
               <div className="flex-1 flex items-center bg-[#1A1A1A] rounded-lg border border-gray-800 px-3 focus-within:ring-1 focus-within:ring-[#2EED8F] focus-within:border-[#2EED8F]">
                 <span className="text-gray-500 font-mono text-sm mr-2">&gt;_</span>
                 <input
-                  aria-label="Comando para o Maestro"
+                  aria-label="Command for Maestro"
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}

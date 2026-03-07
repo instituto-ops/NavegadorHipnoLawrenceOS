@@ -221,7 +221,7 @@ class Executor:
         try:
             tree = await self.page.evaluate(tree_script)
             return str(tree)
-        except Exception:
+        except:
             return "Error extracting page structure."
 
     async def take_screenshot(self) -> str | None:

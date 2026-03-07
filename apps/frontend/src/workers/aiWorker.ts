@@ -13,9 +13,7 @@ class PipelineSingleton {
   static model = 'Xenova/all-MiniLM-L6-v2';
   static instance: FeatureExtractionPipeline | null = null;
 
-  static async getInstance(
-    progress_callback?: (progress: unknown) => void
-  ): Promise<FeatureExtractionPipeline> {
+  static async getInstance(progress_callback?: (progress: unknown) => void) {
     if (this.instance === null) {
       // The @xenova/transformers types are generic, so we cast to our expected signature
       this.instance = (await pipeline(this.task, this.model, {

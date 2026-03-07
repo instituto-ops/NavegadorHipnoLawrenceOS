@@ -58,7 +58,7 @@ export const JulesTerminal: React.FC<JulesTerminalProps> = ({
         >
           <span className="text-green-500 font-mono py-2 pl-2">❯</span>
           <input
-            aria-label="Comando do terminal Jules"
+            aria-label="Jules terminal command"
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}

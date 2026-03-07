@@ -4,7 +4,7 @@ import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 
 export const MainLayout: React.FC = () => {
-  const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     classNames(
       'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium',
       isActive

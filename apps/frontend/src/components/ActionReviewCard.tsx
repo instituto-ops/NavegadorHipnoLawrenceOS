@@ -35,7 +35,7 @@ export const ActionReviewCard: React.FC<ActionReviewCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedPlanJson, setEditedPlanJson] = useState(JSON.stringify(plan, null, 2));
 
-  const handleSaveEdit = (): void => {
+  const handleSaveEdit = () => {
     try {
       const newPlan = JSON.parse(editedPlanJson);
       onEdit(newPlan);

@@ -56,7 +56,7 @@ const MetricCard = ({
   icon: React.ElementType;
   trend: string;
   trendUp: boolean;
-}): React.ReactElement => (
+}) => (
   <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm">
     <div className="flex justify-between items-start">
       <div>
@@ -84,7 +84,7 @@ export const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGaLoading, setIsGaLoading] = useState(true);
 
-  const fetchSpreadsheetData = async (): Promise<void> => {
+  const fetchSpreadsheetData = async () => {
     setIsLoading(true);
     try {
       // Direct CORS proxy
@@ -216,7 +216,7 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const fetchGA4Data = async (): Promise<void> => {
+  const fetchGA4Data = async () => {
     setIsGaLoading(true);
     try {
       const response = await fetch('http://localhost:8000/api/analytics/active-users');
