@@ -76,7 +76,7 @@ jobs:
           pip install mypy
       - name: Run Mypy Type Checking
         run: |
-          mypy apps/backend --ignore-missing-imports
+          mypy apps/backend --ignore-missing-imports --explicit-package-bases
 
   frontend-checks:
     needs: auto-fixer
