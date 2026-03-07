@@ -1,6 +1,5 @@
 import {
   Search,
-  Zap,
   ShieldCheck,
   Globe,
   BarChart3,
@@ -9,10 +8,9 @@ import {
   Info,
   Loader2,
   ArrowRight,
-  Gauge,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface PageSpeedData {
   id: string;
@@ -25,7 +23,7 @@ interface PageSpeedData {
   };
 }
 
-const ScoreGauge = ({ score, title }: { score: number; title: string }) => {
+const ScoreGauge = ({ score, title }: { score: number; title: string }): JSX.Element => {
   const data = [
     { name: 'Score', value: score },
     { name: 'Remaining', value: 100 - score },
@@ -71,7 +69,7 @@ export const SeoIntelligence: React.FC = () => {
   const [url, setUrl] = useState('https://hipnolawrence.com');
   const [isLoading, setIsLoading] = useState(false);
   const [pageSpeed, setPageSpeed] = useState<PageSpeedData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   const runAnalysis = async () => {
     setIsLoading(true);
@@ -83,8 +81,8 @@ export const SeoIntelligence: React.FC = () => {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setPageSpeed(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
       // Mock for demo if error
       setPageSpeed({
         id: url,

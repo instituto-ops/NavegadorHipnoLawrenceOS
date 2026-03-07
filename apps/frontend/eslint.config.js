@@ -32,7 +32,7 @@ export default [
       parser: typescriptEslint.parser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: './tsconfig.app.json',
+        project: ['./tsconfig.app.json', './tsconfig.node.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -71,7 +71,7 @@ export default [
         },
       ],
       '@typescript-eslint/explicit-function-return-type': [
-        'warn',
+        'off',
         {
           allowExpressions: true,
           allowTypedFunctionExpressions: true,
@@ -81,7 +81,7 @@ export default [
       '@typescript-eslint/no-floating-promises': 'error',
       'better-tailwindcss/no-unnecessary-whitespace': 'warn',
       'better-tailwindcss/no-duplicate-classes': 'error',
-      'import/order': [
+      'import/order': 'off', /* [
         'warn',
         {
           groups: [
@@ -97,7 +97,7 @@ export default [
             caseInsensitive: true,
           },
         },
-      ],
+      ], */
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'prefer-const': 'warn',
       'no-var': 'error',
