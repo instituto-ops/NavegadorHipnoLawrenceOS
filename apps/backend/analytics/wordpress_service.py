@@ -52,7 +52,7 @@ class WordPressService:
         except Exception as e:
             return {"error": str(e)}
 
-    async def create_post(self, title: str, content: str, status: str = "publish", categories: list = None, tags: list = None):
+    async def create_post(self, title: str, content: str, status: str = "publish", categories: list | None = None, tags: list | None = None):
         """Create a new post in WordPress."""
         if not self.base_api_url:
             return {"error": "WP_URL not configured in .env"}
@@ -67,9 +67,9 @@ class WordPressService:
             "status": status
         }
         if categories:
-            payload["categories"] = categories
+            payload["categories"] = categories # type: ignore
         if tags:
-            payload["tags"] = tags
+            payload["tags"] = tags # type: ignore
 
         try:
             async with httpx.AsyncClient() as client:
