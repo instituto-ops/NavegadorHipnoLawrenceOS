@@ -1,5 +1,6 @@
 import { Search, Loader2, TerminalSquare } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
+import { LogEntry } from '../components/LogEntry';
 import { useAgentSocket } from '../hooks/useAgentSocket';
 
 export const AbidusAnalysis: React.FC = () => {
@@ -94,10 +95,12 @@ Apresente um relatório textual completo e profissional, formatado em Markdown, 
           ) : (
             <div className="space-y-3">
               {logs.map((log, index) => (
-                <div key={index} className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-                  <span className="text-gray-500 mr-2">[{new Date().toLocaleTimeString()}]</span>
-                  {log}
-                </div>
+                <LogEntry
+                  key={index}
+                  log={log}
+                  className="text-gray-300 whitespace-pre-wrap leading-relaxed"
+                  timeClassName="text-gray-500 mr-2"
+                />
               ))}
               {isRunning && (
                 <div className="flex items-center gap-2 text-[#2EED8F] animate-pulse py-2">

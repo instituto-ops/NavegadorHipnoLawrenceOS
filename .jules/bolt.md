@@ -1,0 +1,3 @@
+## 2025-01-20 - [React Re-render Optimization & Bug Fix]
+**Learning:** Found an O(N) re-render bottleneck and timestamp bug in `AgentChat.tsx`. The component maps over a `logs` array and dynamically renders `new Date().toLocaleTimeString()` for each entry. Because the component also manages `input` state, every keystroke triggers a full re-render of the potentially massive logs array, recalculating and overwriting the timestamp for all previous logs with the current time.
+**Action:** Extract log entries into a `React.memo` component with an initial `useState` timestamp. This memoizes expensive list renders and permanently fixes the timestamp at the exact moment the log was mounted, reducing re-render time from O(N) to O(1) per keystroke.
