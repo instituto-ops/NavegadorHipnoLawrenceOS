@@ -43,7 +43,7 @@ class GA4Service:
                     "city": row.dimension_values[0].value,
                     "activeUsers": row.metric_values[0].value
                 })
-            
+
             return results
         except Exception as e:
             return {"error": str(e)}

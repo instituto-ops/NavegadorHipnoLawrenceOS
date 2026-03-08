@@ -28,15 +28,15 @@ class Executor:
         import os
 
         self.playwright = await async_playwright().start()
-        
+
         # Setup persistent profile directory so logins (Google Ads, IG) are saved securely
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         user_data_dir = os.path.join(base_dir, "browser_profile")
-        
+
         # Launch Chromium with persistent context to retain cookies and states
         self.context = await self.playwright.chromium.launch_persistent_context(
             user_data_dir=user_data_dir,
-            headless=self.headless, 
+            headless=self.headless,
             slow_mo=50,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             ignore_default_args=["--enable-automation"],
@@ -45,10 +45,10 @@ class Executor:
                 "--disable-infobars"
             ]
         )
-        
+
         # Inject script to completely hide webdriver from Google security checks
         await self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        
+
         # Persistent contexts create a default page automatically
         if len(self.context.pages) > 0:
             self.page = self.context.pages[0]
@@ -134,7 +134,7 @@ class Executor:
                         print(f"Fill: Element {selector} is readonly. Attempting to click it first to activate...")
                         await self.page.click(selector, force=True)
                         await self._stealth_delay(1000, 2000)
-                    
+
                     # Organic typing simulation
                     await self.page.fill(selector, "", timeout=5000)
                     await self._stealth_delay(1000, 2500)
@@ -198,7 +198,7 @@ class Executor:
         """Captures a simplified version of the accessibility tree for LLM reasoning."""
         if not self.page:
             return "No page loaded."
-        
+
         # We use a custom JS injection to get interactive elements only, which is cheaper and clearer for the LLM
         tree_script = """
         () => {

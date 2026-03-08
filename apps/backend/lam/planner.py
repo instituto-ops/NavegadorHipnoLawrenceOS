@@ -43,8 +43,10 @@ class Plan(BaseModel):
 
 
 def create_planner_chain(model_name: str = "llama-3.3-70b-versatile"):
+    from typing import Any
     # We use Llama 3 via Groq for planning
     api_key = os.environ.get("GROQ_API_KEY", "")
+    llm: Any
     if not api_key:
         # Fallback to OpenRouter if Groq key is missing
         api_key = os.environ.get("OPENROUTER_API_KEY", "")

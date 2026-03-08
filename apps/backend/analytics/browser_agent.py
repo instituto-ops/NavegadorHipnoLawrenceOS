@@ -53,12 +53,12 @@ class BrowserAgentService:
         async with async_playwright() as p:
             try:
                 browser: Browser = await p.chromium.launch(headless=True)
-                
+
                 # Context setup with Stealth
                 context_args = {}
                 if device == "mobile":
                     context_args.update(p.devices['iPhone 13'])
-                
+
                 context = await browser.new_context(**context_args)
                 page: Page = await context.new_page()
                 await stealth_async(page)
@@ -66,7 +66,7 @@ class BrowserAgentService:
                 # Thought: Navigate to URL
                 episode["thoughts"].append(f"Navegando para {url} e aguardando rede ficar ociosa.")
                 await page.goto(url, wait_until="networkidle", timeout=60000)
-                
+
                 # Observation: Page loaded
                 title = await page.title()
                 episode["observations"].append(f"Página carregada com sucesso. Título: {title}")
@@ -80,7 +80,7 @@ class BrowserAgentService:
                 # Analysis: Heuristic checks (Section 2.1)
                 h1_count = int(await page.evaluate("() => document.querySelectorAll('h1').length"))
                 images_no_alt = int(await page.evaluate("() => document.querySelectorAll('img:not([alt])').length"))
-                
+
                 # Typing analysis to avoid further Pyre issues
                 health: int = 100 - (images_no_alt * 5) - (0 if h1_count == 1 else 10)
                 issue_list: List[Dict[str, str]] = []
@@ -90,7 +90,7 @@ class BrowserAgentService:
                         "severity": "critical",
                         "msg": f"Encontrados {h1_count} tags H1. O ideal  exatamente 1."
                     })
-                
+
                 if images_no_alt > 0:
                     issue_list.append({
                         "severity": "warning",

@@ -4,7 +4,7 @@ import json
 
 async def test_seo_and_wp():
     base_url = "http://localhost:8000"
-    
+
     print("\n--- 🧪 Teste 1: PageSpeed Insights API ---")
     url_to_test = "https://hipnolawrence.com"
     try:

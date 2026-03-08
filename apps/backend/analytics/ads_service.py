@@ -16,7 +16,7 @@ class GoogleAdsService:
     def _initialize_client(self):
         if self.client:
             return True
-        
+
         if not self.developer_token:
             return False
 

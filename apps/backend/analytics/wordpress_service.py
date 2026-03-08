@@ -1,6 +1,7 @@
 import os
 import httpx
 from dotenv import load_dotenv
+from typing import Any
 
 load_dotenv()
 
@@ -20,7 +21,7 @@ class WordPressService:
         """Fetch basic stats from WordPress."""
         if not self.base_api_url:
             return {"error": "WP_URL not configured in .env"}
-        
+
         auth = self._get_auth()
         if not auth:
             return {"error": "WP_USERNAME or WP_APP_PASSWORD not configured."}
@@ -31,20 +32,20 @@ class WordPressService:
                 # Get total posts
                 posts_resp = await client.get(f"{self.base_api_url}/posts?per_page=1", auth=auth)
                 stats['total_posts'] = posts_resp.headers.get('X-WP-Total', '0')
-                
+
                 # Get total pages
                 pages_resp = await client.get(f"{self.base_api_url}/pages?per_page=1", auth=auth)
                 stats['total_pages'] = pages_resp.headers.get('X-WP-Total', '0')
-                
+
                 # Get total comments
                 comments_resp = await client.get(f"{self.base_api_url}/comments?per_page=1", auth=auth)
                 stats['total_comments'] = comments_resp.headers.get('X-WP-Total', '0')
-                
+
                 # Get recent posts (titles)
                 recent_posts_resp = await client.get(f"{self.base_api_url}/posts?per_page=5", auth=auth)
                 recent_posts = recent_posts_resp.json()
                 stats['recent_posts'] = [
-                    {"title": p['title']['rendered'], "date": p['date']} 
+                    {"title": p['title']['rendered'], "date": p['date']}
                     for p in recent_posts
                 ]
 
@@ -52,16 +53,16 @@ class WordPressService:
         except Exception as e:
             return {"error": str(e)}
 
-    async def create_post(self, title: str, content: str, status: str = "publish", categories: list = None, tags: list = None):
+    async def create_post(self, title: str, content: str, status: str = "publish", categories: list | None = None, tags: list | None = None):
         """Create a new post in WordPress."""
         if not self.base_api_url:
             return {"error": "WP_URL not configured in .env"}
-        
+
         auth = self._get_auth()
         if not auth:
             return {"error": "WP_USERNAME or WP_APP_PASSWORD not configured."}
 
-        payload = {
+        payload: dict[str, Any] = {
             "title": title,
             "content": content,
             "status": status
