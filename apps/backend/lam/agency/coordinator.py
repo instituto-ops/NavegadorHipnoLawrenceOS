@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Literal
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
+from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field, SecretStr
 
 # Import the main state
@@ -14,7 +15,9 @@ try:
     from .copy_agent import copy_agent_node
     from .seo_agent import seo_agent_node
 except ImportError:
-    pass
+    from lam.agency.ads_agent import ads_agent_node
+    from lam.agency.copy_agent import copy_agent_node
+    from lam.agency.seo_agent import seo_agent_node
 
 
 class RoutingDecision(BaseModel):

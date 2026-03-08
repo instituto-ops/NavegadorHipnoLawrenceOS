@@ -6,10 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class GBPService:
     def __init__(self):
-        self.scopes = ["https://www.googleapis.com/auth/business.manage"]
+        self.scopes = ['https://www.googleapis.com/auth/business.manage']
         self.client_id = os.getenv("GOOGLE_CLIENT_ID")
         self.client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
         self.refresh_token = os.getenv("GBP_REFRESH_TOKEN")
@@ -27,7 +26,7 @@ class GBPService:
             token_uri="https://oauth2.googleapis.com/token",
             client_id=self.client_id,
             client_secret=self.client_secret,
-            scopes=self.scopes,
+            scopes=self.scopes
         )
 
         if creds and creds.expired and creds.refresh_token:
@@ -49,7 +48,7 @@ class GBPService:
 
         try:
             # Performance API: businessprofileperformance
-            service = build("businessprofileperformance", "v1", credentials=creds)
+            service = build('businessprofileperformance', 'v1', credentials=creds)
 
             # Example: Fetching impressions
             # This will fail until the API access is approved
@@ -58,12 +57,10 @@ class GBPService:
             # Simplified placeholder response for now
             return {
                 "status": "connected",
-                "message": "GBP Service ready. Waiting for API approval for location: "
-                + self.location_id,
+                "message": "GBP Service ready. Waiting for API approval for location: " + self.location_id
             }
         except Exception as e:
             return {"error": str(e)}
-
 
 # Singleton instance
 gbp_service = GBPService()

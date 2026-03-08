@@ -1,7 +1,6 @@
 import json
 import asyncio
 from dotenv import load_dotenv
-from typing import Any
 from langchain_groq import ChatGroq
 from browser_use import Agent, Browser, BrowserProfile
 from fastapi import WebSocket, WebSocketDisconnect
@@ -14,12 +13,12 @@ async def run_agent(task: str, websocket: WebSocket):
     llm = ChatGroq(model="llama3-70b-8192", temperature=0.0)
 
     # Initialize Browser (headless=False)
-    browser = Browser(config=BrowserProfile(headless=False))  # type: ignore
+    browser = Browser(config=BrowserProfile(headless=False))
 
     try:
         # We define a custom action/callback logic by wrapping the agent execution or
         # using the step generator. `browser-use` allows running steps iteratively.
-        agent: Any = Agent(task=task, llm=llm, browser=browser)  # type: ignore
+        agent = Agent(task=task, llm=llm, browser=browser)
 
         await websocket.send_text(
             json.dumps({"type": "log", "message": f"Starting task: {task}"})
