@@ -12,6 +12,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAgentSocket } from '../hooks/useAgentSocket';
 import { ActionReviewCard } from './ActionReviewCard';
 import { JulesTerminal } from './JulesTerminal';
+import { LogEntry } from './LogEntry';
 
 export const AgentChat: React.FC = () => {
   const [input, setInput] = useState('');
@@ -109,10 +110,12 @@ export const AgentChat: React.FC = () => {
                 </p>
               ) : (
                 logs.map((log, index) => (
-                  <div key={index} className="mb-1 leading-relaxed">
-                    <span className="text-gray-600 mr-2">[{new Date().toLocaleTimeString()}]</span>
-                    {log}
-                  </div>
+                  <LogEntry
+                    key={index}
+                    log={log}
+                    className="mb-1 leading-relaxed"
+                    timeClassName="text-gray-600 mr-2"
+                  />
                 ))
               )}
               {isRunning && (
