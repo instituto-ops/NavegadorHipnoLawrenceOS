@@ -9,7 +9,6 @@ from pydantic import SecretStr
 from .schemas import SEOAsset
 
 
-
 def create_seo_planner_chain():
     api_key = os.environ.get("GROQ_API_KEY", "")
     llm = ChatGroq(
