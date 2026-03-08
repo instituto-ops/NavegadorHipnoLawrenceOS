@@ -1,6 +1,7 @@
 import os
 import httpx
 from dotenv import load_dotenv
+from typing import Any
 
 load_dotenv()
 
@@ -52,7 +53,7 @@ class WordPressService:
         except Exception as e:
             return {"error": str(e)}
 
-    async def create_post(self, title: str, content: str, status: str = "publish", categories: list = None, tags: list = None):
+    async def create_post(self, title: str, content: str, status: str = "publish", categories: list | None = None, tags: list | None = None):
         """Create a new post in WordPress."""
         if not self.base_api_url:
             return {"error": "WP_URL not configured in .env"}
@@ -61,7 +62,7 @@ class WordPressService:
         if not auth:
             return {"error": "WP_USERNAME or WP_APP_PASSWORD not configured."}
 
-        payload = {
+        payload: dict[str, Any] = {
             "title": title,
             "content": content,
             "status": status
