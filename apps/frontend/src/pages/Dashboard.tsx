@@ -8,7 +8,7 @@ import {
   Activity,
   Loader2,
 } from 'lucide-react';
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { memo, useMemo, useEffect, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -44,39 +44,45 @@ interface GA4CityData {
   activeUsers: string;
 }
 
-const MetricCard = ({
-  title,
-  value,
-  icon: Icon,
-  trend,
-  trendUp,
-}: {
-  title: string;
-  value: string | number;
-  icon: React.ElementType;
-  trend: string;
-  trendUp: boolean;
-}): React.ReactElement => (
-  <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm">
-    <div className="flex justify-between items-start">
-      <div>
-        <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1">{title}</p>
-        <h3 className="text-2xl font-bold text-white font-mono">{value}</h3>
+// Memoized to prevent unnecessary re-renders when parent Dashboard state changes
+const MetricCard = memo(
+  ({
+    title,
+    value,
+    icon: Icon,
+    trend,
+    trendUp,
+  }: {
+    title: string;
+    value: string | number;
+    icon: React.ElementType;
+    trend: string;
+    trendUp: boolean;
+  }): React.ReactElement => (
+    <div className="bg-[#111111] border border-gray-800/60 rounded-xl p-5 shadow-sm">
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1">
+            {title}
+          </p>
+          <h3 className="text-2xl font-bold text-white font-mono">{value}</h3>
+        </div>
+        <div
+          className={`p-2 rounded-lg ${trendUp ? 'bg-[#2EED8F]/10 text-[#2EED8F]' : 'bg-red-500/10 text-red-500'}`}
+        >
+          <Icon size={20} />
+        </div>
       </div>
-      <div
-        className={`p-2 rounded-lg ${trendUp ? 'bg-[#2EED8F]/10 text-[#2EED8F]' : 'bg-red-500/10 text-red-500'}`}
-      >
-        <Icon size={20} />
+      <div className="mt-4 flex items-center gap-2">
+        <span className={`text-xs font-medium ${trendUp ? 'text-[#2EED8F]' : 'text-red-500'}`}>
+          {trendUp ? '↑' : '↓'} {trend}
+        </span>
+        <span className="text-gray-600 text-xs">Desempenho Atual</span>
       </div>
     </div>
-    <div className="mt-4 flex items-center gap-2">
-      <span className={`text-xs font-medium ${trendUp ? 'text-[#2EED8F]' : 'text-red-500'}`}>
-        {trendUp ? '↑' : '↓'} {trend}
-      </span>
-      <span className="text-gray-600 text-xs">Desempenho Atual</span>
-    </div>
-  </div>
+  )
 );
+MetricCard.displayName = 'MetricCard';
 
 export const Dashboard: React.FC = () => {
   const [adsData, setAdsData] = useState<AdData[]>([]);
