@@ -119,7 +119,7 @@ async def generate_plan(command: str, page_context: str = "No page loaded.") -> 
     except Exception as e:
         error_msg = str(e)
         if "rate_limit_exceeded" in error_msg.lower() or "429" in error_msg:
-            print(f"Planner: High-end model rate limited. Falling back to Llama 3.1 8B...")
+            print("Planner: High-end model rate limited. Falling back to Llama 3.1 8B...")
             try:
                 # Fallback to the lighter, high-quota model
                 chain = create_planner_chain(model_name="llama-3.1-8b-instant")
