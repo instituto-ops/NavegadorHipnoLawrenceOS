@@ -1,7 +1,7 @@
 import asyncio
 import random
 import time
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from playwright.async_api import async_playwright, Page, Browser
 try:
     from playwright_stealth import stealth_async
