@@ -52,7 +52,10 @@ export const JulesTerminal: React.FC<JulesTerminalProps> = ({
       </div>
 
       <div className="p-2 border-t border-gray-800 bg-[#2d2d2d]">
-        <form onSubmit={onSubmit} className="flex gap-2">
+        <form
+          onSubmit={onSubmit}
+          className="flex gap-2 focus-within:ring-1 focus-within:ring-green-500 rounded-lg transition-all border border-transparent focus-within:border-green-500"
+        >
           <span className="text-green-500 font-mono py-2 pl-2">❯</span>
           <input
             type="text"
@@ -60,6 +63,7 @@ export const JulesTerminal: React.FC<JulesTerminalProps> = ({
             onChange={(e) => setInput(e.target.value)}
             disabled={!isConnected || isRunning}
             placeholder="jules --help"
+            aria-label="Jules command line input"
             className="flex-1 px-2 py-2 bg-transparent text-gray-200 font-mono focus:outline-none disabled:opacity-50 placeholder-gray-600"
           />
         </form>
