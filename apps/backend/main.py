@@ -1,4 +1,5 @@
 from typing import Any
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from lam.orchestrator import LamOrchestrator
@@ -18,9 +19,11 @@ from analytics.browser_agent import browser_agent
 
 app = FastAPI(title="NeuroStrategy OS Backend")
 
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -206,11 +209,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 asyncio.create_task(run_jules_command(request=request, websocket=websocket))
 
     except WebSocketDisconnect:
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
     except Exception as e:
         print(f"WS Error: {e}")
-        if current_task: current_task.cancel()
+        if current_task:
+            current_task.cancel()
         await orchestrator.close()
 
 

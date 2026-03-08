@@ -2,7 +2,6 @@ import sys
 import argparse
 import asyncio
 import os
-import json
 from dotenv import load_dotenv
 
 # We import the orchestrator to simulate the assistant's behavior
