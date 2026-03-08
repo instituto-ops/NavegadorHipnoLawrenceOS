@@ -17,11 +17,15 @@ try:
     from .agency.coordinator import marketing_coordinator_node, route_agency
     from .agency.copy_agent import copy_agent_node
     from .agency.seo_agent import seo_agent_node
+    from .summarizer import generate_markdown_report
+    from database.sql_db import save_report
 except ImportError:
     from lam.agency.ads_agent import ads_agent_node
     from lam.agency.coordinator import marketing_coordinator_node, route_agency
     from lam.agency.copy_agent import copy_agent_node
     from lam.agency.seo_agent import seo_agent_node
+    from lam.summarizer import generate_markdown_report
+    from database.sql_db import save_report
 
 
 # Core state definition for the LAM session
@@ -209,10 +213,36 @@ class LamOrchestrator:
         return {"execution_results": results, "status": "executed", "last_screenshot": screenshot}
 
     async def _node_summarization(self, state: LamState):
-        """Wraps up and summarizes."""
-        print("Summarization Node: Finalizing session.")
+        """Wraps up and summarizes into a professional report."""
+        print("Summarization Node: Finalizing session and generating report.")
         results = state.get("execution_results", [])
-        summary = f"Task completed with {len(results)} steps logged."
+        task = state.get("task", "")
+
+        # 1. Generate the professional markdown summary for the UI
+        summary = await generate_markdown_report(results, task)
+        
+        # 2. Extract and Persist structured NeuroInsights for the Dashboard
+        try:
+            from lam.summarizer import process_execution_results
+            await process_execution_results(results, task)
+            print("Successfully processed and saved NeuroInsights to DB.")
+        except Exception as e:
+            print(f"Error processing neuro insights: {e}")
+
+        # Determine URL if possible from task or state
+        url = None
+        if isinstance(task, str) and "http" in task:
+            import re
+            match = re.search(r'https?://[^\s]+', task)
+            if match: url = match.group(0)
+
+        # Persist report to SQL DB
+        try:
+            await save_report(task, "abidus_analysis" if "abidus" in str(task).lower() else "general", summary, results, url)
+            print("Successfully saved report to SQL DB.")
+        except Exception as e:
+            print(f"Error saving report to SQL DB: {e}")
+        
         # In the future, save to NeuroEngine here
         return {"summary": summary, "status": "completed"}
 

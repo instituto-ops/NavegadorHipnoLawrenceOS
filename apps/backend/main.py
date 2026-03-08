@@ -1,4 +1,10 @@
 from typing import Any
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the project root .env
+load_dotenv(dotenv_path="../../.env")
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from lam.orchestrator import LamOrchestrator
@@ -15,8 +21,15 @@ from analytics.n8n_service import n8n_service
 from analytics.instagram_service import instagram_service
 from analytics.pagespeed_service import pagespeed_service
 from analytics.browser_agent import browser_agent
+from database.sql_db import init_db, get_latest_reports, get_latest_insights
 
 app = FastAPI(title="NeuroStrategy OS Backend")
+
+@app.on_event("startup")
+async def startup_event():
+    print("NeuroStrategy OS: Initializing Relational Database Persistence...")
+    await init_db()
+    print("NeuroStrategy OS: Database Ready.")
 
 app.add_middleware(
     CORSMiddleware,
@@ -100,6 +113,18 @@ async def get_visual_audit(url: str, device: str = "desktop"):
     return data
 
 
+@app.get("/api/dashboard/insights")
+async def get_insights(limit: int = 10):
+    data = await get_latest_insights(limit)
+    return data
+
+
+@app.get("/api/reports/latest")
+async def get_reports(limit: int = 5):
+    data = await get_latest_reports(limit)
+    return data
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -112,7 +137,7 @@ async def websocket_endpoint(websocket: WebSocket):
         try:
             async for event in orchestrator.graph.astream(initial_state, config):
                 for node_name, state in event.items():
-                    await websocket.send_text(json.dumps({"type": "log", "message": f"Node executed: {node_name}"}))
+                    await websocket.send_text(json.dumps({"type": "log", "message": f"Node executed: {node_name}"}, ensure_ascii=False))
                     # Forward screenshot if present in state update
                     if "last_screenshot" in state and state["last_screenshot"]:
                         await websocket.send_text(json.dumps({"type": "screenshot", "data": state["last_screenshot"]}))
@@ -120,7 +145,7 @@ async def websocket_endpoint(websocket: WebSocket):
             # Check for HITL
             snapshot = await orchestrator.graph.aget_state(config)
             if snapshot.next and snapshot.next[0] == "Verification":
-                await websocket.send_text(json.dumps({"type": "log", "message": "HITL checkpoint reached. Waiting for human approval."}))
+                await websocket.send_text(json.dumps({"type": "log", "message": "HITL checkpoint reached. Waiting for human approval."}, ensure_ascii=False))
                 plan = snapshot.values.get("plan", {})
                 # Also send the last screenshot with the HITL request if available
                 last_shot = snapshot.values.get("last_screenshot")
@@ -131,16 +156,17 @@ async def websocket_endpoint(websocket: WebSocket):
                     "type": "hitl_request",
                     "thread_id": thread_id,
                     "plan": plan
-                }))
+                }, ensure_ascii=False))
             else:
-                await websocket.send_text(json.dumps({"type": "log", "message": "Task completed."}))
-                await websocket.send_text(json.dumps({"type": "done"}))
+                summary = snapshot.values.get("summary", "")
+                await websocket.send_text(json.dumps({"type": "log", "message": "Task completed."}, ensure_ascii=False))
+                await websocket.send_text(json.dumps({"type": "done", "summary": summary}, ensure_ascii=False))
         except asyncio.CancelledError:
-            await websocket.send_text(json.dumps({"type": "log", "message": "Task forcefully stopped by user."}))
-            await websocket.send_text(json.dumps({"type": "done"}))
+            await websocket.send_text(json.dumps({"type": "log", "message": "Task forcefully stopped by user."}, ensure_ascii=False))
+            await websocket.send_text(json.dumps({"type": "done"}, ensure_ascii=False))
         except Exception as e:
-            await websocket.send_text(json.dumps({"type": "error", "message": str(e)}))
-            await websocket.send_text(json.dumps({"type": "done"}))
+            await websocket.send_text(json.dumps({"type": "error", "message": str(e)}, ensure_ascii=False))
+            await websocket.send_text(json.dumps({"type": "done"}, ensure_ascii=False))
 
     try:
         while True:
@@ -157,7 +183,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue
 
                 thread_id = msg.thread_id or str(uuid.uuid4())
-                await websocket.send_text(json.dumps({"type": "log", "message": f"Starting task: {msg.task} (Thread: {thread_id})"}))
+                await websocket.send_text(json.dumps({"type": "log", "message": f"Starting task: {msg.task} (Thread: {thread_id})"}, ensure_ascii=False))
 
                 config: Any = {"configurable": {"thread_id": thread_id}}
                 initial_state: Any = {
@@ -189,15 +215,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 config: Any = {"configurable": {"thread_id": thread_id}}
 
                 if msg.action == "approve":
-                    await websocket.send_text(json.dumps({"type": "log", "message": "Plan approved. Resuming..."}))
+                    await websocket.send_text(json.dumps({"type": "log", "message": "Plan approved. Resuming..."}, ensure_ascii=False))
                     await orchestrator.graph.aupdate_state(config, {"hitl_approved": True})
                     current_task = asyncio.create_task(process_lam_stream(None, config, thread_id))
                 elif msg.action == "edit":
-                    await websocket.send_text(json.dumps({"type": "log", "message": "Plan edited. Resuming..."}))
+                    await websocket.send_text(json.dumps({"type": "log", "message": "Plan edited. Resuming..."}, ensure_ascii=False))
                     await orchestrator.graph.aupdate_state(config, {"plan": msg.plan, "hitl_approved": True})
                     current_task = asyncio.create_task(process_lam_stream(None, config, thread_id))
                 elif msg.action in ["reject", "cancel"]:
-                    await websocket.send_text(json.dumps({"type": "log", "message": "Task aborted."}))
+                    await websocket.send_text(json.dumps({"type": "log", "message": "Task aborted."}, ensure_ascii=False))
                     await orchestrator.graph.aupdate_state(config, {"hitl_approved": False})
                     current_task = asyncio.create_task(process_lam_stream(None, config, thread_id))
 

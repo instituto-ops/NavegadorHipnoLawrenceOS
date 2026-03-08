@@ -18,9 +18,9 @@ import { Outlet, NavLink } from 'react-router-dom';
 export const MainLayout: React.FC = () => {
   const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
     classNames(
-      'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative',
+      'flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group relative',
       isActive
-        ? 'bg-gradient-to-r from-[#2EED8F]/20 to-transparent text-[#2EED8F]'
+        ? 'bg-[#2EED8F]/10 text-[#2EED8F]'
         : 'text-gray-400 hover:text-white hover:bg-white/5'
     );
 
@@ -32,7 +32,7 @@ export const MainLayout: React.FC = () => {
   return (
     <div className="flex h-screen w-full bg-[#070707] text-gray-300 overflow-hidden selection:bg-[#2EED8F]/20">
       {/* Sidebar - Ultra Premium */}
-      <aside className="w-64 flex-shrink-0 flex flex-col border-r border-white/5 bg-[#0D0D0D]/80 backdrop-blur-3xl overflow-y-auto custom-scrollbar">
+      <aside className="w-72 flex-shrink-0 flex flex-col border-r border-white/5 bg-[#0D0D0D]/80 backdrop-blur-3xl overflow-y-auto custom-scrollbar">
         {/* App Branding */}
         <div className="p-6 pb-2">
           <div className="flex items-center gap-3 mb-1">
@@ -74,28 +74,7 @@ export const MainLayout: React.FC = () => {
               Brain & Intel
             </h2>
             <nav className="space-y-1">
-              <NavLink to="/" end className={({ isActive }) => navLinkClass({ isActive })}>
-                {({ isActive }) => (
-                  <>
-                    {activeIndicator(isActive)}
-                    <Zap size={18} className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'} />
-                    <span className="text-sm font-medium">Navegador Aut├┤nomo</span>
-                  </>
-                )}
-              </NavLink>
-              <NavLink
-                to="/jules-workspace"
-                className={({ isActive }) => navLinkClass({ isActive })}
-              >
-                {({ isActive }) => (
-                  <>
-                    {activeIndicator(isActive)}
-                    <Code2 size={18} className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'} />
-                    <span className="text-sm font-medium">Jules Copilot</span>
-                  </>
-                )}
-              </NavLink>
-              <NavLink to="/dashboard" className={({ isActive }) => navLinkClass({ isActive })}>
+              <NavLink to="/" end className={navLinkClass}>
                 {({ isActive }) => (
                   <>
                     {activeIndicator(isActive)}
@@ -104,6 +83,24 @@ export const MainLayout: React.FC = () => {
                       className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'}
                     />
                     <span className="text-sm font-medium">Painel Central</span>
+                  </>
+                )}
+              </NavLink>
+              <NavLink to="/navigator" className={navLinkClass}>
+                {({ isActive }) => (
+                  <>
+                    {activeIndicator(isActive)}
+                    <Zap size={18} className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'} />
+                    <span className="text-sm font-medium">Navegador Autônomo</span>
+                  </>
+                )}
+              </NavLink>
+              <NavLink to="/jules-workspace" className={navLinkClass}>
+                {({ isActive }) => (
+                  <>
+                    {activeIndicator(isActive)}
+                    <Code2 size={18} className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'} />
+                    <span className="text-sm font-medium">Jules Copilot</span>
                   </>
                 )}
               </NavLink>
@@ -116,10 +113,7 @@ export const MainLayout: React.FC = () => {
               Marketing Hub
             </h2>
             <nav className="space-y-1">
-              <NavLink
-                to="/seo-intelligence"
-                className={({ isActive }) => navLinkClass({ isActive })}
-              >
+              <NavLink to="/seo-intelligence" className={navLinkClass}>
                 {({ isActive }) => (
                   <>
                     {activeIndicator(isActive)}
@@ -128,10 +122,7 @@ export const MainLayout: React.FC = () => {
                   </>
                 )}
               </NavLink>
-              <NavLink
-                to="/abidus-analysis"
-                className={({ isActive }) => navLinkClass({ isActive })}
-              >
+              <NavLink to="/abidus-analysis" className={navLinkClass}>
                 {({ isActive }) => (
                   <>
                     {activeIndicator(isActive)}
@@ -139,15 +130,23 @@ export const MainLayout: React.FC = () => {
                       size={18}
                       className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'}
                     />
-                    <span className="text-sm font-medium">An├ílise de Campo</span>
+                    <span className="text-sm font-medium">Análise de Campo</span>
                   </>
                 )}
               </NavLink>
               <NavLink to="/marketing-factory" className={navLinkClass}>
-                <Megaphone size={18} className="text-gray-500" />
-                <span className="text-sm font-medium">Cria├º├úo & Copy</span>
+                {({ isActive }) => (
+                  <>
+                    {activeIndicator(isActive)}
+                    <Megaphone
+                      size={18}
+                      className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'}
+                    />
+                    <span className="text-sm font-medium">Criação & Copy</span>
+                  </>
+                )}
               </NavLink>
-              <NavLink to="/whatsapp-crm" className={({ isActive }) => navLinkClass({ isActive })}>
+              <NavLink to="/whatsapp-crm" className={navLinkClass}>
                 {({ isActive }) => (
                   <>
                     {activeIndicator(isActive)}
@@ -169,12 +168,22 @@ export const MainLayout: React.FC = () => {
             </h2>
             <nav className="space-y-1">
               <NavLink to="/analytics" className={navLinkClass}>
-                <BarChart3 size={18} className="text-gray-500" />
-                <span className="text-sm font-medium">M├®tricas Reais</span>
+                {({ isActive }) => (
+                  <>
+                    {activeIndicator(isActive)}
+                    <BarChart3 size={18} className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'} />
+                    <span className="text-sm font-medium">Métricas Reais</span>
+                  </>
+                )}
               </NavLink>
               <NavLink to="/settings" className={navLinkClass}>
-                <Settings size={18} className="text-gray-500" />
-                <span className="text-sm font-medium">Configura├º├Áes</span>
+                {({ isActive }) => (
+                  <>
+                    {activeIndicator(isActive)}
+                    <Settings size={18} className={isActive ? 'text-[#2EED8F]' : 'text-gray-500'} />
+                    <span className="text-sm font-medium">Configurações</span>
+                  </>
+                )}
               </NavLink>
             </nav>
           </section>
@@ -200,7 +209,7 @@ export const MainLayout: React.FC = () => {
           {/* Subtle Ambient Background */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2EED8F]/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-          <div className="relative animate-fade-in">
+          <div className="relative h-full animate-fade-in flex flex-col">
             <Outlet />
           </div>
         </div>

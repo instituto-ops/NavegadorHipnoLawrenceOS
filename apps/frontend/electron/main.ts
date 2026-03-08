@@ -38,6 +38,7 @@ function createWindow(): void {
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       nodeIntegration: true,
       contextIsolation: false, // Set to false to allow nodeIntegration to work as expected
+      webviewTag: true,
     },
   });
 

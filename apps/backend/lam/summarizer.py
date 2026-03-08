@@ -15,9 +15,11 @@ from pydantic import BaseModel, Field
 try:
     from lam.neuro_engine import IntelligenceSource, NeuroInsight, InsightCategory
     from database.vector_db import ltm_db
+    from database.sql_db import save_insight
 except ImportError:
     from .neuro_engine import IntelligenceSource, NeuroInsight, InsightCategory
     from database.vector_db import ltm_db
+    from database.sql_db import save_insight
 
 class SummarizerOutput(BaseModel):
     category: InsightCategory = Field(..., description="Category: Priority, Risk, Opportunity, or Trend")
@@ -102,7 +104,14 @@ async def process_execution_results(results: List[Any], task_description: str) -
         # 4. Persist to LTM
         try:
             await ltm_db.store_insight(insight)
-            print(f"Successfully saved NeuroInsight {insight.id} to LTM.")
+            await save_insight(
+                title=insight.title,
+                category=insight.category.value if hasattr(insight.category, 'value') else str(insight.category),
+                description=insight.description,
+                actions=insight.actionable_items,
+                confidence=insight.confidence_score
+            )
+            print(f"Successfully saved NeuroInsight {insight.id} to LTM and SQL DB.")
         except Exception as e:
             print(f"Error persisting insight to LTM: {e}")
 
@@ -127,6 +136,32 @@ async def process_execution_results(results: List[Any], task_description: str) -
             pass
 
         return [fallback_insight]
+
+async def generate_markdown_report(results: List[Any], task_description: str) -> str:
+    """
+    Synthesizes execution results into a professional Markdown report.
+    """
+    api_key = os.environ.get("GROQ_API_KEY", "")
+    llm = ChatGroq(temperature=0.3, model="llama-3.3-70b-versatile", api_key=SecretStr(api_key) if api_key else None)
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """You are the NeuroEngine Core. Your goal is to synthesize raw web execution results into a professional, structured Markdown report.
+The report must directly answer the user's initial request.
+Use clear headings, bullet points, and highlight key insights.
+If the user specified a specific methodology (like "Análises Abidus"), follow it strictly.
+Be concise but thorough."""),
+        ("human", "User Task: {task}\n\nRaw Execution Results:\n{results}")
+    ])
+
+    raw_results_str = json.dumps(results, indent=2)
+    chain = prompt | llm
+    
+    try:
+        response = await chain.ainvoke({"task": task_description, "results": raw_results_str})
+        return str(response.content)
+    except Exception as e:
+        print(f"Error generating markdown report: {e}")
+        return f"Erro ao gerar relatório final: {e}\n\nResultados brutos: {len(results)} passos executados."
 
 if __name__ == "__main__":
     import asyncio

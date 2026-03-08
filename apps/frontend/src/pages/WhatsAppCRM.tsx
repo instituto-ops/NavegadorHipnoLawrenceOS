@@ -7,11 +7,11 @@ export const WhatsAppCRM: React.FC = () => {
   const [chatHistory, setChatHistory] = useState([
     {
       role: 'system',
-      content: '­ƒÆ¼ Hub de Agentes Cl├¡nicos Ativo. Como posso ajudar com este paciente?',
+      content: '📱 Hub de Agentes Clínicos Ativo. Como posso ajudar com este paciente?',
     },
   ]);
   const [suggestedReply] = useState<string | null>(
-    'Ol├í! Parab├®ns por tomar a decis├úo de cuidar de sua sa├║de mental hoje. Poderia compartilhar de forma breve qual o momento pelo qual est├í passando? Assim garantimos que somos a melhor ajuda para voc├¬.'
+    'Olá! Parabéns por tomar a decisão de cuidar de sua saúde mental hoje. Poderia compartilhar de forma breve qual o momento pelo qual está passando? Assim garantimos que somos a melhor ajuda para você.'
   );
 
   const handleSendMessage = (): void => {
@@ -25,7 +25,7 @@ export const WhatsAppCRM: React.FC = () => {
         {
           role: 'system',
           content:
-            'Analisando o quadro... Sugiro mantermos o foco no "Acolhimento Ativo" e "Alinhamento de Expectativas". J├í preparei uma nova sugest├úo de resposta r├ípida baseada nos princ├¡pios cl├¡nicos.',
+            'Analisando o quadro... Sugiro mantermos o foco no "Acolhimento Ativo" e "Alinhamento de Expectativas". Já preparei uma nova sugestão de resposta rápida baseada nos princípios clínicos.',
         },
       ]);
     }, 1000);
@@ -34,7 +34,7 @@ export const WhatsAppCRM: React.FC = () => {
   const copyToClipboard = (): void => {
     if (suggestedReply) {
       void navigator.clipboard.writeText(suggestedReply);
-      alert('Copiado para a ├írea de transfer├¬ncia!');
+      alert('Copiado para a área de transferência!');
     }
   };
 
@@ -67,7 +67,7 @@ export const WhatsAppCRM: React.FC = () => {
         {/* Header Tools */}
         <div className="p-4 border-b border-white/5">
           <h3 className="text-base font-bold text-white mb-1">Painel de Atendimento</h3>
-          <p className="text-xs text-gray-400">Hub Especialista & Categoriza├º├úo</p>
+          <p className="text-xs text-gray-400">Hub Especialista & Categorização</p>
         </div>
 
         {/* Tabs */}
@@ -76,7 +76,7 @@ export const WhatsAppCRM: React.FC = () => {
             className={`flex-1 pb-2 text-xs font-semibold uppercase tracking-wider ${activeTab === 'hub' ? 'text-[#2EED8F] border-b-2 border-[#2EED8F]' : 'text-gray-500 hover:text-gray-300'}`}
             onClick={() => setActiveTab('hub')}
           >
-            Hub Cl├¡nico
+            Hub Clínico
           </button>
           <button
             className={`flex-1 pb-2 text-xs font-semibold uppercase tracking-wider ${activeTab === 'tags' ? 'text-[#2EED8F] border-b-2 border-[#2EED8F]' : 'text-gray-500 hover:text-gray-300'}`}
@@ -86,16 +86,16 @@ export const WhatsAppCRM: React.FC = () => {
           </button>
         </div>
 
-        {/* Tab Content: Hub Cl├¡nico */}
+        {/* Tab Content: Hub Clínico */}
         <div
           className={`flex-1 flex flex-col overflow-hidden ${activeTab === 'hub' ? '' : 'hidden'}`}
         >
-          {/* Box de Sugest├úo Ativa */}
+          {/* Box de Sugestão Ativa */}
           <div className="p-4 border-b border-white/5 bg-[#151515]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-[#2EED8F] flex items-center gap-1 uppercase tracking-wider">
                 <Zap size={12} />
-                Sugest├úo Ativa
+                Sugestão Ativa
               </span>
               <div className="flex gap-2">
                 <button
@@ -132,7 +132,7 @@ export const WhatsAppCRM: React.FC = () => {
           <div className="flex-1 flex flex-col overflow-hidden bg-black/20">
             <div className="p-2 border-b border-white/5 flex items-center gap-2 bg-[#111]">
               <Bot size={14} className="text-[#2EED8F]" />
-              <span className="text-xs font-bold text-gray-300">Discuss├úo com Hub de Agentes</span>
+              <span className="text-xs font-bold text-gray-300">Discussão com Hub de Agentes</span>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
@@ -178,40 +178,40 @@ export const WhatsAppCRM: React.FC = () => {
           <div className="mb-6">
             <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
               <Tags size={14} />
-              Categoriza├º├úo (n8n Sync)
+              Categorização (n8n Sync)
             </h4>
 
             <div className="space-y-3">
               <div>
                 <label className="text-xs text-gray-400 mb-1 block">
-                  Motivo do Contato (Inten├º├úo)
+                  Motivo do Contato (Intenção)
                 </label>
                 <select className="w-full bg-[#151515] border border-white/10 rounded-lg p-2 text-sm text-gray-200 outline-none focus:border-[#2EED8F]/50">
-                  <option>Avalia├º├úo TEA Adulto</option>
-                  <option>Ansiedade / P├ónico</option>
+                  <option>Avaliação TEA Adulto</option>
+                  <option>Ansiedade / Pânico</option>
                   <option>Trauma Extremo</option>
                   <option>Hipnose Ericksoniana</option>
-                  <option>D├║vida de Valores</option>
+                  <option>Dúvida de Valores</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-xs text-gray-400 mb-1 block">Est├ígio de Consci├¬ncia</label>
+                <label className="text-xs text-gray-400 mb-1 block">Estágio de Consciência</label>
                 <select className="w-full bg-[#151515] border border-white/10 rounded-lg p-2 text-sm text-gray-200 outline-none focus:border-[#2EED8F]/50">
-                  <option>Prepara├º├úo/A├º├úo (Pronto p/ Agendar)</option>
-                  <option>Contempla├º├úo (Precisa de D├║vidas)</option>
-                  <option>Pr├®-contempla├º├úo (S├│ Curioso)</option>
+                  <option>Preparação/Ação (Pronto p/ Agendar)</option>
+                  <option>Contemplação (Precisa de Dúvidas)</option>
+                  <option>Pré-contemplação (Só Curioso)</option>
                 </select>
               </div>
 
               <div>
                 <label className="text-xs text-gray-400 mb-1 block">
-                  Risco Cl├¡nico Identificado?
+                  Risco Clínico Identificado?
                 </label>
                 <select className="w-full bg-[#151515] border border-white/10 rounded-lg p-2 text-sm text-gray-200 outline-none focus:border-[#2EED8F]/50">
                   <option>Normal (Zero red flags)</option>
                   <option>Baixo (Ansiedade Controlada)</option>
-                  <option>M├®dio (Sintomas Agudos)</option>
+                  <option>Médio (Sintomas Agudos)</option>
                   <option className="text-red-500 font-bold">ALTO (Psicose / Tentativa)</option>
                 </select>
               </div>
@@ -233,7 +233,7 @@ export const WhatsAppCRM: React.FC = () => {
                 Particular
               </span>
               <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-md border border-purple-500/30 cursor-pointer hover:bg-purple-500/30">
-                Plano de Sa├║de
+                Plano de Saúde
               </span>
               <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-md border border-green-500/30 cursor-pointer hover:bg-green-500/30">
                 + Adicionar Atributo

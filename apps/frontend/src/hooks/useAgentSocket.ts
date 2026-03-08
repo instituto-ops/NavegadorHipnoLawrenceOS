@@ -2,15 +2,16 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 export interface AgentMessage {
   type:
-    | 'log'
-    | 'screenshot'
-    | 'done'
-    | 'error'
-    | 'jules_output'
-    | 'jules_error'
-    | 'jules_done'
-    | 'hitl_request';
+  | 'log'
+  | 'screenshot'
+  | 'done'
+  | 'error'
+  | 'jules_output'
+  | 'jules_error'
+  | 'jules_done'
+  | 'hitl_request';
   message?: string;
+  summary?: string;
   data?: string; // base64 screenshot data
   exit_code?: number;
   thread_id?: string;
@@ -21,6 +22,7 @@ export function useAgentSocket(url: string): {
   logs: string[];
   julesLogs: string[];
   screenshot: string | null;
+  result: string | null;
   isConnected: boolean;
   isRunning: boolean;
   isJulesRunning: boolean;
@@ -37,6 +39,7 @@ export function useAgentSocket(url: string): {
   const [logs, setLogs] = useState<string[]>([]);
   const [julesLogs, setJulesLogs] = useState<string[]>([]);
   const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [result, setResult] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isJulesRunning, setIsJulesRunning] = useState(false);
@@ -44,49 +47,70 @@ export function useAgentSocket(url: string): {
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    ws.current = new WebSocket(url);
+    let socket: WebSocket | null = null;
+    let reconnectTimeout: any = null;
 
-    ws.current.onopen = () => {
-      setIsConnected(true);
-    };
+    const connect = () => {
+      console.log('Connecting to WebSocket:', url);
+      socket = new WebSocket(url);
+      ws.current = socket;
 
-    ws.current.onmessage = (event) => {
-      try {
-        const data: AgentMessage = JSON.parse(event.data);
-        if (data.type === 'log' && data.message) {
-          setLogs((prev) => [...prev, data.message!]);
-        } else if (data.type === 'screenshot' && data.data) {
-          setScreenshot(`data:image/jpeg;base64,${data.data}`);
-        } else if (data.type === 'done') {
-          setIsRunning(false);
-        } else if (data.type === 'error' && data.message) {
-          setLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
-          setIsRunning(false);
-        } else if (data.type === 'jules_output' && data.message) {
-          setJulesLogs((prev) => [...prev, data.message!]);
-        } else if (data.type === 'jules_error' && data.message) {
-          setJulesLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
-          setIsJulesRunning(false);
-        } else if (data.type === 'jules_done') {
-          setJulesLogs((prev) => [...prev, `[PROCESS EXITED WITH CODE ${data.exit_code}]`]);
-          setIsJulesRunning(false);
-        } else if (data.type === 'hitl_request' && data.thread_id && data.plan) {
-          setHitlRequest({ thread_id: data.thread_id, plan: data.plan });
+      socket.onopen = () => {
+        setIsConnected(true);
+        console.log('WebSocket connected');
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const data: AgentMessage = JSON.parse(event.data);
+          if (data.type === 'log' && data.message) {
+            setLogs((prev) => [...prev, data.message!]);
+          } else if (data.type === 'screenshot' && data.data) {
+            setScreenshot(`data:image/jpeg;base64,${data.data}`);
+          } else if (data.type === 'done') {
+            if (data.summary) {
+              setResult(data.summary);
+            }
+            setIsRunning(false);
+          } else if (data.type === 'error' && data.message) {
+            setLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
+            setIsRunning(false);
+          } else if (data.type === 'jules_output' && data.message) {
+            setJulesLogs((prev) => [...prev, data.message!]);
+          } else if (data.type === 'jules_error' && data.message) {
+            setJulesLogs((prev) => [...prev, `[ERROR] ${data.message}`]);
+            setIsJulesRunning(false);
+          } else if (data.type === 'jules_done') {
+            setJulesLogs((prev) => [...prev, `[PROCESS EXITED WITH CODE ${data.exit_code}]`]);
+            setIsJulesRunning(false);
+          } else if (data.type === 'hitl_request' && data.thread_id && data.plan) {
+            setHitlRequest({ thread_id: data.thread_id, plan: data.plan });
+          }
+        } catch (e) {
+          console.error('Failed to parse websocket message', e);
         }
-      } catch (e) {
-        console.error('Failed to parse websocket message', e);
-      }
+      };
+
+      socket.onerror = (err) => {
+        console.error('WebSocket error:', err);
+      };
+
+      socket.onclose = () => {
+        setIsConnected(false);
+        setIsRunning(false);
+        setIsJulesRunning(false);
+        console.log('WebSocket closed. Attempting reconnect in 3s...');
+        reconnectTimeout = setTimeout(connect, 3000);
+      };
     };
 
-    ws.current.onclose = () => {
-      setIsConnected(false);
-      setIsRunning(false);
-      setIsJulesRunning(false);
-    };
+    connect();
 
     return () => {
-      if (ws.current) {
-        ws.current.close();
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (socket) {
+        socket.onclose = null; // Prevent reconnect on intentional unmount
+        socket.close();
       }
     };
   }, [url]);
@@ -96,6 +120,7 @@ export function useAgentSocket(url: string): {
       if (ws.current && isConnected) {
         setLogs([]);
         setScreenshot(null);
+        setResult(null);
         setIsRunning(true);
         ws.current.send(JSON.stringify({ type: 'lam', task }));
       }
@@ -140,6 +165,7 @@ export function useAgentSocket(url: string): {
     logs,
     julesLogs,
     screenshot,
+    result,
     isConnected,
     isRunning,
     isJulesRunning,

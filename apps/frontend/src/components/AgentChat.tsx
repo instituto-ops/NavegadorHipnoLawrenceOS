@@ -11,22 +11,17 @@ import {
 import React, { useState, useRef, useEffect } from 'react';
 import { useAgentSocket } from '../hooks/useAgentSocket';
 import { ActionReviewCard } from './ActionReviewCard';
-import { JulesTerminal } from './JulesTerminal';
 
 export const AgentChat: React.FC = () => {
   const [input, setInput] = useState('');
-  const [julesInput, setJulesInput] = useState('');
 
   const {
     logs,
-    julesLogs,
     screenshot,
     isConnected,
     isRunning,
-    isJulesRunning,
     hitlRequest,
     sendTask,
-    sendJulesCommand,
     sendPanicStop,
     sendHitlResponse,
   } = useAgentSocket('ws://localhost:8000/ws');
@@ -42,13 +37,6 @@ export const AgentChat: React.FC = () => {
     if (!input.trim() || !isConnected || isRunning) return;
     sendTask(input);
     setInput('');
-  };
-
-  const handleJulesSubmit = (e: React.FormEvent): void => {
-    e.preventDefault();
-    if (!julesInput.trim() || !isConnected || isJulesRunning) return;
-    sendJulesCommand(julesInput);
-    setJulesInput('');
   };
 
   return (
@@ -95,7 +83,7 @@ export const AgentChat: React.FC = () => {
         {/* Left Column: Logs / Chat */}
         <div className="flex-[0.4] flex flex-col gap-4 overflow-hidden">
           {/* LAM Logs */}
-          <div className="flex-[0.6] flex flex-col bg-[#111111] rounded-xl border border-gray-800/60 overflow-hidden shadow-sm">
+          <div className="flex-1 flex flex-col bg-[#111111] rounded-xl border border-gray-800/60 overflow-hidden shadow-sm">
             <div className="px-4 py-3 flex items-center gap-2 border-b border-gray-800/60">
               <TerminalSquare size={16} className="text-gray-500" />
               <h2 className="font-mono text-xs text-gray-500 uppercase tracking-wider">
@@ -176,20 +164,9 @@ export const AgentChat: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Jules & Live View */}
+        {/* Right Column: Live View (Full Height) */}
         <div className="flex-[0.6] flex flex-col gap-4 overflow-hidden">
-          <div className="flex-[0.4] overflow-hidden rounded-xl border border-gray-800/60 shadow-sm flex flex-col bg-[#111111]">
-            <JulesTerminal
-              logs={julesLogs}
-              isRunning={isJulesRunning}
-              isConnected={isConnected}
-              input={julesInput}
-              setInput={setJulesInput}
-              onSubmit={handleJulesSubmit}
-            />
-          </div>
-
-          <div className="flex-[0.6] flex flex-col bg-[#111111] rounded-xl border border-gray-800/60 overflow-hidden shadow-sm">
+          <div className="flex-1 flex flex-col bg-[#111111] rounded-xl border border-gray-800/60 overflow-hidden shadow-sm">
             <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-800/60">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>

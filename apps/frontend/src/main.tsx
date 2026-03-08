@@ -20,11 +20,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <AgentChat />,
+        element: <Dashboard />,
       },
       {
-        path: 'dashboard',
-        element: <Dashboard />,
+        path: 'navigator',
+        element: <AgentChat />,
       },
       {
         path: 'abidus-analysis',

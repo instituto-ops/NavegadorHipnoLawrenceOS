@@ -160,8 +160,8 @@ class Executor:
         elif action_type == "EXTRACT":
             selector = params.get("selector", "body")
             content = await self.page.inner_text(selector)
-            # Truncate for safety
-            return content[:500] + "..." if len(content) > 500 else content
+            # Truncate for safety, but allow more for SEO analysis
+            return content[:15000] + "..." if len(content) > 15000 else content
 
         elif action_type == "DOCTORALIA_SCRAPE":
             url = params.get("url")

@@ -22,34 +22,34 @@ export const JulesWorkspace: React.FC = () => {
 
   const suggestions = [
     {
-      title: 'Status e Revis├Áes',
-      desc: 'Verificar a fila de Pull Requests no reposit├│rio.',
+      title: 'Status e Revisões',
+      desc: 'Verificar a fila de Pull Requests no repositório.',
       command:
-        'jules ask "Verifique a fila de Pull Requests e fa├ºa um resumo do que precisa ser revisado."',
+        'jules ask "Verifique a fila de Pull Requests e faça um resumo do que precisa ser revisado."',
     },
     {
       title: 'Corrigir Lint / CI',
       desc: 'Pedir ao Jules para consertar problemas de linting e type checking.',
       command:
-        'jules ask "Analise os ├║ltimos logs de erro do CI/CD e sugira as corre├º├Áes necess├írias nos arquivos afetados."',
+        'jules ask "Analise os últimos logs de erro do CI/CD e sugira as correções necessárias nos arquivos afetados."',
     },
     {
-      title: 'Refatora├º├úo Espec├¡fica',
-      desc: 'Exigir uma refatora├º├úo em um componente.',
+      title: 'Refatoração Específica',
+      desc: 'Exigir uma refatoração em um componente.',
       command:
         'jules ask "Refatore o componente x para melhor performance e legibilidade, garantindo tipagem estrita."',
     },
     {
       title: 'Atualizar Ambiente',
-      desc: 'Sincronizar depend├¬ncias e checar atualiza├º├Áes.',
+      desc: 'Sincronizar dependências e checar atualizações.',
       command:
-        'jules ask "Verifique se h├í pacotes desatualizados no package.json que quebram o reposit├│rio."',
+        'jules ask "Verifique se há pacotes desatualizados no package.json que quebram o repositório."',
     },
   ];
 
   return (
     <div className="flex h-full w-full gap-6">
-      {/* Coluna Esquerda: Sugest├Áes e Hub Natural */}
+      {/* Coluna Esquerda: Sugestões e Hub Natural */}
       <div className="flex-[0.35] flex flex-col gap-4">
         <div className="bg-[#111] border border-white/5 rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
@@ -58,13 +58,13 @@ export const JulesWorkspace: React.FC = () => {
             </div>
             <div>
               <h2 className="text-lg font-bold text-gray-200">Jules Copilot</h2>
-              <p className="text-xs text-gray-500">Engenheiro de Software Aut├┤nomo</p>
+              <p className="text-xs text-gray-500">Engenheiro de Software Autônomo</p>
             </div>
           </div>
 
           <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-            Use linguagem natural para pedir que o Jules revise c├│digo, aprove PRs ou conserte
-            falhas de CI/CD. Clique nas sugest├Áes abaixo para preencher o terminal.
+            Use linguagem natural para pedir que o Jules revise código, aprove PRs ou conserte
+            falhas de CI/CD. Clique nas sugestões abaixo para preencher o terminal.
           </p>
 
           <h3 className="text-xs font-bold uppercase tracking-wider text-gray-600 mb-3 flex items-center gap-2">
@@ -90,11 +90,11 @@ export const JulesWorkspace: React.FC = () => {
           </div>
         </div>
 
-        {/* Status de Conex├úo */}
+        {/* Status de Conexão */}
         <div className="bg-[#111] border border-white/5 rounded-xl p-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
             <Terminal className="text-gray-500" size={18} />
-            <span className="text-sm font-medium text-gray-300">Conex├úo CLI</span>
+            <span className="text-sm font-medium text-gray-300">Conexão CLI</span>
           </div>
           <div className="flex items-center gap-2">
             <span

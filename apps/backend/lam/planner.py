@@ -1,5 +1,6 @@
 from pydantic import SecretStr
 import os
+import asyncio
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 from langchain_groq import ChatGroq
@@ -112,18 +113,26 @@ async def generate_plan(command: str, page_context: str = "No page loaded.") -> 
     # We enrich the human prompt with current page context if available
     enriched_command = f"Goal: {command}\n\nCurrent Browser State (Accessibility Tree): {page_context}"
 
+    primary_model = "llama-3.3-70b-versatile"
+    fallback_model = "llama-3.1-8b-instant"
+
     try:
         # Try with the high-end model first (Llama 3.3 70B)
-        chain = create_planner_chain(model_name="llama-3.3-70b-versatile")
-        return await chain.ainvoke({"command": enriched_command})
+        print(f"Planner: Invoking {primary_model}...")
+        chain = create_planner_chain(model_name=primary_model)
+        # Using a 30 second timeout for the LLM call
+        result = await asyncio.wait_for(chain.ainvoke({"command": enriched_command}), timeout=30.0)
+        print(f"Planner: {primary_model} responded successfully.")
+        return result
     except Exception as e:
         error_msg = str(e)
-        if "rate_limit_exceeded" in error_msg.lower() or "429" in error_msg:
-            print(f"Planner: High-end model rate limited. Falling back to Llama 3.1 8B...")
+        if "rate_limit_exceeded" in error_msg.lower() or "429" in error_msg or isinstance(e, asyncio.TimeoutError):
+            print(f"Planner: Primary model failed ({type(e).__name__}). Falling back to {fallback_model}...")
             try:
                 # Fallback to the lighter, high-quota model
-                chain = create_planner_chain(model_name="llama-3.1-8b-instant")
-                return await chain.ainvoke({"command": enriched_command})
+                chain = create_planner_chain(model_name=fallback_model)
+                result = await asyncio.wait_for(chain.ainvoke({"command": enriched_command}), timeout=20.0)
+                return result
             except Exception as e2:
                 print(f"Planner: Fallback model also failed: {e2}")
                 raise e2

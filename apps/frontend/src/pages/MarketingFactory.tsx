@@ -3,11 +3,11 @@ import { PenTool, CheckCircle2, Loader2, Wand2, Globe, Search, Target } from 'lu
 import React, { useState, useEffect } from 'react';
 
 const DOCTORALIA_TERMS = [
-  'psic├│logo especialista em autismo em adultos',
-  'hipnose cl├¡nica ericksoniana online',
-  'psicoterapia breve estrat├®gica com hipnose',
+  'psicólogo especialista em autismo em adultos',
+  'hipnose clínica ericksoniana online',
+  'psicoterapia breve estratégica com hipnose',
   'tratamento para burnout autista',
-  'avalia├º├úo de autismo em adultos Goi├ónia',
+  'avaliação de autismo em adultos Goiânia',
   'hipnoterapia para ansiedade online',
 ];
 
@@ -44,10 +44,10 @@ export const MarketingFactory: React.FC = () => {
     setTimeout(() => {
       setTitle(`Guia Completo: ${keyword.charAt(0).toUpperCase() + keyword.slice(1)}`);
       setContent(
-        `A busca por ${keyword} tem crescido exponencialmente. No Instituto Lawrence, entendemos que cada paciente ├® ├║nico...`
+        `A busca por ${keyword} tem crescido exponencialmente. No Instituto Lawrence, entendemos que cada paciente é único...`
       );
       setMetaDesc(
-        `Descubra como a ${keyword} pode transformar sua vida. Atendimento especializado em Goi├ónia e Online. Saiba mais.`
+        `Descubra como a ${keyword} pode transformar sua vida. Atendimento especializado em Goiânia e Online. Saiba mais.`
       );
       setIsGenerating(false);
     }, 2000);
@@ -102,7 +102,7 @@ export const MarketingFactory: React.FC = () => {
                     type="text"
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
-                    placeholder="Ex: hipnose para ansiedade em goi├ónia"
+                    placeholder="Ex: hipnose para ansiedade em goiânia"
                     className="bg-[#0D0D0D] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#2EED8F]/50 transition-all font-medium"
                   />
                   <div className="flex flex-wrap gap-2 mt-1">
@@ -120,13 +120,13 @@ export const MarketingFactory: React.FC = () => {
 
                 <div className="flex flex-col gap-2 pt-4 border-t border-white/5">
                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    T├¡tulo do Artigo (H1)
+                    Título do Artigo (H1)
                   </label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="T├¡tulo otimizado para clique..."
+                    placeholder="Título otimizado para clique..."
                     className="bg-transparent border-none text-2xl font-bold text-white focus:outline-none placeholder:text-gray-700"
                   />
                 </div>
@@ -146,7 +146,7 @@ export const MarketingFactory: React.FC = () => {
 
                 <div className="flex flex-col gap-2 pt-4">
                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    Conte├║do Profundo
+                    Conteúdo Profundo
                   </label>
                   <textarea
                     value={content}
@@ -196,7 +196,7 @@ export const MarketingFactory: React.FC = () => {
                 </div>
               </div>
               <p className="text-xs text-gray-400 italic">
-                "Siga o M├®todo Abidus para atingir 100/100"
+                "Siga o Método Abidus para atingir 100/100"
               </p>
             </div>
 
@@ -212,7 +212,7 @@ export const MarketingFactory: React.FC = () => {
               </button>
               <button className="w-full h-14 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl flex items-center justify-center gap-3 text-white font-bold uppercase tracking-widest transition-all">
                 <Globe size={18} />
-                Agendar Publica├º├úo
+                Agendar Publicação
               </button>
             </div>
 
@@ -229,14 +229,14 @@ export const MarketingFactory: React.FC = () => {
                       title.includes(keyword) && keyword ? 'text-[#2EED8F]' : 'text-gray-700'
                     }
                   />
-                  KW no T├¡tulo Principal
+                  KW no Título Principal
                 </li>
                 <li className="flex items-center gap-2 text-xs">
                   <CheckCircle2
                     size={14}
                     className={content.length > 500 ? 'text-[#2EED8F]' : 'text-gray-700'}
                   />
-                  Densidade de Conte├║do
+                  Densidade de Conteúdo
                 </li>
                 <li className="flex items-center gap-2 text-xs">
                   <CheckCircle2
@@ -266,7 +266,7 @@ export const MarketingFactory: React.FC = () => {
               <div className="flex flex-col items-end">
                 <span className="text-lg font-black text-[#2EED8F]">Top 3</span>
                 <span className="text-[9px] text-[#2EED8F]/50 px-2 py-0.5 bg-[#2EED8F]/5 rounded uppercase">
-                  Est├ível
+                  Estável
                 </span>
               </div>
             </div>
