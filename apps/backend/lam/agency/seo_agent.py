@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -13,7 +13,7 @@ try:
     from ..planner import Plan, generate_plan
 
 except ImportError:
-    from lam.planner import Plan, generate_plan
+    pass
 
 
 def create_seo_planner_chain():
