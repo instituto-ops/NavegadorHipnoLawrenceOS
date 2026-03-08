@@ -138,14 +138,17 @@ export const AgentChat: React.FC = () => {
           )}
           <div className="bg-[#111111] rounded-xl border border-gray-800/60 p-2 shadow-sm">
             <form onSubmit={handleSubmit} className="flex gap-2">
-              <div className="flex-1 flex items-center bg-[#1A1A1A] rounded-lg border border-gray-800 px-3">
-                <span className="text-gray-500 font-mono text-sm mr-2">&gt;_</span>
+              <div className="flex-1 flex items-center bg-[#1A1A1A] rounded-lg border border-gray-800 px-3 focus-within:ring-1 focus-within:ring-[#2EED8F]/50">
+                <span className="text-gray-500 font-mono text-sm mr-2" aria-hidden="true">
+                  &gt;_
+                </span>
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={!isConnected || isRunning}
                   placeholder={!isConnected ? 'Conectando ao sistema...' : 'Comando para o Maestro'}
+                  aria-label="Comando para o Maestro"
                   className="flex-1 py-3 bg-transparent text-gray-300 border-none focus:outline-none focus:ring-0 placeholder-gray-600 font-mono text-sm min-w-0"
                 />
               </div>
