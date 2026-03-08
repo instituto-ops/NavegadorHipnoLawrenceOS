@@ -81,7 +81,23 @@ export default [
       '@typescript-eslint/no-floating-promises': 'error',
       'better-tailwindcss/no-unnecessary-whitespace': 'warn',
       'better-tailwindcss/no-duplicate-classes': 'error',
-      'import/order': 'off',
+      'import/order': [
+        'warn',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+        },
+      ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'prefer-const': 'warn',
       'no-var': 'error',
